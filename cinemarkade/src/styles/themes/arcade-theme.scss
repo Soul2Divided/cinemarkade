@@ -1,0 +1,16 @@
+
+$font-pixel: 'Press Start 2P', monospace;
+
+$arcade-bg: #050505;
+$arcade-text-white: #ffffff;
+$arcade-yellow: #ffe600;
+$arcade-red: #ff2a2a;
+$arcade-cyan: #00f0ff;
+$arcade-blue-shadow: #880000;
+
+%pixel-text-rendering {
+    font-family: $font-pixel;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    text-rendering: pixelated;
+}

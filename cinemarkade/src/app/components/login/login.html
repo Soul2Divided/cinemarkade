@@ -1,0 +1,27 @@
+<div class="crt-screen">
+    <div class="scanlines"></div>
+
+    <header class="arcade-hud">
+        <div class="hud-item">1UP<br><span class="score">00</span></div>
+        <div class="hud-item center">HI-SCORE<br><span class="score">25000</span></div>
+    </header>
+
+    <main class="arcade-content">
+        <h1 class="game-title">CINEMARKADE</h1>
+
+        <nav class="menu-container">
+            <ul class="menu-list">
+                @for (option of options; track option; let i = $index) {
+                <li [class.active]="activeOptionIndex === i" (mouseenter)="setActiveIndex(i)">
+                    <span class="pointer">▶</span>
+                    <span class="option-label">{{ option }}</span>
+                </li>
+                }
+            </ul>
+        </nav>
+    </main>
+
+    <footer class="arcade-footer">
+        <p class="insert-coin">INSERT COIN TO PLAY</p>
+    </footer>
+</div>
