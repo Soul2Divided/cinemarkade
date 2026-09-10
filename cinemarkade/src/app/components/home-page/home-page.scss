@@ -1,0 +1,155 @@
+@use '../../../styles/themes/arcade-theme' as theme;
+@use '../../../styles/mixins/pixel-art' as mixins;
+
+.billboard-container {
+    width: 100%;
+    max-width: 1000px;
+
+    .section-title {
+        font-size: 1.2rem;
+        color: theme.$arcade-yellow;
+        margin-bottom: 2rem;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+
+    .movies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 2rem;
+        width: 100%;
+    }
+
+    .movie-card {
+        background-color: #0d0d0d;
+        border: 3px solid theme.$arcade-text-white;
+        padding: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+            transform: translateY(-4px);
+
+            .btn-buy {
+                background-color: theme.$arcade-yellow;
+                color: #000;
+            }
+        }
+
+        .poster-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            margin-bottom: 1rem;
+
+            .poster-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border: 2px solid #222;
+            }
+
+            .badge-hall {
+                position: absolute;
+                top: 8px;
+                left: 8px;
+                background: #000;
+                color: theme.$arcade-cyan;
+                font-size: 0.65rem;
+                padding: 0.3rem 0.5rem;
+                border: 1px solid theme.$arcade-cyan;
+            }
+        }
+
+        .movie-title {
+            font-size: 0.9rem;
+            color: theme.$arcade-text-white;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .movie-meta {
+            font-size: 0.65rem;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+
+        .btn-buy {
+            width: 100%;
+            background: transparent;
+            border: 2px solid theme.$arcade-yellow;
+            color: theme.$arcade-yellow;
+            font-family: inherit;
+            font-size: 0.75rem;
+            padding: 0.5rem 0;
+            cursor: pointer;
+        }
+    }
+}
+
+/* Estilos del Modal */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+
+    .modal-window {
+        background-color: #0d0d0d;
+        border: 4px solid theme.$arcade-yellow;
+        padding: 2.5rem;
+        position: relative;
+        max-width: 500px;
+        width: 90%;
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: theme.$arcade-red;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .auth-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+
+            .modal-title {
+                font-size: 1rem;
+                color: theme.$arcade-yellow;
+                margin-bottom: 1rem;
+            }
+
+            .action-btn {
+                width: 100%;
+                background: transparent;
+                border: 2px solid theme.$arcade-text-white;
+                padding: 0.8rem;
+                font-family: inherit;
+                font-size: 0.8rem;
+                cursor: pointer;
+
+                &.text-yellow {
+                    color: theme.$arcade-yellow;
+                    border-color: theme.$arcade-yellow;
+                }
+
+                &:hover {
+                    background-color: #222;
+                }
+            }
+        }
+    }
+}
