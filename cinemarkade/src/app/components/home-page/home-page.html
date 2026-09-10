@@ -1,17 +1,7 @@
-<div class="crt-screen">
-    <!-- HUD Superior: Navegación fija -->
-    <header class="arcade-hud">
-        <div class="brand">
-            <span class="logo-text">CINEMARKADE</span>
-        </div>
-        <div class="user-actions">
-            <button type="button" class="hud-btn" (click)="openAuthModal()">
-                <span class="pointer">▶</span> INICIAR SESIÓN
-            </button>
-        </div>
-    </header>
+<app-navbar></app-navbar>
 
-    <!-- Contenido Principal: Grilla de Cartelera -->
+<div class="crt-screen">
+
     <main class="arcade-content">
         <section class="billboard-container">
             <h2 class="section-title">EN CARTELERA</h2>
@@ -20,7 +10,6 @@
                 @for (movie of movies; track movie.id) {
                 <article class="movie-card" (click)="selectMovie(movie)">
                     <div class="poster-wrapper">
-                        <!-- Poster en HD pero con marco retro -->
                         <img [src]="movie.posterUrl" [alt]="movie.title" class="poster-img" />
                         <span class="badge-hall">{{ movie.hall }}</span>
                     </div>
@@ -37,13 +26,11 @@
             </div>
         </section>
 
-        <!-- Modal de Login/Invitado (Desplegable) -->
         @if (isAuthModalOpen) {
         <div class="modal-backdrop" (click)="closeAuthModal()">
             <div class="modal-window" (click)="$event.stopPropagation()">
                 <button type="button" class="close-btn" (click)="closeAuthModal()">X</button>
 
-                <!-- Alterna entre Login o Teclado de Invitado dentro del modal -->
                 @if (modalView === 'options') {
                 <div class="auth-options">
                     <h3 class="modal-title">ACCESO JUGADOR</h3>

@@ -1,0 +1,96 @@
+@use '../../../styles/themes/arcade-theme' as theme;
+@use '../../../styles/mixins/pixel-art' as mixins;
+
+.arcade-navbar {
+    @extend %pixel-text-rendering;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background-color: #0d0d0d;
+    border-bottom: 3px solid theme.$arcade-yellow;
+    gap: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+
+    .nav-brand {
+        cursor: pointer;
+
+        .logo-text {
+            font-family: theme.$font-pixel;
+            font-size: 1.1rem;
+            color: theme.$arcade-yellow;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0px theme.$arcade-blue-shadow;
+        }
+    }
+
+    .nav-search {
+        display: flex;
+        align-items: center;
+        background-color: #000000;
+        border: 2px solid theme.$arcade-text-white;
+        padding: 0.4rem 0.8rem;
+        flex: 1;
+        max-width: 450px;
+
+        .search-icon {
+            font-size: 0.8rem;
+            margin-right: 0.6rem;
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: theme.$arcade-text-white;
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            width: 100%;
+
+            &::placeholder {
+                color: #666666;
+            }
+        }
+
+        &:focus-within {
+            border-color: theme.$arcade-yellow;
+        }
+    }
+
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid theme.$arcade-text-white;
+            color: theme.$arcade-text-white;
+            font-family: theme.$font-pixel;
+            font-size: 0.75rem;
+            padding: 0.5rem 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            &:hover {
+                border-color: theme.$arcade-yellow;
+                color: theme.$arcade-yellow;
+                background-color: #1a1a1a;
+            }
+
+            &.cart-btn {
+                position: relative;
+
+                .cart-badge {
+                    background-color: theme.$arcade-red;
+                    color: #ffffff;
+                    font-size: 0.6rem;
+                    padding: 0.1rem 0.3rem;
+                }
+            }
+        }
+    }
+}

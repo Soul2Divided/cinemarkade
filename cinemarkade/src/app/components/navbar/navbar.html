@@ -1,0 +1,22 @@
+<header class="arcade-navbar">
+    <div class="nav-brand" routerLink="/">
+        <span class="logo-text">CINEMARKADE</span>
+    </div>
+
+    <div class="nav-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input" placeholder="BUSCAR PELÍCULA..." (input)="onSearch($event)" />
+    </div>
+
+    <div class="nav-actions">
+        <button type="button" class="nav-btn cart-btn" routerLink="/cart" aria-label="Carrito">
+            <span class="icon">🛒</span>
+            <span class="cart-badge">0</span>
+        </button>
+
+        <button type="button" class="nav-btn profile-btn" routerLink="/login" aria-label="Perfil">
+            <span class="icon">👤</span>
+            <span class="profile-text">INGRESAR</span>
+        </button>
+    </div>
+</header>

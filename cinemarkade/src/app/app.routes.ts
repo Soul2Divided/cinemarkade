@@ -9,6 +9,10 @@ export const routes: Routes = [
         path: 'invitado',
         loadComponent: () => import('./components/guest-screen/guest-screen').then((m) => m.GuestScreen),
     },
+    {
+        path: 'menu',
+        loadComponent: () => import('./components/menu/menu').then((m) => m.Menu)
+    },
     // {
     //     path: 'register',
     //     // loadComponent: () => import('./components/register/register').then((m) => m.Register),

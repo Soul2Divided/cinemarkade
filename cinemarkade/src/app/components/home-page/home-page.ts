@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Navbar } from "../navbar/navbar";
 
 interface Movie {
   id: number;
@@ -12,7 +13,7 @@ interface Movie {
 }
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, Navbar],
   selector: 'app-home-page',
   styleUrl: './home-page.scss',
   templateUrl: './home-page.html',
