@@ -1,154 +1,534 @@
 @use '../../../styles/themes/arcade-theme' as theme;
 @use '../../../styles/mixins/pixel-art' as mixins;
 
-.billboard-container {
+:host {
+    display: block;
     width: 100%;
-    max-width: 1000px;
+}
 
-    .section-title {
-        font-size: 1.2rem;
-        color: theme.$arcade-yellow;
-        margin-bottom: 2rem;
-        text-align: center;
-        letter-spacing: 2px;
+.crt-screen {
+    @extend %pixel-text-rendering;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #050505;
+    color: theme.$arcade-text-white;
+    box-sizing: border-box;
+}
+
+.arcade-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+    padding: 1.5rem 3rem 4rem 3rem;
+    max-width: 1300px;
+    margin: 0 auto;
+
+    @media (max-width: 768px) {
+        padding: 1rem 1rem 3rem 1rem;
+        gap: 2.5rem;
+    }
+}
+
+.btn-pixel {
+    font-family: theme.$font-pixel;
+    font-size: 0.75rem;
+    padding: 0.8rem 1.2rem;
+    border: 2px solid theme.$arcade-text-white;
+    background: transparent;
+    cursor: pointer;
+
+    &.yellow {
+        background-color: theme.$arcade-yellow;
+        color: #000;
+        border-color: theme.$arcade-yellow;
     }
 
-    .movies-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 2rem;
+    &:hover {
+        opacity: 0.85;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 0.65rem;
+        padding: 0.6rem 0.9rem;
         width: 100%;
     }
+}
 
-    .movie-card {
-        background-color: #0d0d0d;
-        border: 3px solid theme.$arcade-text-white;
-        padding: 1rem;
-        cursor: pointer;
-        transition: transform 0.2s ease;
+.btn-pixel-sm {
+    font-family: theme.$font-pixel;
+    font-size: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    background: transparent;
+    border: 1px solid theme.$arcade-yellow;
+    color: theme.$arcade-yellow;
+    cursor: pointer;
 
-        &:hover {
-            border-color: theme.$arcade-yellow;
-            transform: translateY(-4px);
+    &:hover {
+        background-color: theme.$arcade-yellow;
+        color: #000;
+    }
+}
 
-            .btn-buy {
-                background-color: theme.$arcade-yellow;
-                color: #000;
-            }
-        }
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
 
-        .poster-wrapper {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 2 / 3;
-            margin-bottom: 1rem;
+    .section-title {
+        font-family: theme.$font-pixel;
+        font-size: 1rem;
+        color: theme.$arcade-text-white;
+        letter-spacing: 1px;
 
-            .poster-img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                border: 2px solid #222;
-            }
-
-            .badge-hall {
-                position: absolute;
-                top: 8px;
-                left: 8px;
-                background: #000;
-                color: theme.$arcade-cyan;
-                font-size: 0.65rem;
-                padding: 0.3rem 0.5rem;
-                border: 1px solid theme.$arcade-cyan;
-            }
-        }
-
-        .movie-title {
-            font-size: 0.9rem;
-            color: theme.$arcade-text-white;
-            margin: 0 0 0.5rem 0;
-        }
-
-        .movie-meta {
-            font-size: 0.65rem;
-            color: #888;
-            margin-bottom: 1rem;
-        }
-
-        .btn-buy {
-            width: 100%;
-            background: transparent;
-            border: 2px solid theme.$arcade-yellow;
+        &::before {
+            content: '▌';
             color: theme.$arcade-yellow;
-            font-family: inherit;
-            font-size: 0.75rem;
-            padding: 0.5rem 0;
-            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            font-size: 0.8rem;
+        }
+    }
+
+    .see-more {
+        font-family: theme.$font-pixel;
+        font-size: 0.65rem;
+        color: theme.$arcade-yellow;
+        cursor: pointer;
+
+        @media (max-width: 768px) {
+            font-size: 0.55rem;
         }
     }
 }
 
-/* Estilos del Modal */
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.85);
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    border: 3px solid theme.$arcade-yellow;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
+    align-items: flex-end;
+    padding: 2.5rem;
+    box-sizing: border-box;
+    overflow: hidden;
 
-    .modal-window {
-        background-color: #0d0d0d;
-        border: 4px solid theme.$arcade-yellow;
-        padding: 2.5rem;
-        position: relative;
-        max-width: 500px;
-        width: 90%;
+    @media (max-width: 768px) {
+        height: auto;
+        min-height: 380px;
+        padding: 1.5rem;
+    }
 
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: transparent;
-            border: none;
-            color: theme.$arcade-red;
-            font-family: inherit;
-            font-size: 1rem;
-            cursor: pointer;
+    .hero-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .auth-options {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            align-items: center;
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.4) 100%);
 
-            .modal-title {
-                font-size: 1rem;
-                color: theme.$arcade-yellow;
-                margin-bottom: 1rem;
+            @media (max-width: 768px) {
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 50%, rgba(0, 0, 0, 0.5) 100%);
+            }
+        }
+    }
+
+    .hero-info {
+        position: relative;
+        z-index: 2;
+        max-width: 550px;
+
+        .badge-featured {
+            background-color: theme.$arcade-red;
+            color: #fff;
+            font-family: theme.$font-pixel;
+            font-size: 0.6rem;
+            padding: 0.3rem 0.6rem;
+
+            &.badge-combo {
+                background-color: theme.$arcade-cyan;
+                color: #000;
+            }
+        }
+
+        .hero-title {
+            font-family: theme.$font-pixel;
+            font-size: 1.8rem;
+            color: theme.$arcade-yellow;
+            margin: 1rem 0 0.5rem 0;
+            text-shadow: 3px 3px 0px theme.$arcade-blue-shadow;
+
+            @media (max-width: 768px) {
+                font-size: 1.2rem;
+            }
+        }
+
+        .hero-meta {
+            font-family: theme.$font-pixel;
+            font-size: 0.65rem;
+            color: #aaa;
+            margin-bottom: 1rem;
+        }
+
+        .hero-synopsis {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: theme.$arcade-text-white;
+            margin-bottom: 1.5rem;
+
+            @media (max-width: 768px) {
+                font-size: 0.75rem;
+            }
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+        }
+    }
+
+    .hero-indicators {
+        position: absolute;
+        bottom: 1rem;
+        right: 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+        z-index: 3;
+
+        @media (max-width: 768px) {
+            top: 1rem;
+            bottom: auto;
+        }
+
+        .indicator-btn {
+            width: 12px;
+            height: 12px;
+            background-color: #333;
+            border: 1px solid theme.$arcade-text-white;
+            cursor: pointer;
+
+            &.active {
+                background-color: theme.$arcade-yellow;
+                border-color: theme.$arcade-yellow;
+            }
+        }
+    }
+}
+
+.top-ranking-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 550px) {
+        grid-template-columns: 1fr;
+    }
+
+    .ranking-card {
+        display: flex;
+        align-items: center;
+        background-color: #0d0d0d;
+        border: 2px solid theme.$arcade-text-white;
+        padding: 0.8rem;
+        cursor: pointer;
+
+        .ranking-number {
+            font-family: theme.$font-pixel;
+            font-size: 2rem;
+            color: theme.$arcade-yellow;
+            margin-right: 1rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .card-media img {
+            width: 60px;
+            height: 85px;
+            object-fit: cover;
+            border: 1px solid #333;
+        }
+
+        .card-details h4 {
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            margin-left: 1rem;
+            color: theme.$arcade-text-white;
+        }
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+        }
+    }
+}
+
+.posters-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+
+    .poster-card {
+        background-color: #0d0d0d;
+        border: 2px solid theme.$arcade-text-white;
+        padding: 0.8rem;
+        cursor: pointer;
+
+        .card-media {
+            position: relative;
+            aspect-ratio: 2/3;
+            margin-bottom: 0.8rem;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
             }
 
-            .action-btn {
+            .badge-hall {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                background: #000;
+                color: theme.$arcade-cyan;
+                font-family: theme.$font-pixel;
+                font-size: 0.55rem;
+                padding: 0.2rem 0.4rem;
+                border: 1px solid theme.$arcade-cyan;
+            }
+        }
+
+        .card-title {
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            color: theme.$arcade-text-white;
+            text-align: center;
+            margin: 0;
+        }
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+        }
+    }
+}
+
+.genres-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+
+    .genre-card {
+        background-color: #0d0d0d;
+        border: 2px solid theme.$arcade-text-white;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+        cursor: pointer;
+
+        .genre-icon {
+            font-size: 1.5rem;
+        }
+
+        .genre-name {
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            color: theme.$arcade-yellow;
+        }
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+            background-color: #1a1a1a;
+        }
+    }
+}
+
+.wide-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 550px) {
+        grid-template-columns: 1fr;
+    }
+
+    .wide-card {
+        background-color: #0d0d0d;
+        border: 2px solid theme.$arcade-text-white;
+        padding: 0.8rem;
+        cursor: pointer;
+
+        .card-media {
+            aspect-ratio: 16/9;
+            margin-bottom: 0.8rem;
+
+            img {
                 width: 100%;
-                background: transparent;
-                border: 2px solid theme.$arcade-text-white;
-                padding: 0.8rem;
-                font-family: inherit;
-                font-size: 0.8rem;
-                cursor: pointer;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
 
-                &.text-yellow {
-                    color: theme.$arcade-yellow;
-                    border-color: theme.$arcade-yellow;
-                }
+        .card-details {
+            h4 {
+                font-family: theme.$font-pixel;
+                font-size: 0.75rem;
+                color: theme.$arcade-text-white;
+                margin: 0 0 0.4rem 0;
+            }
 
-                &:hover {
-                    background-color: #222;
-                }
+            p {
+                font-family: theme.$font-pixel;
+                font-size: 0.55rem;
+                color: #888;
+                margin: 0;
+            }
+        }
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+        }
+    }
+}
+
+.upcoming-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: 900px) {
+        grid-template-columns: 1fr;
+    }
+
+    .upcoming-featured {
+        border: 2px solid theme.$arcade-text-white;
+        height: 100%;
+        min-height: 250px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .upcoming-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .upcoming-item {
+            background-color: #0d0d0d;
+            border: 2px solid theme.$arcade-text-white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            h4 {
+                font-family: theme.$font-pixel;
+                font-size: 0.7rem;
+                color: theme.$arcade-text-white;
+                margin: 0 0 0.4rem 0;
+            }
+
+            p {
+                font-family: theme.$font-pixel;
+                font-size: 0.55rem;
+                color: theme.$arcade-yellow;
+                margin: 0;
+            }
+        }
+    }
+}
+
+.features-footer {
+    border-top: 3px solid theme.$arcade-yellow;
+    padding-top: 3rem;
+
+    .footer-title {
+        font-family: theme.$font-pixel;
+        font-size: 0.9rem;
+        color: theme.$arcade-yellow;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+
+        @media (max-width: 1024px) {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (max-width: 550px) {
+            grid-template-columns: 1fr;
+        }
+
+        .feature-item {
+            background-color: #0d0d0d;
+            border: 2px solid theme.$arcade-text-white;
+            padding: 1.5rem;
+            text-align: center;
+
+            .feature-icon {
+                font-size: 1.8rem;
+                display: block;
+                margin-bottom: 0.8rem;
+            }
+
+            h5 {
+                font-family: theme.$font-pixel;
+                font-size: 0.65rem;
+                color: theme.$arcade-text-white;
+                margin: 0 0 0.5rem 0;
+            }
+
+            p {
+                font-family: theme.$font-pixel;
+                font-size: 0.5rem;
+                color: #888;
+                margin: 0;
             }
         }
     }

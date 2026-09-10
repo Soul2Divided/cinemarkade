@@ -1,53 +1,161 @@
 <app-navbar></app-navbar>
 
 <div class="crt-screen">
-
     <main class="arcade-content">
-        <section class="billboard-container">
-            <h2 class="section-title">EN CARTELERA</h2>
 
-            <div class="movies-grid">
-                @for (movie of movies; track movie.id) {
-                <article class="movie-card" (click)="selectMovie(movie)">
-                    <div class="poster-wrapper">
-                        <img [src]="movie.posterUrl" [alt]="movie.title" class="poster-img" />
-                        <span class="badge-hall">{{ movie.hall }}</span>
+        <section class="hero-section">
+            <div class="hero-backdrop">
+                <img [src]="elementosHero[indiceHeroActual].imagenBanner" [alt]="elementosHero[indiceHeroActual].titulo"
+                    class="hero-img" />
+                <div class="hero-overlay"></div>
+            </div>
+
+            <div class="hero-info">
+                <span class="badge-featured" [class.badge-combo]="elementosHero[indiceHeroActual].tipo === 'combo'">
+                    {{ elementosHero[indiceHeroActual].etiqueta }}
+                </span>
+                <h1 class="hero-title">{{ elementosHero[indiceHeroActual].titulo }}</h1>
+                <p class="hero-meta">{{ elementosHero[indiceHeroActual].meta }}</p>
+                <p class="hero-synopsis">{{ elementosHero[indiceHeroActual].sinopsis }}</p>
+
+                <div class="hero-actions">
+                    <button type="button" class="btn-pixel yellow"
+                        (click)="ejecutarAccionHero(elementosHero[indiceHeroActual])">
+                        {{ elementosHero[indiceHeroActual].textoBoton }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-indicators">
+                @for (item of elementosHero; track item.id; let i = $index) {
+                <button type="button" class="indicator-btn" [class.active]="indiceHeroActual === i"
+                    (click)="seleccionarHero(i)">
+                </button>
+                }
+            </div>
+        </section>
+
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2 class="section-title">TENDENCIAS DE LA SEMANA</h2>
+                <span class="see-more">VER MÁS ▶</span>
+            </div>
+            <div class="top-ranking-grid">
+                @for (pelicula of listaPrueba; track $index) {
+                <article class="ranking-card" (click)="seleccionarPelicula(pelicula)">
+                    <span class="ranking-number">{{ $index + 1 }}</span>
+                    <div class="card-media">
+                        <img [src]="pelicula.imagen" [alt]="pelicula.nombre" />
                     </div>
-
-                    <div class="movie-info">
-                        <h3 class="movie-title">{{ movie.title }}</h3>
-                        <p class="movie-meta">{{ movie.genre }} | {{ movie.duration }}</p>
-                        <button type="button" class="btn-buy">
-                            TICKETS <span class="price">${{ movie.price }}</span>
-                        </button>
+                    <div class="card-details">
+                        <h4>{{ pelicula.nombre }}</h4>
                     </div>
                 </article>
                 }
             </div>
         </section>
 
-        @if (isAuthModalOpen) {
-        <div class="modal-backdrop" (click)="closeAuthModal()">
-            <div class="modal-window" (click)="$event.stopPropagation()">
-                <button type="button" class="close-btn" (click)="closeAuthModal()">X</button>
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2 class="section-title">ESTRENOS EXCLUSIVOS</h2>
+                <span class="see-more">VER MÁS ▶</span>
+            </div>
+            <div class="posters-grid">
+                @for (pelicula of listaPrueba; track $index) {
+                <article class="poster-card" (click)="seleccionarPelicula(pelicula)">
+                    <div class="card-media">
+                        <img [src]="pelicula.imagen" [alt]="pelicula.nombre" />
+                        <span class="badge-hall">{{ pelicula.sala }}</span>
+                    </div>
+                    <h4 class="card-title">{{ pelicula.nombre }}</h4>
+                </article>
+                }
+            </div>
+        </section>
 
-                @if (modalView === 'options') {
-                <div class="auth-options">
-                    <h3 class="modal-title">ACCESO JUGADOR</h3>
-                    <button type="button" class="action-btn text-yellow" (click)="modalView = 'guest'">
-                        INGRESAR COMO INVITADO
-                    </button>
-                    <button type="button" class="action-btn text-white" routerLink="/login">
-                        INICIAR SESIÓN
-                    </button>
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2 class="section-title">EXPLORAR POR GÉNEROS</h2>
+                <span class="see-more">VER MÁS ▶</span>
+            </div>
+            <div class="genres-grid">
+                @for (genero of generos; track genero) {
+                <div class="genre-card">
+                    <span class="genre-icon">👾</span>
+                    <span class="genre-name">{{ genero }}</span>
                 </div>
                 }
             </div>
-        </div>
-        }
-    </main>
+        </section>
 
-    <footer class="arcade-footer">
-        <p class="insert-coin">SELECCIONA UNA PELÍCULA PARA COMPRAR TICKETS</p>
-    </footer>
+        <section class="catalog-section">
+            <div class="section-header">
+                <h2 class="section-title">RECOMENDADO PARA TI</h2>
+                <span class="see-more">VER MÁS ▶</span>
+            </div>
+            <div class="wide-cards-grid">
+                @for (pelicula of listaPrueba; track $index) {
+                <article class="wide-card" (click)="seleccionarPelicula(pelicula)">
+                    <div class="card-media">
+                        <img [src]="pelicula.banner" [alt]="pelicula.nombre" />
+                    </div>
+                    <div class="card-details">
+                        <h4>{{ pelicula.nombre }}</h4>
+                        <p>{{ pelicula.genero }} | {{ pelicula.restriccionEdad }}</p>
+                    </div>
+                </article>
+                }
+            </div>
+        </section>
+
+        <section class="catalog-section upcoming-section">
+            <div class="section-header">
+                <h2 class="section-title">PRÓXIMOS LANZAMIENTOS</h2>
+                <span class="see-more">VER MÁS ▶</span>
+            </div>
+            <div class="upcoming-container">
+                <div class="upcoming-featured">
+                    <img [src]="peliculaDestacada.banner" [alt]="peliculaDestacada.nombre" />
+                </div>
+                <div class="upcoming-list">
+                    @for (pelicula of listaPrueba; track $index) {
+                    <div class="upcoming-item">
+                        <div class="item-info">
+                            <h4>{{ pelicula.nombre }}</h4>
+                            <p>ESTRENO: 15 DE MAYO</p>
+                        </div>
+                        <button type="button" class="btn-pixel-sm">RECORDAR</button>
+                    </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="features-footer">
+            <h3 class="footer-title">¿POR QUÉ ELEGIR CINEMARKADE?</h3>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">📺</span>
+                    <h5>CALIDAD ULTRA HD</h5>
+                    <p>PROYECCIÓN RETRO DIGITAL</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔊</span>
+                    <h5>AUDIO ESPACIAL</h5>
+                    <p>SONIDO ENVOLVENTE 8-BIT</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🚫</span>
+                    <h5>SIN PUBLICIDAD</h5>
+                    <p>ACCESO DIRECTO A SALA</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🎟️</span>
+                    <h5>TICKETS DIGITALES</h5>
+                    <p>CANJEA TU HIGH SCORE</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
 </div>

@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { Navbar } from "../navbar/navbar";
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Pelicula } from '../../models/pelicula';
+import { HeroItem } from '../../models/hero-item';
+import { ELEMENTOS_HERO_MOCK, LISTA_PELICULAS_MOCK, PELICULA_INTERSTELLAR_MOCK } from '../../data/movies.mock';
+
 
 interface Movie {
   id: number;
@@ -13,47 +16,55 @@ interface Movie {
 }
 
 @Component({
-  imports: [RouterLink, Navbar],
+  imports: [Navbar],
   selector: 'app-home-page',
   styleUrl: './home-page.scss',
   templateUrl: './home-page.html',
 })
 export class HomePage {
-  isAuthModalOpen: boolean = false;
-  modalView: 'options' | 'guest' = 'options';
+  indiceHeroActual: number = 0;
+  private intervaloAutoPlay: any;
 
-  movies: Movie[] = [
-    {
-      id: 1,
-      title: 'INTERSTELLAR',
-      genre: 'SCI-FI',
-      duration: '169 MIN',
-      hall: 'SALA 1 - IMAX',
-      price: 4500,
-      posterUrl: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg'
-    },
-    {
-      id: 2,
-      title: 'THE BATMAN',
-      genre: 'ACCIÓN',
-      duration: '176 MIN',
-      hall: 'SALA 2 - 3D',
-      price: 4000,
-      posterUrl: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9325a3S.jpg'
+  elementosHero: HeroItem[] = ELEMENTOS_HERO_MOCK;
+  peliculaDestacada: Pelicula = PELICULA_INTERSTELLAR_MOCK;
+  listaPrueba: Pelicula[] = LISTA_PELICULAS_MOCK;
+  generos: string[] = ['CIENCIA FICCIÓN', 'THRILLER', 'DRAMA', 'ACCIÓN'];
+
+  ngOnInit(): void {
+    this.iniciarAutoPlay();
+  }
+
+  ngOnDestroy(): void {
+    this.detenerAutoPlay();
+  }
+
+  iniciarAutoPlay(): void {
+    this.intervaloAutoPlay = setInterval(() => {
+      this.siguienteHero();
+    }, 5000);
+  }
+
+  detenerAutoPlay(): void {
+    if (this.intervaloAutoPlay) {
+      clearInterval(this.intervaloAutoPlay);
     }
-  ];
-
-  openAuthModal(): void {
-    this.modalView = 'options';
-    this.isAuthModalOpen = true;
   }
 
-  closeAuthModal(): void {
-    this.isAuthModalOpen = false;
+  siguienteHero(): void {
+    this.indiceHeroActual = (this.indiceHeroActual + 1) % this.elementosHero.length;
   }
 
-  selectMovie(movie: Movie): void {
-    // Si el usuario intenta comprar sin autenticarse, despliega el modal
-    this.openAuthModal();
+  seleccionarHero(indice: number): void {
+    this.indiceHeroActual = indice;
+    this.detenerAutoPlay();
+    this.iniciarAutoPlay();
+  }
+
+  seleccionarPelicula(pelicula: Pelicula): void {
+    console.log('Película seleccionada:', pelicula.nombre);
+  }
+
+  ejecutarAccionHero(item: HeroItem): void {
+    console.log('Acción ejecutada:', item.titulo);
   }
 }
