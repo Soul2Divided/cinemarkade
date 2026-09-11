@@ -1,0 +1,37 @@
+<app-navbar></app-navbar>
+
+<div class="login-container">
+    <form class="form-login" [formGroup]="formLogin" (ngSubmit)="onSubmit()" [class.error-shake]="errorMessage">
+        <h2 class="form-login-heading">INICIAR SESIÓN</h2>
+
+        @if (errorMessage) {
+        <div class="error-message">
+            <span class="error-icon">⚠️</span> {{ errorMessage }}
+        </div>
+        }
+
+        <div class="form-group" [class.has-error]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched">
+            <label class="form-label">EMAIL</label>
+            <input type="email" formControlName="email" class="form-control" placeholder="PLAYER1@CINEMARKADE.COM"
+                required autofocus>
+        </div>
+
+        <div class="form-group"
+            [class.has-error]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
+            <label class="form-label">CONTRASEÑA</label>
+            <input type="password" formControlName="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button class="btn btn-pixel yellow" type="submit" [disabled]="formLogin.invalid">
+            PRESS START
+        </button>
+
+        <div class="form-login-footer-container">
+            <a class="form-login-footer" href="#">¿OLVIDASTE TU CONTRASEÑA?</a>
+
+            <button type="button" class="btn-back-bottom" (click)="irASeleccion()">
+                ◄ VOLVER AL MENÚ
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,138 @@
+@use '../../../styles/themes/arcade-theme' as theme;
+@use '../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #050505;
+}
+
+.select-container {
+    @extend %pixel-text-rendering;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+.arcade-card {
+    background-color: #0d0d0d;
+    border: 3px solid theme.$arcade-yellow;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+    box-shadow: 6px 6px 0px #000;
+    position: relative;
+}
+
+.arcade-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.8rem;
+    text-align: center;
+
+    .badge-header {
+        font-family: theme.$font-pixel;
+        font-size: 0.6rem;
+        color: theme.$arcade-red;
+        letter-spacing: 1px;
+        animation: blink 1.2s infinite;
+    }
+
+    .arcade-title {
+        font-family: theme.$font-pixel;
+        font-size: 1.5rem;
+        color: theme.$arcade-yellow;
+        margin: 0;
+        text-shadow: 3px 3px 0px theme.$arcade-blue-shadow;
+        letter-spacing: 2px;
+    }
+
+    .menu-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+
+        .btn-menu {
+            font-family: theme.$font-pixel;
+            font-size: 0.75rem;
+            padding: 1rem 0.8rem;
+            background: #000;
+            border: 2px solid theme.$arcade-text-white;
+            color: theme.$arcade-text-white;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+
+            .selector {
+                opacity: 0;
+                color: theme.$arcade-yellow;
+            }
+
+            &:hover {
+                border-color: theme.$arcade-yellow;
+                color: theme.$arcade-yellow;
+                transform: translateX(4px);
+
+                .selector {
+                    opacity: 1;
+                }
+            }
+
+            &.yellow:hover {
+                border-color: theme.$arcade-yellow;
+                color: theme.$arcade-yellow;
+            }
+
+            &.cyan:hover {
+                border-color: theme.$arcade-cyan;
+                color: theme.$arcade-cyan;
+
+                .selector {
+                    color: theme.$arcade-cyan;
+                }
+            }
+
+            &.guest {
+                border-color: #444;
+                color: #aaa;
+
+                &:hover {
+                    border-color: #fff;
+                    color: #fff;
+
+                    .selector {
+                        color: #fff;
+                    }
+                }
+            }
+        }
+    }
+
+    .press-start-text {
+        font-family: theme.$font-pixel;
+        font-size: 0.55rem;
+        color: #666;
+        margin: 0;
+    }
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}

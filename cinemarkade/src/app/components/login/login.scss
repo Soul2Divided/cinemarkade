@@ -1,0 +1,231 @@
+@use '../../../styles/themes/arcade-theme' as theme;
+@use '../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+    background-color: #050505;
+}
+
+.login-container {
+    @extend %pixel-text-rendering;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+.form-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0.5rem;
+
+    .form-login-heading {
+        margin: 0;
+        text-align: center;
+    }
+}
+
+.form-login-footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    margin-top: 0.5rem;
+
+    .form-login-footer {
+        font-family: theme.$font-pixel;
+        font-size: 0.6rem;
+        color: theme.$arcade-cyan;
+        text-decoration: none;
+
+        &:hover {
+            color: theme.$arcade-yellow;
+            text-decoration: underline;
+        }
+    }
+
+    .btn-back-bottom {
+        background: transparent;
+        border: 1px dashed #444;
+        color: #888;
+        font-family: theme.$font-pixel;
+        font-size: 0.6rem;
+        padding: 0.5rem 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+            color: theme.$arcade-yellow;
+            background-color: #111;
+        }
+    }
+}
+
+.form-login {
+    background-color: #0d0d0d;
+    border: 3px solid theme.$arcade-yellow;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 6px 6px 0px #000;
+    position: relative;
+
+    .form-login-heading {
+        font-family: theme.$font-pixel;
+        font-size: 1.2rem;
+        color: theme.$arcade-yellow;
+        text-align: center;
+        margin: 0;
+        letter-spacing: 1px;
+        text-shadow: 2px 2px 0px theme.$arcade-blue-shadow;
+
+        &::before {
+            content: '► ';
+            color: theme.$arcade-red;
+        }
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .form-label {
+            font-family: theme.$font-pixel;
+            font-size: 0.65rem;
+            color: theme.$arcade-text-white;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            font-family: theme.$font-pixel;
+            font-size: 0.75rem;
+            padding: 0.8rem 1rem;
+            background-color: #000000;
+            border: 2px solid theme.$arcade-text-white;
+            color: theme.$arcade-yellow;
+            outline: none;
+            box-sizing: border-box;
+
+            &::placeholder {
+                color: #444444;
+            }
+
+            &:focus {
+                border-color: theme.$arcade-yellow;
+                box-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
+            }
+        }
+
+        &.has-error {
+            .form-label {
+                color: theme.$arcade-red;
+            }
+
+            .form-control {
+                border-color: theme.$arcade-red;
+                background-color: rgba(255, 0, 85, 0.1);
+                color: theme.$arcade-red;
+                box-shadow: 0 0 10px rgba(255, 0, 85, 0.5);
+
+                &::placeholder {
+                    color: rgba(255, 0, 85, 0.5);
+                }
+            }
+        }
+    }
+
+    .btn-pixel {
+        font-family: theme.$font-pixel;
+        font-size: 0.85rem;
+        padding: 1rem;
+        border: 2px solid theme.$arcade-yellow;
+        background-color: theme.$arcade-yellow;
+        color: #000000;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        letter-spacing: 1px;
+
+        &:hover:not(:disabled) {
+            background-color: #fff;
+            border-color: #fff;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+        }
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: #555;
+            background-color: #333;
+            color: #777;
+        }
+    }
+
+    .form-login-footer-container {
+        text-align: center;
+        margin-top: 0.5rem;
+
+        .form-login-footer {
+            font-family: theme.$font-pixel;
+            font-size: 0.6rem;
+            color: theme.$arcade-cyan;
+            text-decoration: none;
+
+            &:hover {
+                color: theme.$arcade-yellow;
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+.error-message {
+    font-family: theme.$font-pixel;
+    font-size: 0.65rem;
+    color: #fff;
+    background-color: theme.$arcade-red;
+    border: 2px solid #fff;
+    padding: 0.8rem;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.error-shake {
+    animation: arcade-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes arcade-shake {
+
+    10%,
+    90% {
+        transform: translate3d(-2px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(4px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-6px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(6px, 0, 0);
+    }
+}
