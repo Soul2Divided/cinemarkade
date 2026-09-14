@@ -1,0 +1,124 @@
+<app-navbar></app-navbar>
+
+<div class="login-container">
+    <form class="form-login" [formGroup]="formRegister" (ngSubmit)="onSubmit()" [class.error-shake]="errorMessage">
+
+        <!-- ENCABEZADO Y HEADER CON INDICADOR DE STAGE -->
+        <div class="form-header">
+            <h2 class="form-login-heading">NUEVO JUGADOR</h2>
+            <div class="stage-badge">STAGE {{ pasoActual }} / 2</div>
+        </div>
+
+        @if (errorMessage) {
+        <div class="error-message">
+            <span class="error-icon">⚠️</span> {{ errorMessage }}
+        </div>
+        }
+
+        <!-- STAGE 1: CREDENCIALES BÁSICAS DE LA CUENTA -->
+        @if (pasoActual === 1) {
+        <div class="step-content">
+            <span class="step-subtitle">[ PASO 1: DATOS DE CUENTA ]</span>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('nombre')">
+                <label class="form-label">NOMBRE</label>
+                <input type="text" formControlName="nombre" class="form-control" placeholder="JUGADOR 1" autofocus>
+            </div>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('apellido')">
+                <label class="form-label">APELLIDO</label>
+                <input type="text" formControlName="apellido" class="form-control" placeholder="ARCADE">
+            </div>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('mail')">
+                <label class="form-label">EMAIL</label>
+                <input type="email" formControlName="mail" class="form-control" placeholder="PLAYER1@CINEMARKADE.COM">
+            </div>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('password')">
+                <label class="form-label">CONTRASEÑA</label>
+                <input type="password" formControlName="password" class="form-control" placeholder="••••••••">
+            </div>
+
+            <button type="button" class="btn btn-pixel yellow" (click)="siguientePaso()">
+                NEXT STAGE ►
+            </button>
+        </div>
+        }
+
+        <!-- STAGE 2: CONFIGURACIÓN Y PERFIL DE JUGADOR -->
+        @if (pasoActual === 2) {
+        <div class="step-content">
+            <span class="step-subtitle">[ PASO 2: PERFIL DE JUGADOR ]</span>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('fechaNacimiento')">
+                <label class="form-label">FECHA DE NACIMIENTO</label>
+                <input type="date" formControlName="fechaNacimiento" class="form-control">
+            </div>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('tipoSangre')">
+                <label class="form-label">TIPO DE SANGRE</label>
+                <select formControlName="tipoSangre" class="form-control">
+                    <option value="" disabled selected>SELECCIONAR TIPO</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+            </div>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('colorOjos')">
+                <label class="form-label">COLOR DE OJOS</label>
+                <div class="color-options-grid">
+                    <button type="button" class="color-btn blue"
+                        [class.selected]="formRegister.get('colorOjos')?.value === 'Azul/Celeste'"
+                        (click)="seleccionarColorOjos('Azul/Celeste')">
+                        <span class="color-dot"></span>
+                        <span class="color-name">AZUL / CELESTE</span>
+                    </button>
+
+                    <button type="button" class="color-btn brown"
+                        [class.selected]="formRegister.get('colorOjos')?.value === 'Marrón'"
+                        (click)="seleccionarColorOjos('Marrón')">
+                        <span class="color-dot"></span>
+                        <span class="color-name">MARRÓN</span>
+                    </button>
+
+                    <button type="button" class="color-btn green"
+                        [class.selected]="formRegister.get('colorOjos')?.value === 'Verde'"
+                        (click)="seleccionarColorOjos('Verde')">
+                        <span class="color-dot"></span>
+                        <span class="color-name">VERDE</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="isFieldInvalid('diasVacaciones')">
+                <label class="form-label">DÍAS DE VACACIONES POR AÑO</label>
+                <input type="number" formControlName="diasVacaciones" class="form-control" placeholder="14" min="0">
+            </div>
+
+            <div class="stage-actions">
+                <button type="button" class="btn-prev-stage" (click)="pasoAnterior()">
+                    ◄ PREV STAGE
+                </button>
+
+                <button class="btn btn-pixel cyan" type="submit" [disabled]="formRegister.invalid" (click)="logRegisterData()">
+                    CREATE CHARACTER
+                </button>
+            </div>
+        </div>
+        }
+
+        <div class="form-login-footer-container">
+            <button type="button" class="btn-back-bottom" (click)="irASeleccion()">
+                ◄ VOLVER AL MENÚ
+            </button>
+        </div>
+
+    </form>
+</div>

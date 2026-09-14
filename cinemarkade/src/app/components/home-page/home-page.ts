@@ -1,7 +1,7 @@
 import { Navbar } from "../navbar/navbar";
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Pelicula } from '../../models/pelicula';
-import { HeroItem } from '../../models/hero-item';
+import { Pelicula } from '../../core/models/pelicula';
+import { HeroItem } from '../../core/models/hero-item';
 import { ELEMENTOS_HERO_MOCK, LISTA_PELICULAS_MOCK, PELICULA_INTERSTELLAR_MOCK } from '../../data/movies.mock';
 
 

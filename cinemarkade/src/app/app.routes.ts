@@ -18,27 +18,17 @@ export const routes: Routes = [
         loadComponent: () => import('./components/menu/menu').then((m) => m.Menu)
     },
     {
+        path: 'select-login',
+        loadComponent: () => import('./components/select-login/select-login').then((m) => m.SelectLogin),
+    },
+    {
         path: 'login',
         loadComponent: () => import('./components/login/login').then((m) => m.Login)
     },
     {
-        path: 'select-login',
-        loadComponent: () => import('./components/select-login/select-login').then((m) => m.SelectLogin),
-        children: [
-            {
-                path: 'login',
-                loadComponent: () => import('./components/login/login').then((m) => m.Login)
-            },
-            // {
-            //     path: 'registro',
-            //     loadComponent: () => import('./components/registro/registro').then((m) => m.Registro)
-            // }
-        ]
+        path: 'register',
+        loadComponent: () => import('./components/register/register').then((m) => m.Register)
     },
-    // {
-    //     path: 'register',
-    //     // loadComponent: () => import('./components/register/register').then((m) => m.Register),
-    // },
     {
         path: '**',
         loadComponent: () => import('./components/home-page/home-page').then((m) => m.HomePage)

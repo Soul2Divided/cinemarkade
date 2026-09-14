@@ -16,6 +16,6 @@ export class SelectLogin {
   }
 
   irARegistro(): void {
-    this.router.navigate(['/registro']);
+    this.router.navigate(['/register']);
   }
 }

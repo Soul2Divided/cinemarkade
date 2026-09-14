@@ -1,5 +1,5 @@
-import { Pelicula } from '../models/pelicula';
-import { HeroItem } from '../models/hero-item'
+import { Pelicula } from '../core/models/pelicula';
+import { HeroItem } from '../core/models/hero-item'
 
 export const PELICULA_INTERSTELLAR_MOCK: Pelicula = {
     id: 1,
