@@ -17,7 +17,7 @@ export class Register {
     nombre: new FormControl('', [Validators.required]),
     apellido: new FormControl('', [Validators.required]),
     mail: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]),
     fechaNacimiento: new FormControl('', [Validators.required]),
     tipoSangre: new FormControl('', [Validators.required]),
     colorOjos: new FormControl('', [Validators.required]),
