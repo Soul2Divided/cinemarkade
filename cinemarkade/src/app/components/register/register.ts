@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Navbar } from '../navbar/navbar';
+import { passwordCheck } from '../../validators/user.validators';
 
 @Component({
   imports: [ReactiveFormsModule, Navbar],
@@ -18,10 +19,13 @@ export class Register {
     apellido: new FormControl('', [Validators.required]),
     mail: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', [Validators.required, Validators.minLength(6), Validators.pattern(/^(?=.*[A-Z])(?=.*\d).+$/)]),
+    password2: new FormControl('', Validators.required),
     fechaNacimiento: new FormControl('', [Validators.required]),
     tipoSangre: new FormControl('', [Validators.required]),
     colorOjos: new FormControl('', [Validators.required]),
     diasVacaciones: new FormControl(14, [Validators.required, Validators.min(0)])
+  }, {
+    validators: passwordCheck
   });
 
   constructor(private router: Router) {}
