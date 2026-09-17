@@ -1,0 +1,15 @@
+<div [class.loader-overlay]="fullScreen()">
+    <div class="loader-container">
+        <div class="film-reel">
+            <div class="reel-center"></div>
+            <div class="reel-hole top"></div>
+            <div class="reel-hole right"></div>
+            <div class="reel-hole bottom"></div>
+            <div class="reel-hole left"></div>
+        </div>
+
+        <div class="loader-text">
+            <span class="prompt">►</span> {{ message() }}
+        </div>
+    </div>
+</div>

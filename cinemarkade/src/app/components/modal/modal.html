@@ -1,0 +1,27 @@
+@if (isOpen()) {
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+    <div class="modal-card" [class]="variant()">
+
+        <div class="modal-header">
+            <div class="modal-title-group">
+                <span class="modal-icon">►</span>
+                <h3 class="modal-title">{{ title() }}</h3>
+            </div>
+            <button type="button" class="btn-close" (click)="closeModal()" aria-label="Cerrar modal">✕</button>
+        </div>
+
+        @if (subtitle()) {
+        <div class="modal-subtitle">[ {{ subtitle() }} ]</div>
+        }
+
+        <div class="modal-body">
+            <ng-content></ng-content>
+        </div>
+
+        <div class="modal-footer">
+            <ng-content select="[modal-actions]"></ng-content>
+        </div>
+
+    </div>
+</div>
+}

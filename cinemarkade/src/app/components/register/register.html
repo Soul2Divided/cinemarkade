@@ -5,7 +5,7 @@
 
         <!-- ENCABEZADO Y HEADER CON INDICADOR DE STAGE -->
         <div class="form-header">
-            <h2 class="form-login-heading">NUEVO JUGADOR</h2>
+            <h2 class="form-login-heading">CREAR USUARIO</h2>
             <div class="stage-badge">STAGE {{ pasoActual }} / 2</div>
         </div>
 
@@ -22,27 +22,42 @@
 
             <div class="form-group" [class.has-error]="isFieldInvalid('nombre')">
                 <label class="form-label">NOMBRE</label>
-                <input type="text" formControlName="nombre" class="form-control" placeholder="JUGADOR 1" autofocus>
+                <input type="text" formControlName="nombre" class="form-control" placeholder="NOMBRE" autofocus>
+                @if (getFieldError('nombre')) {
+                <small class="field-error">{{ getFieldError('nombre') }}</small>
+                }
             </div>
 
             <div class="form-group" [class.has-error]="isFieldInvalid('apellido')">
                 <label class="form-label">APELLIDO</label>
-                <input type="text" formControlName="apellido" class="form-control" placeholder="ARCADE">
+                <input type="text" formControlName="apellido" class="form-control" placeholder="APELLIDO">
+                @if (getFieldError('apellido')) {
+                <small class="field-error">{{ getFieldError('apellido') }}</small>
+                }
             </div>
 
             <div class="form-group" [class.has-error]="isFieldInvalid('mail')">
                 <label class="form-label">EMAIL</label>
-                <input type="email" formControlName="mail" class="form-control" placeholder="PLAYER1@CINEMARKADE.COM">
+                <input type="email" formControlName="mail" class="form-control" placeholder="ALGUIEN@CINEMARKADE.COM">
+                @if (getFieldError('mail')) {
+                <small class="field-error">{{ getFieldError('mail') }}</small>
+                }
             </div>
 
             <div class="form-group" [class.has-error]="isFieldInvalid('password')">
                 <label class="form-label">CONTRASEÑA</label>
                 <input type="password" formControlName="password" class="form-control" placeholder="••••••••">
+                @if (getFieldError('password')) {
+                <small class="field-error">{{ getFieldError('password') }}</small>
+                }
             </div>
 
             <div class="form-group" [class.has-error]="isFieldInvalid('password2')">
                 <label class="form-label">CONFIRMAR CONTRASEÑA</label>
                 <input type="password" formControlName="password2" class="form-control" placeholder="••••••••">
+                @if (getFieldError('password2')) {
+                <small class="field-error">{{ getFieldError('password2') }}</small>
+                }
             </div>
 
             <button type="button" class="btn btn-pixel yellow" (click)="siguientePaso()">
@@ -54,16 +69,19 @@
         <!-- STAGE 2: CONFIGURACIÓN Y PERFIL DE JUGADOR -->
         @if (pasoActual === 2) {
         <div class="step-content">
-            <span class="step-subtitle">[ PASO 2: PERFIL DE JUGADOR ]</span>
+            <span class="step-subtitle">[ PASO 2: DATOS ADICIONALES ]</span>
 
-            <div class="form-group" [class.has-error]="isFieldInvalid('fechaNacimiento')">
+            <div class="form-group" [class.has-error]="isFieldInvalid('fecha_nacimiento')">
                 <label class="form-label">FECHA DE NACIMIENTO</label>
-                <input type="date" formControlName="fechaNacimiento" class="form-control">
+                <input type="date" formControlName="fecha_nacimiento" class="form-control">
+                @if (getFieldError('fecha_nacimiento')) {
+                <small class="field-error">{{ getFieldError('fecha_nacimiento') }}</small>
+                }
             </div>
 
-            <div class="form-group" [class.has-error]="isFieldInvalid('tipoSangre')">
+            <div class="form-group" [class.has-error]="isFieldInvalid('tipo_sangre')">
                 <label class="form-label">TIPO DE SANGRE</label>
-                <select formControlName="tipoSangre" class="form-control">
+                <select formControlName="tipo_sangre" class="form-control">
                     <option value="" disabled selected>SELECCIONAR TIPO</option>
                     <option value="A+">A+</option>
                     <option value="A-">A-</option>
@@ -74,37 +92,46 @@
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
                 </select>
+                @if (getFieldError('tipo_sangre')) {
+                <small class="field-error">{{ getFieldError('tipo_sangre') }}</small>
+                }
             </div>
 
-            <div class="form-group" [class.has-error]="isFieldInvalid('colorOjos')">
+            <div class="form-group" [class.has-error]="isFieldInvalid('color_ojos')">
                 <label class="form-label">COLOR DE OJOS</label>
                 <div class="color-options-grid">
                     <button type="button" class="color-btn blue"
-                        [class.selected]="formRegister.get('colorOjos')?.value === 'Azul/Celeste'"
+                        [class.selected]="formRegister.get('color_ojos')?.value === 'Azul/Celeste'"
                         (click)="seleccionarColorOjos('Azul/Celeste')">
                         <span class="color-dot"></span>
                         <span class="color-name">AZUL / CELESTE</span>
                     </button>
 
                     <button type="button" class="color-btn brown"
-                        [class.selected]="formRegister.get('colorOjos')?.value === 'Marrón'"
+                        [class.selected]="formRegister.get('color_ojos')?.value === 'Marrón'"
                         (click)="seleccionarColorOjos('Marrón')">
                         <span class="color-dot"></span>
                         <span class="color-name">MARRÓN</span>
                     </button>
 
                     <button type="button" class="color-btn green"
-                        [class.selected]="formRegister.get('colorOjos')?.value === 'Verde'"
+                        [class.selected]="formRegister.get('color_ojos')?.value === 'Verde'"
                         (click)="seleccionarColorOjos('Verde')">
                         <span class="color-dot"></span>
                         <span class="color-name">VERDE</span>
                     </button>
                 </div>
+                @if (getFieldError('color_ojos')) {
+                <small class="field-error">{{ getFieldError('color_ojos') }}</small>
+                }
             </div>
 
-            <div class="form-group" [class.has-error]="isFieldInvalid('diasVacaciones')">
+            <div class="form-group" [class.has-error]="isFieldInvalid('cantidad_dias_vacaciones')">
                 <label class="form-label">DÍAS DE VACACIONES POR AÑO</label>
-                <input type="number" formControlName="diasVacaciones" class="form-control" placeholder="14" min="0">
+                <input type="number" formControlName="cantidad_dias_vacaciones" class="form-control" placeholder="14" min="0">
+                @if (getFieldError('cantidad_dias_vacaciones')) {
+                <small class="field-error">{{ getFieldError('cantidad_dias_vacaciones') }}</small>
+                }
             </div>
 
             <div class="stage-actions">
@@ -112,8 +139,8 @@
                     ◄ PREV STAGE
                 </button>
 
-                <button class="btn btn-pixel cyan" type="submit" [disabled]="formRegister.invalid" (click)="logRegisterData()">
-                    CREATE CHARACTER
+                <button class="btn btn-pixel cyan" type="submit" [disabled]="formRegister.invalid">
+                    CREAR USUARIO
                 </button>
             </div>
         </div>
@@ -126,4 +153,20 @@
         </div>
 
     </form>
+
+    @if (mostrarLoader()) {
+    <app-loader message="CREANDO USUARIO..."></app-loader>
+    }
+
+    <app-modal [isOpen]="mostrarModal()" title="CREADO CON EXITO"
+        subtitle="NUEVO REGISTRO EN BASE DE DATOS" variant="cyan" (close)="cerrarModal()">
+
+        <p>El usuario <strong>{{ formRegister.get('mail')?.value }} se ha creado correctamente</strong></p>
+
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+                ACEPTAR
+            </button>
+        </div>
+    </app-modal>
 </div>

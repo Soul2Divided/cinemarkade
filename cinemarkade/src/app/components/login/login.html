@@ -12,7 +12,7 @@
 
         <div class="form-group" [class.has-error]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched">
             <label class="form-label">EMAIL</label>
-            <input type="email" formControlName="email" class="form-control" placeholder="PLAYER1@CINEMARKADE.COM"
+            <input type="email" formControlName="email" class="form-control" placeholder="ALGUIEN@CINEMARKADE.COM"
                 required autofocus>
         </div>
 
@@ -34,4 +34,21 @@
             </button>
         </div>
     </form>
+
+    @if (mostrarLoader()) {
+        <app-loader message="INICIANDO SESIÓN..."></app-loader>
+    }
+
+    <app-modal [isOpen]="mostrarModal()" title="SESIÓN INICIADA CON EXITO" subtitle="DISFRUTA DE TUS PELICULAS FAVORITAS"
+        variant="cyan" (close)="cerrarModal()">
+
+        <p>¡Recordá que con tu cuenta tenés beneficios exclusivos!</p>
+        <p>Acumulá puntos y canjealos por lo que más te guste</p>
+
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+                ACEPTAR
+            </button>
+        </div>
+    </app-modal>
 </div>

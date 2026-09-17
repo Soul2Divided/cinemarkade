@@ -1,0 +1,123 @@
+@use '../../../styles/themes/arcade-theme' as theme;
+@use '../../../styles/mixins/pixel-art' as mixins;
+
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100000;
+    animation: overlay-fade-in 0.2s ease-out;
+}
+
+.loader-container {
+    @extend %pixel-text-rendering;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    padding: 2rem;
+    background-color: #0d0d0d;
+    border: 3px solid theme.$arcade-yellow;
+    box-shadow: 6px 6px 0px #000;
+
+    .film-reel {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        background-color: #000;
+        border: 4px solid theme.$arcade-yellow;
+        box-shadow: 0 0 10px rgba(255, 204, 0, 0.4), 4px 4px 0px #000;
+        animation: spin-reel 1.2s steps(8) infinite;
+
+        .reel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background-color: theme.$arcade-yellow;
+        }
+
+        .reel-hole {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #000;
+            border: 1px solid theme.$arcade-yellow;
+
+            &.top {
+                top: 4px;
+                left: 16px;
+            }
+
+            &.bottom {
+                bottom: 4px;
+                left: 16px;
+            }
+
+            &.left {
+                top: 16px;
+                left: 4px;
+            }
+
+            &.right {
+                top: 16px;
+                right: 4px;
+            }
+        }
+    }
+
+    .loader-text {
+        font-family: theme.$font-pixel;
+        font-size: 0.65rem;
+        color: theme.$arcade-cyan;
+        letter-spacing: 1px;
+        animation: blink-text 0.8s steps(2) infinite;
+
+        .prompt {
+            color: theme.$arcade-yellow;
+            margin-right: 0.2rem;
+        }
+    }
+}
+
+@keyframes spin-reel {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes blink-text {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes overlay-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
