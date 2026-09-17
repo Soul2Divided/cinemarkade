@@ -7,13 +7,13 @@ body {
     padding: 0;
     width: 100%;
     height: 100%;
-    background-color: #050505;
+    background-color: #050507;
+    
+    /* Luz ambiental radial sutil en esquinas superiores (sin patrones repetitivos) */
     background-image: 
-        radial-gradient(#1c1c1c 1px, transparent 1px),
-        linear-gradient(to right, rgba(20, 20, 20, 0.5) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(20, 20, 20, 0.5) 1px, transparent 1px);
-    background-size: 20px 20px, 40px 40px, 40px 40px;
-    background-position: 0 0, 0 0, 0 0;
+        radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(255, 204, 0, 0.05) 0%, transparent 45%);
+    background-attachment: fixed;
     position: relative;
 
     &::after {
@@ -23,8 +23,11 @@ body {
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: linear-gradient(rgba(18, 16, 16, 0) 50%,
-                rgba(0, 0, 0, 0.2) 50%);
+        /* Líneas de escaneo CRT tenues */
+        background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.3) 50%
+        );
         background-size: 100% 3px;
         pointer-events: none;
         z-index: 9999;

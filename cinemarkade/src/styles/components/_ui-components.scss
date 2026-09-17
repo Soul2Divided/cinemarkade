@@ -90,6 +90,22 @@
     }
 }
 
+.btn-pixel-sm {
+    font-family: theme.$font-pixel;
+    font-size: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    background: transparent;
+    border: 1px solid theme.$arcade-yellow;
+    color: theme.$arcade-yellow;
+    cursor: pointer;
+
+    &:hover {
+        background-color: theme.$arcade-yellow;
+        color: #000;
+    }
+
+}
+
 /* ==========================================================================
    INPUTS Y CONTROLES DE FORMULARIO GLOBALES
    ========================================================================== */

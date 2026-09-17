@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, signal } from '@angular/core';
+import { Component, HostListener, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Navbar } from '../navbar/navbar';
 import { Router } from '@angular/router';
@@ -42,7 +42,6 @@ export class Login {
       const { email, password } = this.formLogin.getRawValue();
       await this.userService.iniciarSesion(email ?? '', password ?? '');
       this.mostrarModal.set(true);
-      await this.router.navigate(['/home']);
     } catch (error) {
       this.triggerError(error instanceof Error
         ? error.message
@@ -54,7 +53,7 @@ export class Login {
 
   cerrarModal(): void {
     this.mostrarModal.set(false);
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 
   triggerError(msg: string): void {
