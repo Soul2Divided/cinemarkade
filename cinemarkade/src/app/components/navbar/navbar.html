@@ -9,14 +9,72 @@
     </div>
 
     <div class="nav-actions">
+        <!-- CARRITO -->
         <button type="button" class="nav-btn cart-btn" routerLink="/cart" aria-label="Carrito">
             <span class="icon">🛒</span>
             <span class="cart-badge">0</span>
         </button>
 
+        @if (authService.usuarioActual(); as usuario) {
+        <div class="menu-perfil-container">
+            <button type="button" class="nav-btn profile-btn" (click)="toggleMenu()" aria-label="Menú de usuario">
+                <span class="icon">👤</span>
+                <span class="profile-text">{{ usuario.nombre | uppercase }}</span>
+                <span class="arrow-icon" [class.rotated]="menuAbierto()">▾</span>
+            </button>
+
+            @if (menuAbierto()) {
+            <div class="arcade-dropdown-menu" (click)="$event.stopPropagation()">
+                <div class="dropdown-header">
+                    <span class="user-role-badge">{{ usuario.rol | uppercase }}</span>
+                </div>
+
+                <ul class="dropdown-list">
+                    <li>
+                        <a routerLink="/perfil" (click)="cerrarMenu()" class="dropdown-item">
+                            <span class="item-icon">►</span> MI PERFIL
+                        </a>
+                    </li>
+
+                    @if (usuario.rol === 'cliente') {
+                    <li>
+                        <a routerLink="/mis-puntos" (click)="cerrarMenu()" class="dropdown-item">
+                            <span class="item-icon">🪙</span> MIS PUNTOS
+                        </a>
+                    </li>
+                    }
+
+                    <li class="divider"></li>
+
+                    <li>
+                        <button type="button" (click)="cerrarSesion()" class="dropdown-item logout-btn">
+                            <span class="item-icon">✖</span> CERRAR SESIÓN
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            }
+        </div>
+        } @else {
         <button type="button" class="nav-btn profile-btn" routerLink="/select-login" aria-label="Perfil">
             <span class="icon">👤</span>
             <span class="profile-text">INGRESAR</span>
         </button>
+        }
     </div>
 </header>
+
+@if (mostrarLoader()) {
+<app-loader message="CERRANDO SESIÓN..."></app-loader>
+}
+
+<app-modal [isOpen]="mostrarModal()" title="SESIÓN CERRADA" subtitle="" variant="cyan" (close)="cerrarModal()">
+    <p>Cerraste sesión correctamente.</p>
+    <p>¡Esperamos verte pronto!</p>
+
+    <div modal-actions>
+        <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+            ACEPTAR
+        </button>
+    </div>
+</app-modal>
