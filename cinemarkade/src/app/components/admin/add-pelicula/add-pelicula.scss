@@ -1,0 +1,236 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.movie-page-container {
+    @extend %pixel-text-rendering;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+.movie-card-panel {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 2rem;
+    background-color: #0d0d0d;
+    border: 3px solid theme.$arcade-yellow;
+    box-shadow: 8px 8px 0px #000, 0 0 15px rgba(255, 204, 0, 0.15);
+    padding: 2rem;
+    width: 100%;
+    max-width: 950px;
+    box-sizing: border-box;
+
+    @media (max-width: 850px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   PANEL IZQUIERDO: POSTER / VISTA PREVIA
+   ========================================================================== */
+.poster-preview-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .poster-frame {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 2 / 3;
+        background-color: #000;
+        border: 2px solid theme.$arcade-text-white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+
+        .poster-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .poster-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+
+            .placeholder-icon {
+                font-size: 2.5rem;
+            }
+
+            .placeholder-text {
+                font-family: theme.$font-pixel;
+                font-size: 0.7rem;
+                color: theme.$arcade-yellow;
+            }
+
+            .placeholder-sub {
+                font-family: theme.$font-pixel;
+                font-size: 0.5rem;
+                color: #666;
+            }
+        }
+
+        /* Esquinas pixeladas decorativas estilo marco arcade */
+        .frame-corner {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: theme.$arcade-yellow;
+
+            &.top-left {
+                top: 4px;
+                left: 4px;
+            }
+
+            &.top-right {
+                top: 4px;
+                right: 4px;
+            }
+
+            &.bottom-left {
+                bottom: 4px;
+                left: 4px;
+            }
+
+            &.bottom-right {
+                bottom: 4px;
+                right: 4px;
+            }
+        }
+    }
+
+    .image-upload-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        align-items: center;
+
+        .upload-btn {
+            width: 100%;
+            font-size: 0.65rem;
+            padding: 0.6rem;
+        }
+
+        .or-divider {
+            font-family: theme.$font-pixel;
+            font-size: 0.55rem;
+            color: #555;
+        }
+    }
+}
+
+/* ==========================================================================
+   PANEL DERECHO: DETALLES DE LA PELÍCULA
+   ========================================================================== */
+.movie-details-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5rem;
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px dashed #333;
+        padding-bottom: 0.8rem;
+
+        .panel-title {
+            font-family: theme.$font-pixel;
+            font-size: 1.2rem;
+            color: theme.$arcade-yellow;
+            margin: 0;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px theme.$arcade-blue-shadow;
+        }
+
+        .status-badge {
+            font-family: theme.$font-pixel;
+            font-size: 0.55rem;
+            color: theme.$arcade-cyan;
+            background-color: #000;
+            border: 1px solid theme.$arcade-cyan;
+            padding: 0.3rem 0.5rem;
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+
+        @media (max-width: 550px) {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+    }
+
+    /* SELECTOR DE RESTRICCIÓN DE EDAD */
+    .age-restriction-selector {
+        display: flex;
+        gap: 0.6rem;
+
+        .age-btn {
+            flex: 1;
+            background-color: #000;
+            border: 2px solid theme.$arcade-text-white;
+            color: theme.$arcade-text-white;
+            font-family: theme.$font-pixel;
+            font-size: 0.65rem;
+            padding: 0.6rem 0.2rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            &:hover {
+                border-color: theme.$arcade-yellow;
+                color: theme.$arcade-yellow;
+            }
+
+            &.selected {
+                border-color: theme.$arcade-yellow;
+                background-color: rgba(255, 204, 0, 0.15);
+                color: theme.$arcade-yellow;
+                box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+            }
+        }
+    }
+
+    .panel-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        border-top: 2px dashed #222;
+        padding-top: 1rem;
+
+        @media (max-width: 550px) {
+            flex-direction: column-reverse;
+
+            .btn,
+            .btn-pixel-outline {
+                width: 100%;
+            }
+        }
+    }
+}

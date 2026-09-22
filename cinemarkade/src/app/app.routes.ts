@@ -1,4 +1,7 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './guards/admin-guard';
+import { authGuard } from './guards/auth-guard';
+import path from 'path';
 
 export const routes: Routes = [
     {
@@ -28,6 +31,22 @@ export const routes: Routes = [
     {
         path: 'register',
         loadComponent: () => import('./components/register/register').then((m) => m.Register)
+    },
+    {
+        path: 'admin',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
+        children: [
+            {
+                path: 'pelicula',
+                loadComponent: () => import('./components/admin/add-pelicula/add-pelicula').then((m) => m.AddPelicula)
+            }
+        ],
+    },
+    {
+        path: 'perfil',
+        canActivate: [authGuard],
+        loadComponent: () => import('./components/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
     },
     {
         path: '**',

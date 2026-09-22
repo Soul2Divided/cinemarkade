@@ -15,6 +15,7 @@ import { UserService } from '../../core/user/user.service';
 })
 export class Login {
   errorMessage: string = '';
+  rolLogueado: string = '';
   mostrarModal = signal<boolean>(false);
   mostrarLoader = signal<boolean>(false);
 
@@ -40,7 +41,8 @@ export class Login {
 
     try {
       const { email, password } = this.formLogin.getRawValue();
-      await this.userService.iniciarSesion(email ?? '', password ?? '');
+      const usuario = await this.userService.iniciarSesion(email ?? '', password ?? '');
+      this.rolLogueado = usuario.rol;
       this.mostrarModal.set(true);
     } catch (error) {
       this.triggerError(error instanceof Error
@@ -53,7 +55,7 @@ export class Login {
 
   cerrarModal(): void {
     this.mostrarModal.set(false);
-    this.router.navigate(['/home']);
+    this.router.navigate([this.rolLogueado === 'admin' ? '/admin' : '/home']);
   }
 
   triggerError(msg: string): void {

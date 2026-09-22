@@ -1,0 +1,88 @@
+<app-navbar></app-navbar>
+
+@if (authService.usuarioActual(); as usuario) {
+<div class="profile-page-container">
+    <div class="player-card-panel">
+
+        <!-- CABECERA: TARJETA DE JUGADOR -->
+        <div class="player-header">
+            <div class="avatar-box">
+                <span class="avatar-icon">👾</span>
+                <span class="player-tag">P1</span>
+            </div>
+
+            <div class="player-info">
+                <div class="name-edit-group">
+                    <h2 class="player-name">{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+                    <button type="button" class="btn-edit-profile" (click)="abrirEditarPerfil()" title="Editar Perfil">
+                        ✏️ <span class="edit-text">EDIT</span>
+                    </button>
+                </div>
+                <span class="player-email">{{ usuario.mail }}</span>
+                <div class="player-badges">
+                    <span class="badge-role">CLIENTE</span>
+                    <span class="badge-status">ONLINE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE PUNTOS (SCORE / COINS) -->
+        <div class="score-card">
+            <div class="coin-icon-wrapper">
+                <!-- Moneda de 8 bits creada en CSS/Pixel Art -->
+                <div class="pixel-coin">
+                    <div class="coin-inner">$</div>
+                </div>
+            </div>
+
+            <div class="score-details">
+                <span class="score-label">PUNTOS ACUMULADOS</span>
+                <span class="score-value">{{ usuario.puntos }} PTS</span>
+            </div>
+
+            <button type="button" class="btn-pixel cyan btn-redeem-quick" (click)="irACanjearPuntos()">
+                CANJEAR
+            </button>
+        </div>
+
+        <!-- MENÚ DE OPCIONES Y NAVEGACIÓN (COMMAND MENU) -->
+        <div class="profile-menu-grid">
+            <h3 class="menu-title">► SELECCIONAR OPCIÓN</h3>
+
+            <div class="menu-buttons">
+                <button type="button" class="menu-card-btn" (click)="irAHistorialCompras()">
+                    <div class="btn-icon">🧾</div>
+                    <div class="btn-content">
+                        <span class="btn-title">HISTORIAL DE COMPRAS</span>
+                        <span class="btn-sub">VER CANDADOS, TICKETS Y SNACKS</span>
+                    </div>
+                    <span class="arrow-indicator">►</span>
+                </button>
+
+                <button type="button" class="menu-card-btn" (click)="irAHistorialFunciones()">
+                    <div class="btn-icon">🎟️</div>
+                    <div class="btn-content">
+                        <span class="btn-title">HISTORIAL DE FUNCIONES</span>
+                        <span class="btn-sub">PELÍCULAS Y SALAS VISITADAS</span>
+                    </div>
+                    <span class="arrow-indicator">►</span>
+                </button>
+
+                <button type="button" class="menu-card-btn highlight-yellow" (click)="irACanjearPuntos()">
+                    <div class="btn-icon">🪙</div>
+                    <div class="btn-content">
+                        <span class="btn-title">CANJEAR PUNTOS</span>
+                        <span class="btn-sub">PREMIOS, TICKETS Y DESCUENTOS</span>
+                    </div>
+                    <span class="arrow-indicator">►</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+} @else {
+<div class="profile-page-container">
+    <p class="profile-loading">CARGANDO PERFIL...</p>
+</div>
+}

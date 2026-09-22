@@ -47,17 +47,6 @@ export class UserService {
     }
 
     async iniciarSesion(mail: string, password: string): Promise<User> {
-        const usuario = await this.buscarPorEmail(mail);
-
-        if (!usuario) {
-            throw new Error('No existe un usuario registrado con ese email');
-        }
-
         return this.userRepository.signIn(mail, password);
-    }
-
-    async mailDisponible(mail: string): Promise<boolean> {
-        const usuario = await this.userRepository.findByEmail(mail);
-        return usuario === null;
     }
 }

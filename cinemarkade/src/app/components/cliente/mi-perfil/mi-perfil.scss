@@ -1,0 +1,320 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.profile-page-container {
+    @extend %pixel-text-rendering;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+.player-card-panel {
+    background-color: #0d0d0d;
+    border: 3px solid theme.$arcade-yellow;
+    box-shadow: 8px 8px 0px #000, 0 0 15px rgba(255, 204, 0, 0.15);
+    padding: 2rem;
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   CABECERA: JUGADOR (AVATAR + DATOS + EDITAR)
+   ========================================================================== */
+.player-header {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    border-bottom: 2px dashed #333;
+    padding-bottom: 1.2rem;
+
+    @media (max-width: 520px) {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .avatar-box {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        background-color: #000;
+        border: 2px solid theme.$arcade-cyan;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 3px 3px 0px #000;
+
+        .avatar-icon {
+            font-size: 2.2rem;
+        }
+
+        .player-tag {
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            background-color: theme.$arcade-cyan;
+            color: #000;
+            font-family: theme.$font-pixel;
+            font-size: 0.5rem;
+            padding: 0.1rem 0.3rem;
+            font-weight: bold;
+        }
+    }
+
+    .player-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        flex: 1;
+
+        .name-edit-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+
+            @media (max-width: 520px) {
+                justify-content: center;
+            }
+
+            .player-name {
+                font-family: theme.$font-pixel;
+                font-size: 1.2rem;
+                color: theme.$arcade-yellow;
+                margin: 0;
+                letter-spacing: 1px;
+                text-shadow: 2px 2px 0px theme.$arcade-blue-shadow;
+            }
+
+            .btn-edit-profile {
+                background: transparent;
+                border: 1px solid theme.$arcade-text-white;
+                color: theme.$arcade-text-white;
+                font-family: theme.$font-pixel;
+                font-size: 0.55rem;
+                padding: 0.25rem 0.5rem;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3rem;
+                transition: all 0.15s ease;
+
+                &:hover {
+                    border-color: theme.$arcade-yellow;
+                    color: theme.$arcade-yellow;
+                    background-color: rgba(255, 204, 0, 0.1);
+                }
+            }
+        }
+
+        .player-email {
+            font-family: theme.$font-pixel;
+            font-size: 0.65rem;
+            color: #aaa;
+        }
+
+        .player-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.2rem;
+
+            @media (max-width: 520px) {
+                justify-content: center;
+            }
+
+            .badge-role {
+                background-color: #1a1a1a;
+                border: 1px solid #444;
+                color: #fff;
+                font-family: theme.$font-pixel;
+                font-size: 0.5rem;
+                padding: 0.2rem 0.4rem;
+            }
+
+            .badge-status {
+                background-color: rgba(0, 255, 102, 0.15);
+                border: 1px solid #00ff66;
+                color: #00ff66;
+                font-family: theme.$font-pixel;
+                font-size: 0.5rem;
+                padding: 0.2rem 0.4rem;
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   SCORE CARD (PUNTOS Y MONEDA 8-BIT)
+   ========================================================================== */
+.score-card {
+    background-color: #000;
+    border: 2px solid theme.$arcade-yellow;
+    box-shadow: 4px 4px 0px #000, 0 0 10px rgba(255, 204, 0, 0.2);
+    padding: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+
+    @media (max-width: 520px) {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    /* Moneda retro 8-bits animada */
+    .pixel-coin {
+        width: 42px;
+        height: 42px;
+        background-color: theme.$arcade-yellow;
+        border: 3px solid #b8860b;
+        box-shadow: 0 0 8px theme.$arcade-yellow;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: coin-bounce 1.5s infinite ease-in-out;
+
+        .coin-inner {
+            font-family: theme.$font-pixel;
+            font-size: 1.2rem;
+            color: #000;
+            font-weight: bold;
+        }
+    }
+
+    .score-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        flex: 1;
+
+        .score-label {
+            font-family: theme.$font-pixel;
+            font-size: 0.55rem;
+            color: #888;
+        }
+
+        .score-value {
+            font-family: theme.$font-pixel;
+            font-size: 1.4rem;
+            color: theme.$arcade-yellow;
+            letter-spacing: 1px;
+        }
+    }
+
+    .btn-redeem-quick {
+        font-size: 0.65rem;
+        padding: 0.6rem 1rem;
+    }
+}
+
+/* ==========================================================================
+   MENÚ DE OPCIONES DE NAVEGACIÓN
+   ========================================================================== */
+.profile-menu-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .menu-title {
+        font-family: theme.$font-pixel;
+        font-size: 0.75rem;
+        color: theme.$arcade-text-white;
+        margin: 0;
+    }
+
+    .menu-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+
+        .menu-card-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background-color: #141418;
+            border: 2px solid theme.$arcade-text-white;
+            padding: 1rem;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s ease;
+            box-shadow: 3px 3px 0px #000;
+
+            .btn-icon {
+                font-size: 1.5rem;
+            }
+
+            .btn-content {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+                flex: 1;
+
+                .btn-title {
+                    font-family: theme.$font-pixel;
+                    font-size: 0.75rem;
+                    color: theme.$arcade-text-white;
+                }
+
+                .btn-sub {
+                    font-family: theme.$font-pixel;
+                    font-size: 0.5rem;
+                    color: #777;
+                }
+            }
+
+            .arrow-indicator {
+                font-family: theme.$font-pixel;
+                font-size: 0.8rem;
+                color: #444;
+                transition: color 0.15s ease, transform 0.15s ease;
+            }
+
+            &:hover {
+                border-color: theme.$arcade-cyan;
+                background-color: #1a1a24;
+                transform: translateX(4px);
+
+                .arrow-indicator {
+                    color: theme.$arcade-cyan;
+                    transform: translateX(3px);
+                }
+
+                .btn-title {
+                    color: theme.$arcade-cyan;
+                }
+            }
+
+            &.highlight-yellow:hover {
+                border-color: theme.$arcade-yellow;
+
+                .arrow-indicator,
+                .btn-title {
+                    color: theme.$arcade-yellow;
+                }
+            }
+        }
+    }
+}
+
+/* Animación sutil para la moneda de puntos */
+@keyframes coin-bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}

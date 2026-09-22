@@ -1,0 +1,16 @@
+<div class="admin-shell">
+    <aside class="admin-sidebar">
+        <h2 class="admin-brand">PANEL ADMIN</h2>
+        <nav class="admin-nav">
+            @for (seccion of secciones; track seccion.route) {
+            <a class="admin-nav-item" [routerLink]="seccion.route" routerLinkActive="active">
+                {{ seccion.label }}
+            </a>
+            }
+        </nav>
+    </aside>
+
+    <main class="admin-content">
+        <router-outlet></router-outlet>
+    </main>
+</div>

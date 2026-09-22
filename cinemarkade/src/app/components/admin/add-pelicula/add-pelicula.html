@@ -1,0 +1,121 @@
+<app-navbar></app-navbar>
+
+<div class="movie-page-container">
+    <form class="movie-card-panel" [formGroup]="formMovie" (ngSubmit)="onSubmit()">
+
+        <!-- PANEL IZQUIERDO: VISTA PREVIA DEL POSTER -->
+        <div class="poster-preview-panel">
+            <div class="poster-frame">
+                @if (imagePreviewUrl) {
+                <img [src]="imagePreviewUrl" alt="Vista previa del poster" class="poster-img">
+                } @else {
+                <div class="poster-placeholder">
+                    <span class="placeholder-icon">🎬</span>
+                    <span class="placeholder-text">[ SIN POSTER ]</span>
+                    <span class="placeholder-sub">SELECCIONÁ O PEGÁ UNA IMAGEN</span>
+                </div>
+                }
+                <div class="frame-corner top-left"></div>
+                <div class="frame-corner top-right"></div>
+                <div class="frame-corner bottom-left"></div>
+                <div class="frame-corner bottom-right"></div>
+            </div>
+
+            <!-- CARGA DE IMAGEN (SUBIR ARCHIVO O URL) -->
+            <div class="image-upload-controls">
+                <label class="btn-pixel-outline upload-btn">
+                    <span>📁 CARGAR IMAGEN</span>
+                    <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
+                </label>
+                <span class="or-divider">- O -</span>
+                <div class="form-group">
+                    <input type="text" formControlName="imagen" class="form-control"
+                        placeholder="HTTP://URL-DE-IMAGEN.JPG" (input)="onUrlInput($event)">
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO: FORMULARIO DE DATOS -->
+        <div class="movie-details-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">NUEVA PELÍCULA</h2>
+                <span class="status-badge">INSERT TAPE</span>
+            </div>
+
+            <div class="form-grid">
+                <!-- NOMBRE -->
+                <div class="form-group full-width">
+                    <label class="form-label">TÍTULO DE LA PELÍCULA</label>
+                    <input type="text" formControlName="nombre" class="form-control"
+                        placeholder="EJ: BACK TO THE FUTURE">
+                </div>
+
+                <!-- GÉNERO -->
+                <div class="form-group">
+                    <label class="form-label">GÉNERO</label>
+                    <select formControlName="genero" class="form-control">
+                        <option value="" disabled selected>SELECCIONAR</option>
+                        <option value="Acción">ACCIÓN</option>
+                        <option value="Ciencia Ficción">CIENCIA FICCIÓN</option>
+                        <option value="Terror">TERROR</option>
+                        <option value="Aventura">AVENTURA</option>
+                        <option value="Comedia">COMEDIA</option>
+                        <option value="Drama">DRAMA</option>
+                        <option value="Animación">ANIMACIÓN</option>
+                    </select>
+                </div>
+
+                <!-- DURACIÓN -->
+                <div class="form-group">
+                    <label class="form-label">DURACIÓN (MINUTOS)</label>
+                    <input type="number" formControlName="duracion" class="form-control" placeholder="120" min="1">
+                </div>
+
+                <!-- RESTRICCIÓN DE EDAD -->
+                <div class="form-group full-width">
+                    <label class="form-label">RESTRICCIÓN DE EDAD</label>
+                    <div class="age-restriction-selector">
+                        <button type="button" class="age-btn rating-at"
+                            [class.selected]="formMovie.get('restriccionEdad')?.value === 'ATP'"
+                            (click)="seleccionarRestriccion('ATP')">
+                            ATP
+                        </button>
+                        <button type="button" class="age-btn rating-13"
+                            [class.selected]="formMovie.get('restriccionEdad')?.value === '+13'"
+                            (click)="seleccionarRestriccion('+13')">
+                            +13
+                        </button>
+                        <button type="button" class="age-btn rating-16"
+                            [class.selected]="formMovie.get('restriccionEdad')?.value === '+16'"
+                            (click)="seleccionarRestriccion('+16')">
+                            +16
+                        </button>
+                        <button type="button" class="age-btn rating-18"
+                            [class.selected]="formMovie.get('restriccionEdad')?.value === '+18'"
+                            (click)="seleccionarRestriccion('+18')">
+                            +18
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SINOPSIS -->
+                <div class="form-group full-width">
+                    <label class="form-label">SINOPSIS</label>
+                    <textarea formControlName="sinopsis" class="form-control textarea" rows="4"
+                        placeholder="DESCRIPCIÓN DE LA TRAMA..."></textarea>
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="panel-actions">
+                <button type="button" class="btn-pixel-outline" (click)="cancelar()">
+                    ◄ CANCELAR
+                </button>
+                <button type="submit" class="btn btn-pixel cyan" [disabled]="formMovie.invalid">
+                    GUARDAR PELÍCULA
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>

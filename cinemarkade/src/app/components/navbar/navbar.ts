@@ -35,22 +35,24 @@ export class Navbar {
 
   async cerrarSesion(): Promise<void> {
     this.cerrarMenu();
+    this.mostrarLoader.set(true);
+
     try {
       await this.authService.signOut();
-      this.mostrarLoader.set(true)
+      await new Promise(resolve => setTimeout(resolve, 700));
     } catch (error) {
       this.triggerError(error instanceof Error
         ? error.message
-        : 'No se pudo crear el usuario');
+        : 'No se pudo cerrar la sesión.');
     } finally {
+      this.mostrarLoader.set(false);
       this.mostrarModal.set(true);
-      this.mostrarLoader.set(true);
-      this.router.navigate(['/']);
     }
   }
 
   cerrarModal(): void {
     this.mostrarModal.set(false);
+    this.router.navigate(['/']);
   }
 
   triggerError(msg: string): void {

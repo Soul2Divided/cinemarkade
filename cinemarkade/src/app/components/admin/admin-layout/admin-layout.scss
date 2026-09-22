@@ -1,0 +1,61 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+.admin-shell {
+    @extend %pixel-text-rendering;
+    display: flex;
+    min-height: 100vh;
+    background-color: theme.$arcade-bg;
+    color: theme.$arcade-text-white;
+}
+
+.admin-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background-color: #0d0d0d;
+    border-right: 3px solid theme.$arcade-yellow;
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+
+    .admin-brand {
+        font-family: theme.$font-pixel;
+        font-size: 0.85rem;
+        color: theme.$arcade-yellow;
+        letter-spacing: 1px;
+        margin: 0 0 2rem 0;
+        text-align: center;
+    }
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+
+    .admin-nav-item {
+        font-family: theme.$font-pixel;
+        font-size: 0.65rem;
+        color: theme.$arcade-text-white;
+        text-decoration: none;
+        padding: 0.8rem;
+        border: 2px solid #333;
+        letter-spacing: 1px;
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+            color: theme.$arcade-yellow;
+        }
+
+        &.active {
+            border-color: theme.$arcade-yellow;
+            background-color: rgba(255, 204, 0, 0.1);
+            color: theme.$arcade-yellow;
+        }
+    }
+}
+
+.admin-content {
+    flex: 1;
+    padding: 2rem;
+    box-sizing: border-box;
+}
