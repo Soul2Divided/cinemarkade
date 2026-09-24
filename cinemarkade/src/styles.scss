@@ -8,9 +8,9 @@ body {
     width: 100%;
     height: 100%;
     background-color: #050507;
-    
+
     /* Luz ambiental radial sutil en esquinas superiores (sin patrones repetitivos) */
-    background-image: 
+    background-image:
         radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.05) 0%, transparent 45%),
         radial-gradient(circle at 85% 15%, rgba(255, 204, 0, 0.05) 0%, transparent 45%);
     background-attachment: fixed;
@@ -24,12 +24,17 @@ body {
         width: 100vw;
         height: 100vh;
         /* Líneas de escaneo CRT tenues */
-        background: linear-gradient(
-            rgba(18, 16, 16, 0) 50%,
-            rgba(0, 0, 0, 0.3) 50%
-        );
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.3) 50%);
         background-size: 100% 3px;
         pointer-events: none;
         z-index: 9999;
     }
+}
+
+app-root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
 }

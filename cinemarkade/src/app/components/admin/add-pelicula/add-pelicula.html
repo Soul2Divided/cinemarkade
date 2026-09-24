@@ -1,41 +1,66 @@
-<app-navbar></app-navbar>
-
 <div class="movie-page-container">
     <form class="movie-card-panel" [formGroup]="formMovie" (ngSubmit)="onSubmit()">
 
-        <!-- PANEL IZQUIERDO: VISTA PREVIA DEL POSTER -->
-        <div class="poster-preview-panel">
-            <div class="poster-frame">
-                @if (imagePreviewUrl) {
-                <img [src]="imagePreviewUrl" alt="Vista previa del poster" class="poster-img">
-                } @else {
-                <div class="poster-placeholder">
-                    <span class="placeholder-icon">🎬</span>
-                    <span class="placeholder-text">[ SIN POSTER ]</span>
-                    <span class="placeholder-sub">SELECCIONÁ O PEGÁ UNA IMAGEN</span>
+        <!-- PANEL IZQUIERDO DESFASADO / SOBRESALIENTE -->
+        <div class="floating-media-panel">
+
+            <!-- 1. PREVIEW BANNER (16:9) -->
+            <div class="preview-card banner-card">
+                <span class="card-tag">BANNER (16:9)</span>
+
+                <div class="media-dropzone" (click)="bannerFileInput.click()">
+                    @if (bannerPreviewUrl) {
+                    <img [src]="bannerPreviewUrl" alt="Vista previa banner" class="media-img">
+                    <button type="button" class="btn-remove-media" (click)="removerBanner($event)"
+                        title="Remover Banner">
+                        ✖
+                    </button>
+                    } @else {
+                    <div class="dropzone-placeholder">
+                        <span class="icon">🖼️</span>
+                        <span class="label">CLICK PARA CARGAR</span>
+                        <span class="sub">[ BANNER HORIZONTAL 16:9 ]</span>
+                    </div>
+                    }
+                    <div class="corner top-l"></div>
+                    <div class="corner top-r"></div>
+                    <div class="corner bot-l"></div>
+                    <div class="corner bot-r"></div>
                 </div>
-                }
-                <div class="frame-corner top-left"></div>
-                <div class="frame-corner top-right"></div>
-                <div class="frame-corner bottom-left"></div>
-                <div class="frame-corner bottom-right"></div>
+
+                <input #bannerFileInput type="file" accept="image/*" (change)="onBannerFileSelected($event)" hidden>
             </div>
 
-            <!-- CARGA DE IMAGEN (SUBIR ARCHIVO O URL) -->
-            <div class="image-upload-controls">
-                <label class="btn-pixel-outline upload-btn">
-                    <span>📁 CARGAR IMAGEN</span>
-                    <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
-                </label>
-                <span class="or-divider">- O -</span>
-                <div class="form-group">
-                    <input type="text" formControlName="imagen" class="form-control"
-                        placeholder="HTTP://URL-DE-IMAGEN.JPG" (input)="onUrlInput($event)">
+            <!-- 2. PREVIEW POSTER (2:3) -->
+            <div class="preview-card poster-card">
+                <span class="card-tag">POSTER (2:3)</span>
+
+                <div class="media-dropzone" (click)="posterFileInput.click()">
+                    @if (imagePreviewUrl) {
+                    <img [src]="imagePreviewUrl" alt="Vista previa poster" class="media-img">
+                    <button type="button" class="btn-remove-media" (click)="removerPoster($event)"
+                        title="Remover Poster">
+                        ✖
+                    </button>
+                    } @else {
+                    <div class="dropzone-placeholder">
+                        <span class="icon">🎬</span>
+                        <span class="label">CLICK PARA CARGAR</span>
+                        <span class="sub">[ POSTER VERTICAL 2:3 ]</span>
+                    </div>
+                    }
+                    <div class="corner top-l"></div>
+                    <div class="corner top-r"></div>
+                    <div class="corner bot-l"></div>
+                    <div class="corner bot-r"></div>
                 </div>
+
+                <input #posterFileInput type="file" accept="image/*" (change)="onPosterFileSelected($event)" hidden>
             </div>
+
         </div>
 
-        <!-- PANEL DERECHO: FORMULARIO DE DATOS -->
+        <!-- PANEL DERECHO PRINCIPAL: FORMULARIO DE DATOS -->
         <div class="movie-details-panel">
             <div class="panel-header">
                 <h2 class="panel-title">NUEVA PELÍCULA</h2>
@@ -48,6 +73,20 @@
                     <label class="form-label">TÍTULO DE LA PELÍCULA</label>
                     <input type="text" formControlName="nombre" class="form-control"
                         placeholder="EJ: BACK TO THE FUTURE">
+                </div>
+
+                <!-- URLS OPCIONALES PARA IMÁGENES -->
+                <div class="form-group">
+                    <label class="form-label">URL DEL BANNER <small
+                            style="color: #777; font-size: 0.6rem;">(OPCIONAL)</small></label>
+                    <input type="text" formControlName="banner" class="form-control" placeholder="HTTP://URL-BANNER.JPG"
+                        (input)="onBannerUrlInput($event)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">URL DEL POSTER</label>
+                    <input type="text" formControlName="imagen" class="form-control" placeholder="HTTP://URL-POSTER.JPG"
+                        (input)="onPosterUrlInput($event)">
                 </div>
 
                 <!-- GÉNERO -->
@@ -118,4 +157,20 @@
         </div>
 
     </form>
+
+    @if (mostrarLoader()) {
+    <app-loader message="AÑADIENDO PELICULA..."></app-loader>
+    }
+
+    <app-modal [isOpen]="mostrarModal()" title="CREADO CON EXITO" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
+        variant="cyan" (close)="cerrarModal()">
+
+        <p>La pelicula <strong>{{ formMovie.get('nombre')?.value }} se ha añadido correctamente</strong></p>
+
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+                ACEPTAR
+            </button>
+        </div>
+    </app-modal>
 </div>

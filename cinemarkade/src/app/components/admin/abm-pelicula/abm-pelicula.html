@@ -1,0 +1,84 @@
+<div class="abm-movies-container">
+
+    <!-- CABECERA DEL ABM -->
+    <div class="abm-header">
+        <div class="header-title-group">
+            <h2 class="section-title">CATÁLOGO DE PELÍCULAS</h2>
+            <span class="total-badge">TOTAL: {{ peliculas().length }}</span>
+        </div>
+
+        <!-- BUSCADOR INTERNO -->
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="form-control" placeholder="BUSCAR TÍTULO O GÉNERO..." (input)="onSearch($event)">
+        </div>
+    </div>
+
+    <!-- GRILLA DE PELÍCULAS -->
+    @if (peliculasCargadas()) {
+    <div class="movies-grid">
+        @for (pelicula of peliculasFiltradas(); track pelicula.id) {
+        <div class="movie-card" [class.is-inactive]="!pelicula.activa">
+
+            <!-- AFICHE / POSTER -->
+            <div class="card-media">
+                <img [src]="pelicula.imagen" [alt]="pelicula.nombre" class="poster-img">
+                <span class="badge-rating">{{ pelicula.restriccion_edad }}</span>
+
+                <!-- BADGE DE ESTADO SI ESTÁ INACTIVA -->
+                @if (!pelicula.activa) {
+                <span class="badge-status-off">INACTIVA</span>
+                }
+            </div>
+
+            <!-- DETALLES DE LA PELÍCULA -->
+            <div class="card-details">
+                <h3 class="movie-title">{{ pelicula.nombre | uppercase }}</h3>
+
+                <div class="movie-meta">
+                    <span class="meta-item genre">🎭 {{ pelicula.genero | uppercase }}</span>
+                    <span class="meta-item duration">⏱️ {{ pelicula.duracion }} MIN</span>
+                </div>
+
+                <p class="movie-synopsis">{{ pelicula.sinopsis }}</p>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="card-actions">
+                    <button type="button" class="btn-action edit" (click)="modificarPelicula(pelicula.id)">
+                        ✏️ MODIFICAR
+                    </button>
+
+                    <!-- BOTÓN CONMUTABLE ALTA / BAJA -->
+                    <button type="button" class="btn-action" [class.delete]="pelicula.activa"
+                        [class.activate]="!pelicula.activa" (click)="cambiarEstadoPelicula(pelicula.id, pelicula.activa)">
+                        @if (pelicula.activa) {
+                        ✖ DAR DE BAJA
+                        } @else {
+                        ✔ DAR DE ALTA
+                        }
+                    </button>
+                </div>
+            </div>
+
+    </div>
+    } @empty {
+    <div class="empty-state">
+        <span class="empty-icon">📺</span>
+        <p class="empty-text">[ NO SE ENCONTRARON PELÍCULAS ]</p>
+    </div>
+    }
+</div>
+} @else {
+<!-- LOADER / CARGANDO -->
+<div class="loading-state">
+    <span class="loading-text">CARGANDO CATÁLOGO...</span>
+</div>
+}
+
+<!-- BOTÓN FLOTANTE PARA AÑADIR PELÍCULA (FAB ARCADE) -->
+<button type="button" class="fab-add-movie" (click)="irAAgregarPelicula()" title="Añadir Nueva Película">
+    <span class="fab-icon">+</span>
+    <span class="fab-label">NUEVA PELÍCULA</span>
+</button>
+
+</div>

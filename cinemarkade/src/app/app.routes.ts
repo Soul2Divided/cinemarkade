@@ -38,7 +38,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
         children: [
             {
-                path: 'pelicula',
+                path: 'peliculas',
+                loadComponent: () => import('./components/admin/abm-pelicula/abm-pelicula').then((m) => m.AbmPelicula)
+            },
+            {
+                path: 'nueva-pelicula',
                 loadComponent: () => import('./components/admin/add-pelicula/add-pelicula').then((m) => m.AddPelicula)
             }
         ],
