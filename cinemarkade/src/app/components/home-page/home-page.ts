@@ -1,70 +1,60 @@
-import { Navbar } from "../navbar/navbar";
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Pelicula } from '../../core/models/pelicula';
-import { HeroItem } from '../../core/models/hero-item';
-import { ELEMENTOS_HERO_MOCK, LISTA_PELICULAS_MOCK, PELICULA_INTERSTELLAR_MOCK } from '../../data/movies.mock';
-
-
-interface Movie {
-  id: number;
-  title: string;
-  genre: string;
-  duration: string;
-  hall: string;
-  price: number;
-  posterUrl: string;
-}
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { CommonModule, UpperCasePipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { Navbar } from '../navbar/navbar';
+import { PeliculaService } from '../../core/pelicula/pelicula.service';
+import { Pelicula } from '../../core/pelicula/pelicula.model';
 
 @Component({
-  imports: [Navbar],
+  imports: [Navbar, CommonModule, UpperCasePipe],
   selector: 'app-home-page',
   styleUrl: './home-page.scss',
   templateUrl: './home-page.html',
 })
-export class HomePage {
+
+export class HomePage implements OnInit {
+  private peliculaService = inject(PeliculaService);
+  private router = inject(Router);
+
+  peliculas = signal<Pelicula[]>([]);
+  peliculaSeleccionada = signal<Pelicula | null>(null);
+  peliculaDestacada = computed(() => this.peliculas()[0] ?? null);
+
+  generos: string[] = ['Acción', 'Ciencia Ficción', 'Terror', 'Aventura', 'Comedia', 'Animación'];
+
+  elementosHero = computed(() => {
+    return this.peliculas().filter(p => p.activa && p.banner && p.banner.trim() !== '');
+  });
+
   indiceHeroActual: number = 0;
-  private intervaloAutoPlay: any;
 
-  elementosHero: HeroItem[] = ELEMENTOS_HERO_MOCK;
-  peliculaDestacada: Pelicula = PELICULA_INTERSTELLAR_MOCK;
-  listaPrueba: Pelicula[] = LISTA_PELICULAS_MOCK;
-  generos: string[] = ['CIENCIA FICCIÓN', 'THRILLER', 'DRAMA', 'ACCIÓN'];
-
-  ngOnInit(): void {
-    this.iniciarAutoPlay();
-  }
-
-  ngOnDestroy(): void {
-    this.detenerAutoPlay();
-  }
-
-  iniciarAutoPlay(): void {
-    this.intervaloAutoPlay = setInterval(() => {
-      this.siguienteHero();
-    }, 5000);
-  }
-
-  detenerAutoPlay(): void {
-    if (this.intervaloAutoPlay) {
-      clearInterval(this.intervaloAutoPlay);
+  async ngOnInit(): Promise<void> {
+    try {
+      const data = await this.peliculaService.listarPeliculas();
+      this.peliculas.set((data || []).filter(p => p.activa));
+    } catch (error) {
+      console.error('Error al cargar la cartelera:', error);
     }
   }
 
-  siguienteHero(): void {
-    this.indiceHeroActual = (this.indiceHeroActual + 1) % this.elementosHero.length;
+  seleccionarHero(index: number): void {
+    this.indiceHeroActual = index;
   }
 
-  seleccionarHero(indice: number): void {
-    this.indiceHeroActual = indice;
-    this.detenerAutoPlay();
-    this.iniciarAutoPlay();
+  ejecutarAccionHero(pelicula: Pelicula): void {
+    this.seleccionarPelicula(pelicula);
   }
 
   seleccionarPelicula(pelicula: Pelicula): void {
-    console.log('Película seleccionada:', pelicula.nombre);
+    this.peliculaSeleccionada.set(pelicula);
   }
 
-  ejecutarAccionHero(item: HeroItem): void {
-    console.log('Acción ejecutada:', item.titulo);
+  cerrarDetalle(): void {
+    this.peliculaSeleccionada.set(null);
+  }
+
+  irAFunciones(peliculaId: number): void {
+    this.cerrarDetalle();
+    this.router.navigate(['/funciones', peliculaId]);
   }
 }

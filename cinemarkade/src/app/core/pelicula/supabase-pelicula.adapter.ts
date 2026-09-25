@@ -67,4 +67,20 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
             throw new Error(`Error al cambiar el estado de la película: ${error.message}`);
         }
     }
+
+    async obtenerPorId(id: number): Promise<Pelicula> {
+        const supabase = this.supabaseService.supabaseClient;
+
+        const { data, error } = await supabase
+            .from('pelicula')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            throw new Error(`Error obtener la película: ${error.message}`);
+        }
+
+        return data as Pelicula;
+    }
 }

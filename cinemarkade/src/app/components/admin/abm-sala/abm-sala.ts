@@ -48,7 +48,7 @@ export class AbmSala {
   }
 
   modificarSala(id: number): void {
-    console.log('Modificar sala ID:', id);
+    this.router.navigate(['/admin/editar-sala', id]);
   }
 
   async cambiarEstadoSala(id: number, active: boolean): Promise<void> {

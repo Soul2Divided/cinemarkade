@@ -49,8 +49,7 @@ export class AbmProducto {
   }
 
   modificarProducto(id: number): void {
-    console.log('Modificar producto ID:', id);
-    this.router.navigate(['/admin/productos/editar', id]);
+    this.router.navigate(['/admin/editar-producto', id]);
   }
 
   async cambiarEstadoProducto(id: number, active: boolean): Promise<void> {

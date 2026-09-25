@@ -67,4 +67,20 @@ export class SupabaseProductoAdapter implements ProductoRepository {
             throw new Error(`Error al cambiar el estado del producto: ${error.message}`);
         }
     }
+
+    async obtenerPorId(id: number): Promise<Producto> {
+            const supabase = this.supabaseService.supabaseClient;
+    
+            const { data, error } = await supabase
+                .from('producto')
+                .select('*')
+                .eq('id', id)
+                .single();
+    
+            if (error) {
+                throw new Error(`Error obtener el producto: ${error.message}`);
+            }
+    
+            return data as Producto;
+        }
 }

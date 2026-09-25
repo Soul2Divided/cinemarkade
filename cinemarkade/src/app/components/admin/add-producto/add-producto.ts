@@ -48,22 +48,23 @@ export class AddProducto implements OnInit {
   }
 
   async cargarProductoParaEditar(id: number): Promise<void> {
-    // try {
-    //   const prod = await this.productoRepository.obtenerPorId(id);
-    //   if (prod) {
-    //     this.formProducto.patchValue({
-    //       nombre: prod.nombre,
-    //       imagen: prod.imagen,
-    //       categoria: prod.categoria,
-    //       precio: prod.precio,
-    //       descripcion: prod.descripcion
-    //     });
-    //     this.imagePreviewUrl = prod.imagen;
-    //     this.cdr.detectChanges();
-    //   }
-    // } catch (error) {
-    //   console.error('Error al cargar producto:', error);
-    // }
+    try {
+      const prod = await this.productoService.obtenerPorId(id);
+      if (prod) {
+        this.formProducto.patchValue({
+          nombre: prod.nombre,
+          imagen: prod.imagen,
+          categoria: prod.categoria,
+          precio: prod.precio,
+          descripcion: prod.descripcion
+        });
+
+        this.imagePreviewUrl = prod.imagen;
+        this.cdr.detectChanges();
+      }
+    } catch (error) {
+      console.error('Error al cargar producto para editar:', error);
+    }
   }
 
   onFileSelected(event: Event): void {
@@ -119,7 +120,11 @@ export class AddProducto implements OnInit {
         precio: valores.precio ?? 0,
         descripcion: valores.descripcion ?? '',
       };
-      await this.productoService.crearProducto(datos)
+      if (this.esEdicion && this.productoId) {
+        await this.productoService.actualizarProducto(this.productoId, datos);
+      } else {
+        await this.productoService.crearProducto(datos);
+      }
       this.mostrarModal.set(true);
     } catch (error) {
       this.triggerError(error instanceof Error

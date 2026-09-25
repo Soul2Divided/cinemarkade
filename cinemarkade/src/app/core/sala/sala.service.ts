@@ -13,6 +13,10 @@ export class SalaService {
     async listarSalas(): Promise<Sala[]> {
         return this.salaRepository.listar();
     }
+    
+    async obtenerPorId(id: number): Promise<Sala> {
+        return this.salaRepository.obtenerPorId(id);
+    }
 
     async crearSala(datos: SalaInput): Promise<Sala> {
         this.validarDatosBasicos(datos);
@@ -27,6 +31,8 @@ export class SalaService {
     async cambiarActiva(id: number, activa: boolean): Promise<void> {
         return this.salaRepository.cambiarActiva(id, activa);
     }
+
+    
 
     private validarDatosBasicos(datos: SalaInput): void {
         if (!FORMATOS_SALA.includes(datos.formato)) {

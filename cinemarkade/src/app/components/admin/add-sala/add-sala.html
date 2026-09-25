@@ -3,7 +3,7 @@
 
         <!-- HEADER DEL FORMULARIO -->
         <div class="panel-header">
-            <h2 class="panel-title">NUEVA SALA</h2>
+            <h2 class="panel-title">{{ esEdicion ? 'EDITAR SALA' : 'NUEVA SALA' }}</h2>
             <span class="status-badge">CONFIGURE SCREEN</span>
         </div>
 
@@ -58,7 +58,7 @@
                 ◄ CANCELAR
             </button>
             <button type="submit" class="btn btn-pixel cyan" [disabled]="formSala.invalid">
-                CREAR SALA
+                {{ esEdicion ? 'GUARDAR CAMBIOS' : 'CRAER SALA' }}
             </button>
         </div>
 
@@ -68,11 +68,14 @@
     <app-loader message="AÑADIENDO SALA..."></app-loader>
     }
 
-    <app-modal [isOpen]="mostrarModal()" title="CREADA CON EXITO" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
+    <app-modal [isOpen]="mostrarModal()" title="{{ esEdicion ? 'MODIFICADA CON EXITO' : 'CREADA CON EXITO' }}" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
         variant="cyan" (close)="cerrarModal()">
 
-        <p>La sala se ha añadido correctamente</p>
-
+        @if (esEdicion){
+            <p>El formato de la sala se ha modificado correctamente</p>
+        } @else {
+            <p>La sala se ha añadido correctamente</p>
+        }
         <div modal-actions>
             <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
                 ACEPTAR

@@ -7,25 +7,29 @@ import { ProductoInput, Producto } from './producto.model';
 export class ProductoService {
 
     constructor(
-        @Inject(ProductoRepository) private ProductoRepository: ProductoRepository
+        @Inject(ProductoRepository) private productoRepository: ProductoRepository
     ) { }
 
     async listarProductos(): Promise<Producto[]> {
-        return this.ProductoRepository.listar();
+        return this.productoRepository.listar();
+    }
+
+    async obtenerPorId(id: number): Promise<Producto> {
+        return this.productoRepository.obtenerPorId(id);
     }
 
     async crearProducto(datos: ProductoInput): Promise<Producto> {
         this.validarDatosBasicos(datos);
-        return this.ProductoRepository.crear(datos);
+        return this.productoRepository.crear(datos);
     }
 
     async actualizarProducto(id: number, datos: ProductoInput): Promise<Producto> {
         this.validarDatosBasicos(datos);
-        return this.ProductoRepository.actualizar(id, datos);
+        return this.productoRepository.actualizar(id, datos);
     }
 
     async cambiarActiva(id: number, activa: boolean): Promise<void> {
-        return this.ProductoRepository.cambiarActiva(id, activa);
+        return this.productoRepository.cambiarActiva(id, activa);
     }
 
     private validarDatosBasicos(datos: ProductoInput): void {

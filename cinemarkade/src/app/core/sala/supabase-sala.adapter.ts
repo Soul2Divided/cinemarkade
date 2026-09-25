@@ -67,4 +67,20 @@ export class SupabaseSalaAdapter implements SalaRepository {
             throw new Error(`Error al cambiar el estado de la sala: ${error.message}`);
         }
     }
+
+    async obtenerPorId(id: number): Promise<Sala> {
+        const supabase = this.supabaseService.supabaseClient;
+
+        const { data, error } = await supabase
+            .from('sala')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            throw new Error(`Error obtener la sala: ${error.message}`);
+        }
+
+        return data as Sala;
+    }
 }

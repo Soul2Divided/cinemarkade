@@ -67,7 +67,7 @@
         <!-- PANEL DERECHO PRINCIPAL: FORMULARIO DE DATOS -->
         <div class="movie-details-panel">
             <div class="panel-header">
-                <h2 class="panel-title">NUEVA PELÍCULA</h2>
+                <h2 class="panel-title">{{ esEdicion ? 'EDITAR PELÍCULA' : 'NUEVA PELÍCULA' }}</h2>
                 <span class="status-badge">INSERT TAPE</span>
             </div>
 
@@ -181,7 +181,7 @@
                     ◄ CANCELAR
                 </button>
                 <button type="submit" class="btn btn-pixel cyan" [disabled]="formMovie.invalid">
-                    GUARDAR PELÍCULA
+                    {{ esEdicion ? 'GUARDAR CAMBIOS' : 'GUARDAR PELICULA' }}
                 </button>
             </div>
         </div>
@@ -192,11 +192,15 @@
     <app-loader message="AÑADIENDO PELICULA..."></app-loader>
     }
 
-    <app-modal [isOpen]="mostrarModal()" title="CREADO CON EXITO" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
+    <app-modal [isOpen]="mostrarModal()" title="{{ esEdicion ? 'MODIFICADA CON EXITO' : 'CREADA CON EXITO' }}" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
         variant="cyan" (close)="cerrarModal()">
 
-        <p>La pelicula <strong>{{ formMovie.get('nombre')?.value }} se ha añadido correctamente</strong></p>
-
+        @if (esEdicion) {
+            <p>La pelicula <strong>{{ formMovie.get('nombre')?.value }} se ha modificado correctamente</strong></p>
+        } @else {
+            <p>La pelicula <strong>{{ formMovie.get('nombre')?.value }} se ha añadido correctamente</strong></p>
+        }
+        
         <div modal-actions>
             <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
                 ACEPTAR

@@ -135,11 +135,14 @@
     <app-loader message="AÑADIENDO PRODUCTO..."></app-loader>
     }
 
-    <app-modal [isOpen]="mostrarModal()" title="CREADO CON EXITO" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
+    <app-modal [isOpen]="mostrarModal()" title="{{ esEdicion ? 'MODIFICADO CON EXITO' : 'CREADO CON EXITO' }}" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
         variant="cyan" (close)="cerrarModal()">
 
-        <p><strong>{{ formProducto.get('nombre')?.value }} se ha añadido correctamente</strong></p>
-
+        @if (esEdicion) {
+            <p><strong>{{ formProducto.get('nombre')?.value }} se ha modificado correctamente</strong></p>
+        } @else {
+            <p><strong>{{ formProducto.get('nombre')?.value }} se ha añadido correctamente</strong></p>
+        }
         <div modal-actions>
             <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
                 ACEPTAR

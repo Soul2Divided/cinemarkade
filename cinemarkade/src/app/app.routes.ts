@@ -46,6 +46,10 @@ export const routes: Routes = [
                 loadComponent: () => import('./components/admin/add-pelicula/add-pelicula').then((m) => m.AddPelicula)
             },
             {
+                path: 'editar-pelicula/:id',
+                loadComponent: () => import('./components/admin/add-pelicula/add-pelicula').then((m) => m.AddPelicula)
+            },
+            {
                 path: 'salas',
                 loadComponent: () => import('./components/admin/abm-sala/abm-sala').then((m) => m.AbmSala)
             },
@@ -54,11 +58,19 @@ export const routes: Routes = [
                 loadComponent: () => import('./components/admin/add-sala/add-sala').then((m) => m.AddSala)
             },
             {
+                path: 'editar-sala/:id',
+                loadComponent: () => import('./components/admin/add-sala/add-sala').then((m) => m.AddSala)
+            },
+            {
                 path: 'productos',
                 loadComponent: () => import('./components/admin/abm-producto/abm-producto').then((m) => m.AbmProducto)
             },
             {
                 path: 'nuevo-producto',
+                loadComponent: () => import('./components/admin/add-producto/add-producto').then((m) => m.AddProducto)
+            },
+            {
+                path: 'editar-producto/:id',
                 loadComponent: () => import('./components/admin/add-producto/add-producto').then((m) => m.AddProducto)
             }
         ],

@@ -14,6 +14,10 @@ export class PeliculaService {
         return this.peliculaRepository.listar();
     }
 
+    async obtenerPorId(id: number): Promise<Pelicula> {
+        return this.peliculaRepository.obtenerPorId(id);
+    }
+
     async crearPelicula(datos: PeliculaInput): Promise<Pelicula> {
         this.validarDatosBasicos(datos);
         return this.peliculaRepository.crear(datos);

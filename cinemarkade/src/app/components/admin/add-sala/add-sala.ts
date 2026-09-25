@@ -1,6 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { FormatoSala, FORMATOS_SALA, SalaInput } from '../../../core/sala/sala.model';
 import { SalaService } from '../../../core/sala/sala.service';
 import { Loader } from '../../loader/loader';
@@ -12,13 +12,16 @@ import { Modal } from '../../modal/modal';
   styleUrl: './add-sala.scss',
   templateUrl: './add-sala.html',
 })
-export class AddSala {
+export class AddSala implements OnInit {
   errorMessage: string = '';
   mostrarModal = signal<boolean>(false);
   mostrarLoader = signal<boolean>(false);
+  esEdicion: boolean = false;
+  salaId: number | null = null;
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private salaService: SalaService
   ) { }
 
@@ -27,6 +30,28 @@ export class AddSala {
   formSala = new FormGroup({
     formato: new FormControl<FormatoSala | null>(null, [Validators.required])
   });
+
+  async ngOnInit(): Promise<void> {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.esEdicion = true;
+      this.salaId = Number(idParam);
+      await this.cargarSalaParaEditar(this.salaId);
+    }
+  }
+
+  async cargarSalaParaEditar(id: number): Promise<void> {
+    try {
+      const sala = await this.salaService.obtenerPorId(id);
+      if (sala) {
+        this.formSala.patchValue({
+          formato: sala.formato
+        });
+      }
+    } catch (error) {
+      console.error('Error al cargar sala para editar:', error);
+    }
+  }
 
   seleccionarFormato(formato: FormatoSala): void {
     this.formSala.get('formato')?.setValue(formato);
@@ -46,8 +71,11 @@ export class AddSala {
 
     try {
       const datos: SalaInput = { formato: formatoSeleccionado };
-      console.log('formato enviado:', formatoSeleccionado);
-      await this.salaService.crearSala(datos);
+      if (this.esEdicion && this.salaId) {
+        await this.salaService.actualizarSala(this.salaId, datos);
+      } else {
+        await this.salaService.crearSala(datos);
+      }
       this.mostrarModal.set(true);
     } catch (error) {
       this.triggerError(error instanceof Error

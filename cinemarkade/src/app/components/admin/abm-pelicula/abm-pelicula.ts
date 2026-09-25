@@ -58,8 +58,7 @@ export class AbmPelicula implements OnInit {
   }
 
   modificarPelicula(id: string | number): void {
-    console.log('Modificar película ID:', id);
-    // Próximamente: navegar a edición o abrir modal
+    this.router.navigate(['/admin/editar-pelicula', id]);
   }
 
   async cambiarEstadoPelicula(id: number, active: boolean): Promise<void> {

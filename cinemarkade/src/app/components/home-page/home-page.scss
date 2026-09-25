@@ -520,3 +520,147 @@
         }
     }
 }
+
+.movie-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    /* <--- FONDO DESDIBUJADO / BLUR */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    animation: fadeInBlur 0.25s ease-out forwards;
+}
+
+.movie-modal-card {
+    position: relative;
+    display: flex;
+    gap: 2rem;
+    width: 100%;
+    max-width: 800px;
+    background-color: #0d0d0d;
+    border: 4px solid #ffcc00;
+    box-shadow: 10px 10px 0px #000, 0 0 25px rgba(255, 204, 0, 0.3);
+    padding: 2rem;
+    box-sizing: border-box;
+    animation: zoomInArcade 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    /* <--- ANIMACIÓN DE ACERCAMIENTO */
+
+    @media (max-width: 700px) {
+        flex-direction: column;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .btn-close-modal {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #ff0055;
+        color: #fff;
+        border: 2px solid #fff;
+        width: 32px;
+        height: 32px;
+        font-family: inherit;
+        cursor: pointer;
+        z-index: 10;
+
+        &:hover {
+            background-color: #fff;
+            color: #ff0055;
+        }
+    }
+
+    .modal-media {
+        position: relative;
+        width: 220px;
+        flex-shrink: 0;
+
+        @media (max-width: 700px) {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+
+        .modal-poster {
+            width: 100%;
+            height: auto;
+            border: 2px solid #fff;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .badge-rating {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #000;
+            border: 1px solid #00e5ff;
+            color: #00e5ff;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    .modal-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1.2rem;
+        flex: 1;
+
+        .modal-title {
+            font-size: 1.4rem;
+            color: #ffcc00;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .modal-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .modal-synopsis {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #ccc;
+            margin: 0;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+    }
+}
+
+/* KEYFRAMES ANIMACIONES */
+@keyframes fadeInBlur {
+    from {
+        opacity: 0;
+        backdrop-filter: blur(0px);
+    }
+
+    to {
+        opacity: 1;
+        backdrop-filter: blur(8px);
+    }
+}
+
+@keyframes zoomInArcade {
+    from {
+        opacity: 0;
+        transform: scale(0.6);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
