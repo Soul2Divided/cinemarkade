@@ -1,0 +1,149 @@
+<div class="product-page-container">
+
+    <form class="product-card-panel" [formGroup]="formProducto" (ngSubmit)="onSubmit()">
+
+        <!-- PANEL IZQUIERDO DESFASADO: PREVIEW DE IMAGEN DEL PRODUCTO -->
+        <div class="floating-media-panel">
+            <div class="preview-card" [class.is-invalid]="isFieldInvalid('imagen')">
+                <span class="card-tag">VISTA PREVIA DE PRODUCTO</span>
+
+                <div class="media-dropzone" (click)="imageFileInput.click()">
+                    @if (imagePreviewUrl) {
+                    <img [src]="imagePreviewUrl" alt="Vista previa producto" class="media-img">
+                    <button type="button" class="btn-remove-media" (click)="removerImagen($event)"
+                        title="Remover Imagen">
+                        ✖
+                    </button>
+                    } @else {
+                    <div class="dropzone-placeholder">
+                        <span class="icon">🍿</span>
+                        <span class="label">CLICK PARA CARGAR</span>
+                        <span class="sub">[ IMAGEN DEL PRODUCTO ]</span>
+                    </div>
+                    }
+                    <div class="corner top-l"></div>
+                    <div class="corner top-r"></div>
+                    <div class="corner bot-l"></div>
+                    <div class="corner bot-r"></div>
+                </div>
+
+                <input #imageFileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
+
+                @if (getFieldError('imagen')) {
+                <small class="field-error">{{ getFieldError('imagen') }}</small>
+                }
+            </div>
+        </div>
+
+        <!-- PANEL DERECHO PRINCIPAL: FORMULARIO DE DATOS -->
+        <div class="product-details-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">{{ esEdicion ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO' }}</h2>
+                <span class="status-badge">CANDY ITEM</span>
+            </div>
+
+            <div class="form-grid">
+                <!-- NOMBRE -->
+                <div class="form-group full-width">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('nombre')">
+                        NOMBRE DEL PRODUCTO
+                    </label>
+                    <input type="text" formControlName="nombre" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('nombre')" placeholder="EJ: BALDE DE POCHOCLOS GIGANTE">
+
+                    @if (getFieldError('nombre')) {
+                    <small class="field-error">{{ getFieldError('nombre') }}</small>
+                    }
+                </div>
+
+                <!-- URL DE IMAGEN (OPCIONAL/ALTERNA) -->
+                <div class="form-group full-width">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('imagen')">
+                        URL DE LA IMAGEN <small class="optional-tag">(OPCIONAL/ALTERNA)</small>
+                    </label>
+                    <input type="text" formControlName="imagen" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('imagen')" placeholder="HTTP://URL-IMAGEN.JPG"
+                        (input)="onUrlInput($event)">
+                </div>
+
+                <!-- SELECCIÓN DE CATEGORÍA -->
+                <div class="form-group full-width">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('categoria')">
+                        CATEGORÍA
+                    </label>
+                    <div class="category-selector" [class.is-invalid]="isFieldInvalid('categoria')">
+                        @for (cat of categorias; track cat) {
+                        <button type="button" class="category-btn"
+                            [class.selected]="formProducto.get('categoria')?.value === cat"
+                            (click)="seleccionarCategoria(cat)">
+                            @switch (cat) {
+                            @case ('COMIDA') { 🍿 }
+                            @case ('BEBIDA') { 🥤 }
+                            @case ('GOLOSINA') { 🍬 }
+                            @case ('SNACK') { 🥨 }
+                            }
+                            <span>{{ cat }}</span>
+                        </button>
+                        }
+                    </div>
+
+                    @if (getFieldError('categoria')) {
+                    <small class="field-error">{{ getFieldError('categoria') }}</small>
+                    }
+                </div>
+
+                <!-- PRECIO -->
+                <div class="form-group full-width">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('precio')">
+                        PRECIO ($ ARS)
+                    </label>
+                    <input type="number" formControlName="precio" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('precio')" placeholder="1500" min="1">
+
+                    @if (getFieldError('precio')) {
+                    <small class="field-error">{{ getFieldError('precio') }}</small>
+                    }
+                </div>
+
+                <!-- DESCRIPCIÓN -->
+                <div class="form-group full-width">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('descripcion')">
+                        DESCRIPCIÓN
+                    </label>
+                    <textarea formControlName="descripcion" class="form-control textarea"
+                        [class.is-invalid]="isFieldInvalid('descripcion')" rows="3"
+                        placeholder="DESCRIPCIÓN O DETALLE DEL PRODUCTO..."></textarea>
+
+                    @if (getFieldError('descripcion')) {
+                    <small class="field-error">{{ getFieldError('descripcion') }}</small>
+                    }
+                </div>
+            </div>
+
+            <!-- BOTONES DE ACCIÓN -->
+            <div class="panel-actions">
+                <button type="button" class="btn-pixel-outline" (click)="cancelar()">
+                    ◄ CANCELAR
+                </button>
+                <button type="submit" class="btn btn-pixel cyan" [disabled]="formProducto.invalid">
+                    {{ esEdicion ? 'GUARDAR CAMBIOS' : 'CREAR PRODUCTO' }}
+                </button>
+            </div>
+        </div>
+    </form>
+    @if (mostrarLoader()) {
+    <app-loader message="AÑADIENDO PRODUCTO..."></app-loader>
+    }
+
+    <app-modal [isOpen]="mostrarModal()" title="CREADO CON EXITO" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
+        variant="cyan" (close)="cerrarModal()">
+
+        <p><strong>{{ formProducto.get('nombre')?.value }} se ha añadido correctamente</strong></p>
+
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+                ACEPTAR
+            </button>
+        </div>
+    </app-modal>
+</div>

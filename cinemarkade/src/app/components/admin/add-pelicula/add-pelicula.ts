@@ -125,9 +125,41 @@ export class AddPelicula {
     this.errorMessage = msg;
   }
 
+  isFieldInvalid(field: string): boolean {
+    const control = this.formMovie.get(field);
+    return !!(control && control.touched && control.invalid);
+  }
+
+  getFieldError(field: string): string {
+    const control = this.formMovie.get(field);
+
+    if (!control?.touched) {
+      return '';
+    }
+
+    if (control.hasError('required')) {
+      const requiredMessages: Record<string, string> = {
+        nombre: 'El título de la película es obligatorio',
+        genero: 'Debes seleccionar un género',
+        duracion: 'La duración es obligatoria',
+        imagen: 'Debes seleccionar un poster para la película',
+        sinopsis: 'La sinopsis es obligatoria',
+        restriccionEdad: 'Debes seleccionar la restricción de edad'
+      };
+
+      return requiredMessages[field] ?? 'Este campo es obligatorio';
+    }
+
+    if (field === 'duracion' && control.hasError('min')) {
+      return 'La duración debe ser mayor a 0 minutos';
+    }
+
+    return '';
+  }
+
   cerrarModal(): void {
     this.mostrarModal.set(false);
-    this.router.navigate(['/admin']);
+    this.router.navigate(['/admin/peliculas']);
   }
 
   cancelar(): void {

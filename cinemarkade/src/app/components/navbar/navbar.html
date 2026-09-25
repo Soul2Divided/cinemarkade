@@ -30,16 +30,24 @@
                 </div>
 
                 <ul class="dropdown-list">
+                    @if (usuario.rol === 'cliente') {
                     <li>
                         <a routerLink="/perfil" (click)="cerrarMenu()" class="dropdown-item">
                             <span class="item-icon">►</span> MI PERFIL
                         </a>
                     </li>
 
-                    @if (usuario.rol === 'cliente') {
                     <li>
                         <a routerLink="/mis-puntos" (click)="cerrarMenu()" class="dropdown-item">
                             <span class="item-icon">🪙</span> MIS PUNTOS
+                        </a>
+                    </li>
+                    }
+
+                    @if (usuario.rol === 'admin') {
+                        <li>
+                        <a routerLink="/admin" (click)="cerrarMenu()" class="dropdown-item">
+                            <span class="item-icon">►</span> PANEL ADMIN
                         </a>
                     </li>
                     }

@@ -7,7 +7,7 @@
     min-height: 100vh;
 }
 
-.movie-page-container {
+.product-page-container {
     @extend %pixel-text-rendering;
     display: flex;
     justify-content: center;
@@ -21,7 +21,7 @@
     }
 }
 
-.movie-card-panel {
+.product-card-panel {
     position: relative;
     display: flex;
     background-color: #0d0d0d;
@@ -29,7 +29,7 @@
     box-shadow: 10px 10px 0px #000, 0 0 20px rgba(255, 204, 0, 0.2);
     padding: 2.5rem 2.5rem 2.5rem 180px;
     width: 100%;
-    max-width: 1050px;
+    max-width: 950px;
     box-sizing: border-box;
     margin-left: 140px;
 
@@ -41,6 +41,9 @@
     }
 }
 
+/* ==========================================================================
+   PANEL IZQUIERDO DESFASADO (FLOATING CARD)
+   ========================================================================== */
 .floating-media-panel {
     position: absolute;
     left: -160px;
@@ -79,6 +82,7 @@
         .media-dropzone {
             position: relative;
             width: 100%;
+            aspect-ratio: 1 / 1;
             background-color: #111;
             border: 2px dashed #555;
             cursor: pointer;
@@ -104,7 +108,9 @@
             .media-img {
                 width: 100%;
                 height: 100%;
-                object-fit: cover;
+                object-fit: contain;
+                padding: 0.5rem;
+                box-sizing: border-box;
             }
 
             .btn-remove-media {
@@ -141,7 +147,7 @@
                 text-align: center;
 
                 .icon {
-                    font-size: 2rem;
+                    font-size: 2.5rem;
                 }
 
                 .label {
@@ -185,18 +191,13 @@
                 }
             }
         }
-
-        &.banner-card .media-dropzone {
-            aspect-ratio: 16 / 9;
-        }
-
-        &.poster-card .media-dropzone {
-            aspect-ratio: 2 / 3;
-        }
     }
 }
 
-.movie-details-panel {
+/* ==========================================================================
+   PANEL DERECHO PRINCIPAL: FORMULARIO DE DATOS
+   ========================================================================== */
+.product-details-panel {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -223,10 +224,6 @@
             margin: 0;
             letter-spacing: 1px;
             text-shadow: 3px 3px 0px theme.$arcade-blue-shadow;
-
-            @media (max-width: 480px) {
-                font-size: 1.1rem;
-            }
         }
 
         .status-badge {
@@ -241,12 +238,8 @@
 
     .form-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 1.2rem;
-
-        @media (max-width: 650px) {
-            grid-template-columns: 1fr;
-        }
 
         .full-width {
             grid-column: 1 / -1;
@@ -259,14 +252,19 @@
 
             .form-label {
                 font-family: theme.$font-pixel;
-                font-size: 0.75rem;
+                font-size: 0.8rem;
                 color: theme.$arcade-text-white;
                 letter-spacing: 0.5px;
+
+                .optional-tag {
+                    color: #777;
+                    font-size: 0.65rem;
+                }
             }
 
             .form-control {
                 font-family: theme.$font-pixel;
-                font-size: 0.8rem;
+                font-size: 0.85rem;
                 padding: 0.85rem;
                 background-color: #000;
                 border: 2px solid theme.$arcade-text-white;
@@ -276,7 +274,7 @@
 
                 &::placeholder {
                     color: #555;
-                    font-size: 0.7rem;
+                    font-size: 0.75rem;
                 }
 
                 &:focus {
@@ -287,30 +285,34 @@
 
             .textarea {
                 resize: vertical;
-                min-height: 110px;
+                min-height: 90px;
                 line-height: 1.4;
             }
         }
     }
 
-    .age-restriction-selector {
-        display: flex;
+    /* BOTONES SELECTORES DE CATEGORÍA */
+    .category-selector {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
         gap: 0.8rem;
 
-        @media (max-width: 480px) {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        @media (max-width: 600px) {
+            grid-template-columns: repeat(2, 1fr);
         }
 
-        .age-btn {
-            flex: 1;
+        .category-btn {
             background-color: #000;
             border: 2px solid theme.$arcade-text-white;
             color: theme.$arcade-text-white;
             font-family: theme.$font-pixel;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             padding: 0.8rem 0.4rem;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             transition: all 0.15s ease;
 
             &:hover {
@@ -361,7 +363,7 @@
 
 .form-control.is-invalid,
 .preview-card.is-invalid,
-.age-restriction-selector.is-invalid {
+.category-selector.is-invalid {
     border-color: theme.$arcade-red !important;
     box-shadow: 0 0 10px rgba(255, 0, 85, 0.35) !important;
 }

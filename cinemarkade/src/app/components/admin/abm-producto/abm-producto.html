@@ -1,0 +1,83 @@
+<div class="abm-productos-container">
+
+    <!-- CABECERA DEL ABM -->
+    <div class="abm-header">
+        <div class="header-title-group">
+            <h2 class="section-title">PRODUCTOS CANDYBAR</h2>
+            <span class="total-badge">TOTAL: {{ productos().length }}</span>
+        </div>
+
+        <!-- BUSCADOR INTERNO -->
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="form-control" placeholder="BUSCAR NOMBRE O CATEGORÍA..."
+                (input)="onSearch($event)">
+        </div>
+    </div>
+
+    <!-- GRILLA DE PRODUCTOS -->
+    @if (productosCargados()) {
+    <div class="productos-grid">
+        @for (producto of productosFiltrados(); track producto.id) {
+        <div class="product-card" [class.is-inactive]="!producto.activa">
+
+            <!-- IMAGEN DEL PRODUCTO -->
+            <div class="card-media">
+                <img [src]="producto.imagen" [alt]="producto.nombre" class="product-img">
+                <span class="badge-category">{{ producto.categoria }}</span>
+
+                @if (!producto.activa) {
+                <span class="badge-status-off">INACTIVO</span>
+                }
+            </div>
+
+            <!-- DETALLES DEL PRODUCTO -->
+            <div class="card-details">
+                <h3 class="product-title">{{ producto.nombre | uppercase }}</h3>
+
+                <div class="product-meta">
+                    <span class="meta-item price">💲 {{ producto.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+                </div>
+
+                <p class="product-description">{{ producto.descripcion }}</p>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="card-actions">
+                    <button type="button" class="btn-action edit" (click)="modificarProducto(producto.id)">
+                        ✏️ MODIFICAR
+                    </button>
+
+                    <button type="button" class="btn-action" [class.delete]="producto.activa"
+                        [class.activate]="!producto.activa"
+                        (click)="cambiarEstadoProducto(producto.id, producto.activa)">
+                        @if (producto.activa) {
+                        ✖ DAR DE BAJA
+                        } @else {
+                        ✔ DAR DE ALTA
+                        }
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        } @empty {
+        <div class="empty-state">
+            <span class="empty-icon">🍿</span>
+            <p class="empty-text">[ NO SE ENCONTRARON PRODUCTOS ]</p>
+        </div>
+        }
+    </div>
+    } @else {
+    <!-- LOADER / CARGANDO -->
+    <div class="loading-state">
+        <span class="loading-text">CARGANDO CANDYBAR...</span>
+    </div>
+    }
+
+    <!-- BOTÓN FLOTANTE PARA AÑADIR PRODUCTO -->
+    <button type="button" class="fab-add-product" (click)="irAAgregarProducto()" title="Añadir Nuevo Producto">
+        <span class="fab-icon">+</span>
+        <span class="fab-label">NUEVO PRODUCTO</span>
+    </button>
+
+</div>

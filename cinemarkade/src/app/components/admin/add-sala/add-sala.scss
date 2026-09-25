@@ -1,0 +1,196 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.sala-page-container {
+    @extend %pixel-text-rendering;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 3rem 1.5rem;
+    box-sizing: border-box;
+}
+
+.sala-card-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    background-color: #0d0d0d;
+    border: 4px solid theme.$arcade-yellow;
+    box-shadow: 10px 10px 0px #000, 0 0 20px rgba(255, 204, 0, 0.2);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 650px;
+    box-sizing: border-box;
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px dashed #444;
+        padding-bottom: 1rem;
+
+        @media (max-width: 480px) {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.8rem;
+        }
+
+        .panel-title {
+            font-family: theme.$font-pixel;
+            font-size: 1.4rem;
+            color: theme.$arcade-yellow;
+            margin: 0;
+            letter-spacing: 1px;
+            text-shadow: 3px 3px 0px theme.$arcade-blue-shadow;
+        }
+
+        .status-badge {
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            color: theme.$arcade-cyan;
+            background-color: #000;
+            border: 2px solid theme.$arcade-cyan;
+            padding: 0.4rem 0.7rem;
+        }
+    }
+
+    .form-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+
+        .form-label {
+            font-family: theme.$font-pixel;
+            font-size: 0.8rem;
+            color: theme.$arcade-text-white;
+            letter-spacing: 0.5px;
+        }
+
+        /* GRILLA DE TARJETAS DE SELECCIÓN DE FORMATO */
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+
+            @media (max-width: 550px) {
+                grid-template-columns: 1fr;
+            }
+
+            .format-card {
+                background-color: #000;
+                border: 3px solid theme.$arcade-text-white;
+                padding: 1.5rem 1rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.8rem;
+                cursor: pointer;
+                transition: all 0.15s ease;
+
+                .format-icon {
+                    font-size: 2.2rem;
+                }
+
+                .format-name {
+                    font-family: theme.$font-pixel;
+                    font-size: 1.1rem;
+                    color: theme.$arcade-text-white;
+                }
+
+                .format-tag {
+                    font-family: theme.$font-pixel;
+                    font-size: 0.55rem;
+                    color: #777;
+                }
+
+                &:hover {
+                    border-color: theme.$arcade-yellow;
+                    transform: translateY(-3px);
+
+                    .format-name {
+                        color: theme.$arcade-yellow;
+                    }
+                }
+
+                &.selected {
+                    border-color: theme.$arcade-cyan;
+                    background-color: rgba(0, 229, 255, 0.1);
+                    box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+
+                    .format-name {
+                        color: theme.$arcade-cyan;
+                    }
+
+                    .format-tag {
+                        color: theme.$arcade-cyan;
+                    }
+                }
+            }
+        }
+    }
+
+    /* CAJA DE NOTA INFORMATIVA */
+    .info-box {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        background-color: #000;
+        border: 2px dashed #444;
+        padding: 1rem;
+
+        .info-icon {
+            font-size: 1.2rem;
+        }
+
+        .info-text {
+            font-family: theme.$font-pixel;
+            font-size: 0.65rem;
+            color: #aaa;
+            margin: 0;
+            line-height: 1.4;
+        }
+    }
+
+    .panel-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1.2rem;
+        border-top: 2px dashed #333;
+        padding-top: 1.5rem;
+
+        @media (max-width: 500px) {
+            flex-direction: column-reverse;
+
+            .btn,
+            .btn-pixel-outline {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    }
+}
+
+.field-error {
+    font-family: theme.$font-pixel;
+    font-size: 0.75rem;
+    color: theme.$arcade-red;
+    margin-top: 0.5rem;
+    display: block;
+    letter-spacing: 0.5px;
+}
+
+.label-error {
+    color: theme.$arcade-red !important;
+}
+
+.format-grid.is-invalid {
+    padding: 0.4rem;
+    border: 2px dashed theme.$arcade-red;
+}

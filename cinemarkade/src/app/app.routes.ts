@@ -52,6 +52,14 @@ export const routes: Routes = [
             {
                 path: 'nueva-sala',
                 loadComponent: () => import('./components/admin/add-sala/add-sala').then((m) => m.AddSala)
+            },
+            {
+                path: 'productos',
+                loadComponent: () => import('./components/admin/abm-producto/abm-producto').then((m) => m.AbmProducto)
+            },
+            {
+                path: 'nuevo-producto',
+                loadComponent: () => import('./components/admin/add-producto/add-producto').then((m) => m.AddProducto)
             }
         ],
     },

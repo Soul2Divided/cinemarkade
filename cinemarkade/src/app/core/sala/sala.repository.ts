@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import type { SalaInput, Sala } from './sala.model';
+import { SalaInput, Sala } from './sala.model';
 
 @Injectable()
 export abstract class SalaRepository {

@@ -1,10 +1,12 @@
 <div class="admin-shell">
     <aside class="admin-sidebar">
         <h2 class="admin-brand">PANEL ADMIN</h2>
+
         <nav class="admin-nav">
             @for (seccion of secciones; track seccion.route) {
             <a class="admin-nav-item" [routerLink]="seccion.route" routerLinkActive="active">
-                {{ seccion.label }}
+                <span class="nav-icon">{{ seccion.icon }}</span>
+                <span class="nav-label">{{ seccion.label }}</span>
             </a>
             }
         </nav>

@@ -7,6 +7,8 @@ import { PeliculaRepository } from './core/pelicula/pelicula.repository';
 import { SupabasePeliculaAdapter } from './core/pelicula/supabase-pelicula.adapter';
 import { SalaRepository } from './core/sala/sala.repository';
 import { SupabaseSalaAdapter } from './core/sala/supabase-sala.adapter';
+import { ProductoRepository } from './core/producto/producto.repository';
+import { SupabaseProductoAdapter } from './core/producto/supabase-producto.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +16,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     { provide: UserRepository, useClass: SupabaseUserAdapter },
     { provide: PeliculaRepository, useClass: SupabasePeliculaAdapter },
-    { provide: SalaRepository, useClass: SupabaseSalaAdapter }
+    { provide: SalaRepository, useClass: SupabaseSalaAdapter },
+    { provide: ProductoRepository, useClass: SupabaseProductoAdapter }
   ]
 };

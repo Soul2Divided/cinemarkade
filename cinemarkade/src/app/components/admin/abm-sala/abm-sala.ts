@@ -44,7 +44,7 @@ export class AbmSala {
   }
 
   irAAgregarSala(): void {
-    this.router.navigate(['/admin/salas/nueva-sala']);
+    this.router.navigate(['/admin/nueva-sala']);
   }
 
   modificarSala(id: number): void {

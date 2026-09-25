@@ -6,7 +6,7 @@
     width: 100%;
 }
 
-.abm-salas-container {
+.abm-productos-container {
     @extend %pixel-text-rendering;
     position: relative;
     display: flex;
@@ -18,9 +18,7 @@
     padding-bottom: 5rem;
 }
 
-/* ==========================================================================
-   CABECERA DEL ABM (TÍTULO Y BUSCADOR)
-   ========================================================================== */
+/* CABECERA */
 .abm-header {
     display: flex;
     justify-content: space-between;
@@ -42,7 +40,6 @@
         .section-title {
             font-family: theme.$font-pixel;
             font-size: 1.4rem;
-            /* Aumentado */
             color: theme.$arcade-yellow;
             margin: 0;
             letter-spacing: 1px;
@@ -52,7 +49,6 @@
         .total-badge {
             font-family: theme.$font-pixel;
             font-size: 0.85rem;
-            /* Aumentado */
             background-color: #000;
             border: 2px solid theme.$arcade-cyan;
             color: theme.$arcade-cyan;
@@ -79,7 +75,6 @@
         .form-control {
             font-family: theme.$font-pixel;
             font-size: 0.85rem;
-            /* Aumentado */
             padding: 0.85rem 0.8rem 0.85rem 2.8rem;
             background-color: #000;
             border: 2px solid theme.$arcade-text-white;
@@ -95,10 +90,8 @@
     }
 }
 
-/* ==========================================================================
-   GRILLA DE SALAS
-   ========================================================================== */
-.salas-grid {
+/* GRILLA Y TARJETAS */
+.productos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: 2rem;
@@ -108,7 +101,7 @@
     }
 }
 
-.sala-card {
+.product-card {
     display: flex;
     background-color: #0d0d0d;
     border: 3px solid theme.$arcade-text-white;
@@ -123,7 +116,6 @@
         transform: translateY(-3px);
     }
 
-    /* ESTADO INACTIVO (OPACO Y DESSATURADO) */
     &.is-inactive {
         opacity: 0.55;
         filter: grayscale(0.75);
@@ -137,47 +129,49 @@
             box-shadow: 6px 6px 0px theme.$arcade-cyan;
         }
 
-        .sala-title {
+        .product-title {
             color: #888;
         }
     }
 
-    .card-screen-badge {
+    .card-media {
         position: relative;
-        width: 100px;
-        height: 110px;
+        width: 110px;
+        height: 120px;
         flex-shrink: 0;
         background-color: #000;
-        border: 3px solid theme.$arcade-cyan;
+        border: 2px solid #333;
         display: flex;
-        flex-direction: column;
-        align-items: center;
         justify-content: center;
-        gap: 0.4rem;
+        align-items: center;
 
-        .screen-icon {
-            font-size: 2.2rem;
-            /* Icono más grande */
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
-        .screen-type {
-            font-family: theme.$font-pixel;
-            font-size: 1rem;
-            /* AUMENTADO: Muy fácil de leer */
+        .badge-category {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            background-color: #000;
+            border: 1px solid theme.$arcade-cyan;
             color: theme.$arcade-cyan;
-            font-weight: bold;
-            letter-spacing: 1px;
+            font-family: theme.$font-pixel;
+            font-size: 0.6rem;
+            padding: 0.2rem 0.35rem;
         }
 
         .badge-status-off {
             position: absolute;
-            bottom: -10px;
+            bottom: 4px;
+            right: 4px;
             background-color: theme.$arcade-red;
             color: #fff;
             font-family: theme.$font-pixel;
-            font-size: 0.65rem;
-            /* Aumentado */
-            padding: 0.25rem 0.4rem;
+            font-size: 0.6rem;
+            padding: 0.2rem 0.35rem;
             border: 1px solid #fff;
         }
     }
@@ -187,32 +181,48 @@
         flex-direction: column;
         justify-content: space-between;
         flex: 1;
-        gap: 1rem;
+        gap: 0.8rem;
 
-        .sala-title {
+        .product-title {
             font-family: theme.$font-pixel;
-            font-size: 1.2rem;
-            /* AUMENTADO: Título claro */
+            font-size: 1.1rem;
             color: theme.$arcade-yellow;
             margin: 0;
             line-height: 1.2;
         }
 
-        .sala-meta {
+        .product-meta {
             display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
+            justify-content: space-between;
+            gap: 0.6rem;
 
             .meta-item {
                 font-family: theme.$font-pixel;
-                font-size: 0.85rem;
-                /* AUMENTADO: Texto de formato legible */
-                color: theme.$arcade-text-white;
-                letter-spacing: 0.5px;
+                font-size: 0.8rem;
+
+                &.type {
+                    color: #aaa;
+                }
+
+                &.price {
+                    color: #00ff66;
+                    font-weight: bold;
+                }
             }
         }
 
-        /* BOTONES DE ACCIÓN */
+        .product-description {
+            font-size: 0.8rem;
+            line-height: 1.3;
+            color: theme.$arcade-text-white;
+            margin: 0;
+            display: -webkit-box;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
         .card-actions {
             display: flex;
             gap: 0.8rem;
@@ -225,7 +235,6 @@
                 flex: 1;
                 font-family: theme.$font-pixel;
                 font-size: 0.75rem;
-                /* AUMENTADO: Texto del botón muy cómodo */
                 padding: 0.7rem 0.5rem;
                 border: 2px solid theme.$arcade-text-white;
                 background-color: #000;
@@ -280,15 +289,12 @@
     .loading-text {
         font-family: theme.$font-pixel;
         font-size: 1rem;
-        /* Aumentado */
         color: theme.$arcade-yellow;
     }
 }
 
-/* ==========================================================================
-   BOTÓN FLOTANTE FAB (+ NUEVA SALA)
-   ========================================================================== */
-.fab-add-sala {
+/* FAB */
+.fab-add-product {
     position: fixed;
     bottom: 2.5rem;
     right: 2.5rem;
@@ -312,7 +318,6 @@
 
     .fab-label {
         font-size: 0.9rem;
-        /* Aumentado */
         letter-spacing: 0.5px;
     }
 

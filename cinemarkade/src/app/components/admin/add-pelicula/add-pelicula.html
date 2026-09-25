@@ -1,7 +1,7 @@
 <div class="movie-page-container">
     <form class="movie-card-panel" [formGroup]="formMovie" (ngSubmit)="onSubmit()">
 
-        <!-- PANEL IZQUIERDO DESFASADO / SOBRESALIENTE -->
+        <!-- PANEL IZQUIERDO DESFASADO -->
         <div class="floating-media-panel">
 
             <!-- 1. PREVIEW BANNER (16:9) -->
@@ -32,7 +32,7 @@
             </div>
 
             <!-- 2. PREVIEW POSTER (2:3) -->
-            <div class="preview-card poster-card">
+            <div class="preview-card poster-card" [class.is-invalid]="isFieldInvalid('imagen')">
                 <span class="card-tag">POSTER (2:3)</span>
 
                 <div class="media-dropzone" (click)="posterFileInput.click()">
@@ -56,6 +56,10 @@
                 </div>
 
                 <input #posterFileInput type="file" accept="image/*" (change)="onPosterFileSelected($event)" hidden>
+
+                @if (getFieldError('imagen')) {
+                <small class="field-error">{{ getFieldError('imagen') }}</small>
+                }
             </div>
 
         </div>
@@ -70,29 +74,35 @@
             <div class="form-grid">
                 <!-- NOMBRE -->
                 <div class="form-group full-width">
-                    <label class="form-label">TÍTULO DE LA PELÍCULA</label>
+                    <label class="form-label" [class.label-error]="isFieldInvalid('nombre')">TÍTULO DE LA
+                        PELÍCULA</label>
                     <input type="text" formControlName="nombre" class="form-control"
-                        placeholder="EJ: BACK TO THE FUTURE">
+                        [class.is-invalid]="isFieldInvalid('nombre')" placeholder="EJ: BACK TO THE FUTURE">
+
+                    @if (getFieldError('nombre')) {
+                    <small class="field-error">{{ getFieldError('nombre') }}</small>
+                    }
                 </div>
 
                 <!-- URLS OPCIONALES PARA IMÁGENES -->
                 <div class="form-group">
                     <label class="form-label">URL DEL BANNER <small
-                            style="color: #777; font-size: 0.6rem;">(OPCIONAL)</small></label>
+                            style="color: #777; font-size: 0.65rem;">(OPCIONAL)</small></label>
                     <input type="text" formControlName="banner" class="form-control" placeholder="HTTP://URL-BANNER.JPG"
                         (input)="onBannerUrlInput($event)">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">URL DEL POSTER</label>
-                    <input type="text" formControlName="imagen" class="form-control" placeholder="HTTP://URL-POSTER.JPG"
+                    <label class="form-label" [class.label-error]="isFieldInvalid('imagen')">URL DEL POSTER</label>
+                    <input type="text" formControlName="imagen" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('imagen')" placeholder="HTTP://URL-POSTER.JPG"
                         (input)="onPosterUrlInput($event)">
                 </div>
 
                 <!-- GÉNERO -->
                 <div class="form-group">
-                    <label class="form-label">GÉNERO</label>
-                    <select formControlName="genero" class="form-control">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('genero')">GÉNERO</label>
+                    <select formControlName="genero" class="form-control" [class.is-invalid]="isFieldInvalid('genero')">
                         <option value="" disabled selected>SELECCIONAR</option>
                         <option value="Acción">ACCIÓN</option>
                         <option value="Ciencia Ficción">CIENCIA FICCIÓN</option>
@@ -102,18 +112,29 @@
                         <option value="Drama">DRAMA</option>
                         <option value="Animación">ANIMACIÓN</option>
                     </select>
+
+                    @if (getFieldError('genero')) {
+                    <small class="field-error">{{ getFieldError('genero') }}</small>
+                    }
                 </div>
 
                 <!-- DURACIÓN -->
                 <div class="form-group">
-                    <label class="form-label">DURACIÓN (MINUTOS)</label>
-                    <input type="number" formControlName="duracion" class="form-control" placeholder="120" min="1">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('duracion')">DURACIÓN
+                        (MINUTOS)</label>
+                    <input type="number" formControlName="duracion" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('duracion')" placeholder="120" min="1">
+
+                    @if (getFieldError('duracion')) {
+                    <small class="field-error">{{ getFieldError('duracion') }}</small>
+                    }
                 </div>
 
                 <!-- RESTRICCIÓN DE EDAD -->
                 <div class="form-group full-width">
-                    <label class="form-label">RESTRICCIÓN DE EDAD</label>
-                    <div class="age-restriction-selector">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('restriccionEdad')">RESTRICCIÓN DE
+                        EDAD</label>
+                    <div class="age-restriction-selector" [class.is-invalid]="isFieldInvalid('restriccionEdad')">
                         <button type="button" class="age-btn rating-at"
                             [class.selected]="formMovie.get('restriccionEdad')?.value === 'ATP'"
                             (click)="seleccionarRestriccion('ATP')">
@@ -135,13 +156,22 @@
                             +18
                         </button>
                     </div>
+
+                    @if (getFieldError('restriccionEdad')) {
+                    <small class="field-error">{{ getFieldError('restriccionEdad') }}</small>
+                    }
                 </div>
 
                 <!-- SINOPSIS -->
                 <div class="form-group full-width">
-                    <label class="form-label">SINOPSIS</label>
-                    <textarea formControlName="sinopsis" class="form-control textarea" rows="4"
+                    <label class="form-label" [class.label-error]="isFieldInvalid('sinopsis')">SINOPSIS</label>
+                    <textarea formControlName="sinopsis" class="form-control textarea"
+                        [class.is-invalid]="isFieldInvalid('sinopsis')" rows="4"
                         placeholder="DESCRIPCIÓN DE LA TRAMA..."></textarea>
+
+                    @if (getFieldError('sinopsis')) {
+                    <small class="field-error">{{ getFieldError('sinopsis') }}</small>
+                    }
                 </div>
             </div>
 

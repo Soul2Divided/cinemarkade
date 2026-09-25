@@ -1,1 +1,82 @@
-<p>add-sala works!</p>
+<div class="sala-page-container">
+    <form class="sala-card-panel" [formGroup]="formSala" (ngSubmit)="onSubmit()">
+
+        <!-- HEADER DEL FORMULARIO -->
+        <div class="panel-header">
+            <h2 class="panel-title">NUEVA SALA</h2>
+            <span class="status-badge">CONFIGURE SCREEN</span>
+        </div>
+
+        <!-- SELECCIÓN DE FORMATO -->
+        <div class="form-section">
+            <label class="form-label" [class.label-error]="isFieldInvalid('formato')">
+                SELECCIONAR FORMATO DE PANTALLA
+            </label>
+
+            <div class="format-grid" [class.is-invalid]="isFieldInvalid('formato')">
+                @for (formatoOption of formatosDisponibles; track formatoOption) {
+                <button type="button" class="format-card"
+                    [class.selected]="formSala.get('formato')?.value === formatoOption"
+                    (click)="seleccionarFormato(formatoOption)">
+
+                    <div class="format-icon">
+                        @switch (formatoOption) {
+                        @case ('2D') { 📽️ }
+                        @case ('3D') { 🕶️ }
+                        @case ('4D') { 🌁 }
+                        }
+                    </div>
+
+                    <span class="format-name">{{ formatoOption }}</span>
+                    <span class="format-tag">
+                        @switch (formatoOption) {
+                        @case ('2D') { ESTÁNDAR }
+                        @case ('3D') { REAL D 3D }
+                        @case ('4D') { EFECTOS 4DX }
+                        }
+                    </span>
+                </button>
+                }
+            </div>
+
+            @if (getFieldError('formato')) {
+            <small class="field-error">{{ getFieldError('formato') }}</small>
+            }
+        </div>
+
+        <!-- INFORMACIÓN DE ASIGNACIÓN -->
+        <div class="info-box">
+            <span class="info-icon">ℹ️</span>
+            <p class="info-text">
+                EL NÚMERO DE SALA (ID) SERÁ ASIGNADO AUTOMÁTICAMENTE POR EL SISTEMA AL GUARDAR.
+            </p>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="panel-actions">
+            <button type="button" class="btn-pixel-outline" (click)="cancelar()">
+                ◄ CANCELAR
+            </button>
+            <button type="submit" class="btn btn-pixel cyan" [disabled]="formSala.invalid">
+                CREAR SALA
+            </button>
+        </div>
+
+    </form>
+
+    @if (mostrarLoader()) {
+    <app-loader message="AÑADIENDO SALA..."></app-loader>
+    }
+
+    <app-modal [isOpen]="mostrarModal()" title="CREADA CON EXITO" subtitle="NUEVO REGISTRO EN BASE DE DATOS"
+        variant="cyan" (close)="cerrarModal()">
+
+        <p>La sala se ha añadido correctamente</p>
+
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+                ACEPTAR
+            </button>
+        </div>
+    </app-modal>
+</div>
