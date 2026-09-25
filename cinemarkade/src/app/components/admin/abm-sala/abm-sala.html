@@ -1,0 +1,78 @@
+<div class="abm-salas-container">
+
+    <!-- CABECERA DEL ABM DE SALAS -->
+    <div class="abm-header">
+        <div class="header-title-group">
+            <h2 class="section-title">GESTIÓN DE SALAS</h2>
+            <span class="total-badge">TOTAL: {{ salas().length }}</span>
+        </div>
+
+        <!-- BUSCADOR INTERNO -->
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="form-control" placeholder="BUSCAR FORMATO (2D, 3D...)" (input)="onSearch($event)">
+        </div>
+    </div>
+
+    <!-- GRILLA DE SALAS -->
+    @if (salasCargadas()) {
+    <div class="salas-grid">
+        @for (sala of salasFiltradas(); track sala.id) {
+        <div class="sala-card" [class.is-inactive]="!sala.activa">
+
+            <!-- BADGE ARCADE DEL FORMATO -->
+            <div class="card-screen-badge">
+                <span class="screen-icon">📽️</span>
+                <span class="screen-type">{{ sala.formato }}</span>
+                @if (!sala.activa) {
+                <span class="badge-status-off">INACTIVA</span>
+                }
+            </div>
+
+            <!-- DETALLES DE LA SALA -->
+            <div class="card-details">
+                <h3 class="sala-title">SALA #{{ sala.id }}</h3>
+
+                <div class="sala-meta">
+                    <span class="meta-item format">FORMATO: {{ sala.formato }}</span>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="card-actions">
+                    <button type="button" class="btn-action edit" (click)="modificarSala(sala.id)">
+                        ✏️ MODIFICAR
+                    </button>
+
+                    <button type="button" class="btn-action" [class.delete]="sala.activa"
+                        [class.activate]="!sala.activa" (click)="cambiarEstadoSala(sala.id, sala.activa)">
+                        @if (sala.activa) {
+                        ✖ DAR DE BAJA
+                        } @else {
+                        ✔ DAR DE ALTA
+                        }
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        } @empty {
+        <div class="empty-state">
+            <span class="empty-icon">🏛️</span>
+            <p class="empty-text">[ NO SE ENCONTRARON SALAS ]</p>
+        </div>
+        }
+    </div>
+    } @else {
+    <!-- LOADER / CARGANDO -->
+    <div class="loading-state">
+        <span class="loading-text">CARGANDO SALAS...</span>
+    </div>
+    }
+
+    <!-- BOTÓN FLOTANTE PARA AÑADIR SALA -->
+    <button type="button" class="fab-add-sala" (click)="irAAgregarSala()" title="Añadir Nueva Sala">
+        <span class="fab-icon">+</span>
+        <span class="fab-label">NUEVA SALA</span>
+    </button>
+
+</div>

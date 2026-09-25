@@ -1,0 +1,319 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+}
+
+.abm-salas-container {
+    @extend %pixel-text-rendering;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 2rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding-bottom: 5rem;
+}
+
+/* ==========================================================================
+   CABECERA DEL ABM (TÍTULO Y BUSCADOR)
+   ========================================================================== */
+.abm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px dashed #333;
+    padding-bottom: 1.2rem;
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-title-group {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .section-title {
+            font-family: theme.$font-pixel;
+            font-size: 1.3rem;
+            color: theme.$arcade-yellow;
+            margin: 0;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px theme.$arcade-blue-shadow;
+        }
+
+        .total-badge {
+            font-family: theme.$font-pixel;
+            font-size: 0.75rem;
+            background-color: #000;
+            border: 2px solid theme.$arcade-cyan;
+            color: theme.$arcade-cyan;
+            padding: 0.4rem 0.6rem;
+        }
+    }
+
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 300px;
+
+        @media (max-width: 768px) {
+            width: 100%;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            font-family: theme.$font-pixel;
+            font-size: 0.75rem;
+            padding: 0.75rem 0.8rem 0.75rem 2.4rem;
+            background-color: #000;
+            border: 2px solid theme.$arcade-text-white;
+            color: theme.$arcade-yellow;
+            outline: none;
+            width: 100%;
+
+            &:focus {
+                border-color: theme.$arcade-yellow;
+                box-shadow: 0 0 10px rgba(255, 204, 0, 0.25);
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   GRILLA DE SALAS
+   ========================================================================== */
+.salas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.8rem;
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sala-card {
+    display: flex;
+    background-color: #0d0d0d;
+    border: 3px solid theme.$arcade-text-white;
+    box-shadow: 6px 6px 0px #000;
+    padding: 1.2rem;
+    gap: 1.2rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: theme.$arcade-yellow;
+        box-shadow: 6px 6px 0px theme.$arcade-yellow;
+        transform: translateY(-3px);
+    }
+
+    /* ESTADO INACTIVO (OPACO Y DESSATURADO) */
+    &.is-inactive {
+        opacity: 0.55;
+        filter: grayscale(0.75);
+        border-color: #444;
+        background-color: #080808;
+
+        &:hover {
+            opacity: 0.85;
+            filter: grayscale(0.3);
+            border-color: theme.$arcade-cyan;
+            box-shadow: 6px 6px 0px theme.$arcade-cyan;
+        }
+
+        .sala-title {
+            color: #888;
+        }
+    }
+
+    .card-screen-badge {
+        position: relative;
+        width: 90px;
+        height: 100px;
+        flex-shrink: 0;
+        background-color: #000;
+        border: 2px solid theme.$arcade-cyan;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+
+        .screen-icon {
+            font-size: 1.8rem;
+        }
+
+        .screen-type {
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            color: theme.$arcade-cyan;
+        }
+
+        .badge-status-off {
+            position: absolute;
+            bottom: -8px;
+            background-color: theme.$arcade-red;
+            color: #fff;
+            font-family: theme.$font-pixel;
+            font-size: 0.55rem;
+            padding: 0.15rem 0.3rem;
+            border: 1px solid #fff;
+        }
+    }
+
+    .card-details {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex: 1;
+        gap: 0.8rem;
+
+        .sala-title {
+            font-family: theme.$font-pixel;
+            font-size: 0.95rem;
+            color: theme.$arcade-yellow;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .sala-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+
+            .meta-item {
+                font-family: theme.$font-pixel;
+                font-size: 0.7rem;
+                color: theme.$arcade-text-white;
+            }
+        }
+
+        /* BOTONES DE ACCIÓN */
+        .card-actions {
+            display: flex;
+            gap: 0.6rem;
+
+            @media (max-width: 400px) {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                flex: 1;
+                font-family: theme.$font-pixel;
+                font-size: 0.65rem;
+                padding: 0.55rem 0.4rem;
+                border: 2px solid theme.$arcade-text-white;
+                background-color: #000;
+                color: theme.$arcade-text-white;
+                cursor: pointer;
+                transition: all 0.15s ease;
+
+                &.edit:hover {
+                    border-color: theme.$arcade-yellow;
+                    background-color: theme.$arcade-yellow;
+                    color: #000;
+                }
+
+                &.delete:hover {
+                    border-color: theme.$arcade-red;
+                    background-color: theme.$arcade-red;
+                    color: #fff;
+                }
+
+                &.activate {
+                    border-color: #00ff66;
+                    color: #00ff66;
+
+                    &:hover {
+                        background-color: #00ff66;
+                        color: #000;
+                        box-shadow: 0 0 10px rgba(0, 255, 102, 0.4);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* ESTADOS DE CARGA / VACÍO */
+.empty-state,
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    text-align: center;
+    gap: 1rem;
+    border: 2px dashed #333;
+
+    .empty-icon {
+        font-size: 2.5rem;
+    }
+
+    .empty-text,
+    .loading-text {
+        font-family: theme.$font-pixel;
+        font-size: 0.85rem;
+        color: theme.$arcade-yellow;
+    }
+}
+
+/* ==========================================================================
+   BOTÓN FLOTANTE FAB (+ NUEVA SALA)
+   ========================================================================== */
+.fab-add-sala {
+    position: fixed;
+    bottom: 2.5rem;
+    right: 2.5rem;
+    background-color: theme.$arcade-yellow;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0px #000, 0 0 15px rgba(255, 204, 0, 0.4);
+    color: #000;
+    font-family: theme.$font-pixel;
+    padding: 0.9rem 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 999;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+    .fab-icon {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .fab-label {
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    &:hover {
+        transform: translateY(-4px) scale(1.03);
+        box-shadow: 8px 8px 0px #000, 0 0 20px rgba(255, 204, 0, 0.6);
+    }
+
+    @media (max-width: 600px) {
+        bottom: 1.5rem;
+        right: 1.5rem;
+        padding: 0.8rem 1rem;
+
+        .fab-label {
+            display: none;
+        }
+    }
+}

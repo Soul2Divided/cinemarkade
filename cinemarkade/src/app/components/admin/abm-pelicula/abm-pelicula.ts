@@ -1,11 +1,11 @@
 import { UpperCasePipe } from '@angular/common';
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Pelicula } from '../../../core/pelicula/pelicula.model';
 import { PeliculaRepository } from '../../../core/pelicula/pelicula.repository';
 
 @Component({
-  imports: [UpperCasePipe],
+  imports: [UpperCasePipe, RouterOutlet],
   selector: 'app-abm-pelicula',
   styleUrl: './abm-pelicula.scss',
   templateUrl: './abm-pelicula.html',
@@ -54,7 +54,7 @@ export class AbmPelicula implements OnInit {
   }
 
   irAAgregarPelicula(): void {
-    this.router.navigate(['/admin/peliculas/nueva']);
+    this.router.navigate(['/admin/nueva-pelicula']);
   }
 
   modificarPelicula(id: string | number): void {

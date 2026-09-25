@@ -39,11 +39,19 @@ export const routes: Routes = [
         children: [
             {
                 path: 'peliculas',
-                loadComponent: () => import('./components/admin/abm-pelicula/abm-pelicula').then((m) => m.AbmPelicula)
+                loadComponent: () => import('./components/admin/abm-pelicula/abm-pelicula').then((m) => m.AbmPelicula),
             },
             {
                 path: 'nueva-pelicula',
                 loadComponent: () => import('./components/admin/add-pelicula/add-pelicula').then((m) => m.AddPelicula)
+            },
+            {
+                path: 'salas',
+                loadComponent: () => import('./components/admin/abm-sala/abm-sala').then((m) => m.AbmSala)
+            },
+            {
+                path: 'nueva-sala',
+                loadComponent: () => import('./components/admin/add-sala/add-sala').then((m) => m.AddSala)
             }
         ],
     },

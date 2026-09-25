@@ -15,6 +15,6 @@ interface SeccionAdmin {
 export class AdminLayout {
   secciones: SeccionAdmin[] = [
     { label: 'PELÍCULAS', route: '/admin/peliculas' },
-    { label: 'SALAS', route: '/admin/sala' },
+    { label: 'SALAS', route: '/admin/salas' },
   ];
 }
