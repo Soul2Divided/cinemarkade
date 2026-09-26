@@ -9,6 +9,8 @@ import { SalaRepository } from './core/sala/sala.repository';
 import { SupabaseSalaAdapter } from './core/sala/supabase-sala.adapter';
 import { ProductoRepository } from './core/producto/producto.repository';
 import { SupabaseProductoAdapter } from './core/producto/supabase-producto.adapter';
+import { FuncionRepository } from './core/funcion/funcion.repository';
+import { SupabaseFuncionAdapter } from './core/funcion/supabase-funcion.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +19,7 @@ export const appConfig: ApplicationConfig = {
     { provide: UserRepository, useClass: SupabaseUserAdapter },
     { provide: PeliculaRepository, useClass: SupabasePeliculaAdapter },
     { provide: SalaRepository, useClass: SupabaseSalaAdapter },
-    { provide: ProductoRepository, useClass: SupabaseProductoAdapter }
+    { provide: ProductoRepository, useClass: SupabaseProductoAdapter },
+    { provide: FuncionRepository, useClass: SupabaseFuncionAdapter}
   ]
 };

@@ -12,21 +12,28 @@
             </div>
 
             <div class="hero-info">
-                <span class="badge-featured">
-                    DESTACADO
+                <span class="badge-featured" [class.badge-combo]="elementosHero()[indiceHeroActual].esCombo">
+                    {{ elementosHero()[indiceHeroActual].esCombo ? 'PROMO CANDY' : 'DESTACADO' }}
                 </span>
+
                 <h1 class="hero-title">{{ elementosHero()[indiceHeroActual].nombre | uppercase }}</h1>
+
                 <p class="hero-meta">
+                    @if (elementosHero()[indiceHeroActual].esCombo) {
+                    CANDYBAR | OFERTA ESPECIAL
+                    } @else {
                     {{ elementosHero()[indiceHeroActual].genero | uppercase }} |
                     {{ elementosHero()[indiceHeroActual].duracion }} MIN |
                     {{ elementosHero()[indiceHeroActual].restriccion_edad }}
+                    }
                 </p>
+
                 <p class="hero-synopsis">{{ elementosHero()[indiceHeroActual].sinopsis }}</p>
 
                 <div class="hero-actions">
                     <button type="button" class="btn-pixel yellow"
                         (click)="ejecutarAccionHero(elementosHero()[indiceHeroActual])">
-                        🎟️ VER DETALLES
+                        {{ elementosHero()[indiceHeroActual].esCombo ? '🍿 PEDIR COMBO' : '🎟️ VER DETALLES' }}
                     </button>
                 </div>
             </div>
@@ -47,9 +54,9 @@
                 <span class="see-more">VER MÁS ▶</span>
             </div>
             <div class="top-ranking-grid">
-                @for (pelicula of peliculas(); track pelicula.id; let i = $index) {
+                @for (pelicula of peliculasTendencias(); track pelicula.id; let i = $index) {
                 <article class="ranking-card" (click)="seleccionarPelicula(pelicula)">
-                    <span class="ranking-number">{{ $index + 1 }}</span>
+                    <span class="ranking-number">{{ i + 1 }}</span>
                     <div class="card-media">
                         <img [src]="pelicula.imagen" [alt]="pelicula.nombre" />
                     </div>
@@ -67,7 +74,7 @@
                 <span class="see-more">VER MÁS ▶</span>
             </div>
             <div class="posters-grid">
-                @for (pelicula of peliculas(); track pelicula.id; let i = $index) {
+                @for (pelicula of peliculasEstrenos(); track pelicula.id) {
                 <article class="poster-card" (click)="seleccionarPelicula(pelicula)">
                     <div class="card-media">
                         <img [src]="pelicula.imagen" [alt]="pelicula.nombre" />
@@ -96,20 +103,9 @@
         <section class="catalog-section">
             <div class="section-header">
                 <h2 class="section-title">RECOMENDADO PARA TI</h2>
-                <span class="see-more">VER MÁS ▶</span>
             </div>
-            <div class="wide-cards-grid">
-                @for (pelicula of peliculas(); track pelicula.id; let i = $index) {
-                <article class="wide-card" (click)="seleccionarPelicula(pelicula)">
-                    <div class="card-media">
-                        <img [src]="pelicula.banner" [alt]="pelicula.nombre" />
-                    </div>
-                    <div class="card-details">
-                        <h4>{{ pelicula.nombre }}</h4>
-                        <p>{{ pelicula.genero }} | {{ pelicula.restriccion_edad }}</p>
-                    </div>
-                </article>
-                }
+            <div class="empty-recommendations">
+                <p>[ INICIÁ SESIÓN O MIRÁ PELÍCULAS PARA RECIBIR RECOMENDACIONES ]</p>
             </div>
         </section>
 
@@ -127,11 +123,11 @@
                 }
 
                 <div class="upcoming-list">
-                    @for (pelicula of peliculas(); track pelicula.id) {
+                    @for (pelicula of peliculasProximas(); track pelicula.id) {
                     <div class="upcoming-item">
                         <div class="item-info">
                             <h4>{{ pelicula.nombre }}</h4>
-                            <p>ESTRENO PRÓXIMAMENTE</p>
+                            <p>PRÓXIMAMENTE</p>
                         </div>
                         <button type="button" class="btn-pixel-sm">RECORDAR</button>
                     </div>
