@@ -1,0 +1,152 @@
+<div class="funcion-page-container">
+    <form class="funcion-card-panel" [formGroup]="formFuncion" (ngSubmit)="onSubmit()">
+        <div class="floating-ticket-panel">
+            <div class="ticket-preview-card">
+                <span class="card-tag">FUNCIÓN</span>
+
+                <div class="ticket-stub">
+                    <div class="stub-header">
+                        <span class="brand">CINEMARKADE</span>
+                        @if (esPreventaPreview) {
+                        <span class="stub-badge-preventa">PREVENTA</span>
+                        }
+                    </div>
+
+                    <div class="stub-poster">
+                        @if (peliculaSeleccionada; as pelicula) {
+                        <img [src]="pelicula.imagen" [alt]="pelicula.nombre" class="poster-img">
+                        } @else {
+                        <div class="poster-placeholder">
+                            <span>🎟️</span>
+                            <p>SELECCIONÁ PELÍCULA</p>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="stub-info">
+                        <h4 class="stub-title">
+                            {{ peliculaSeleccionada?.nombre || 'TÍTULO PELÍCULA' }}
+                        </h4>
+                        <div class="stub-row">
+                            <span>{{ formFuncion.controls.formato.value || 'FORMATO' }}</span>
+                            <span>{{ formFuncion.controls.idioma.value || 'IDIOMA' }}</span>
+                        </div>
+                        <div class="stub-row">
+                            <span>{{ formFuncion.controls.fecha.value || 'FECHA' }}</span>
+                            <span>{{ formFuncion.controls.horario.value || 'HORA' }}</span>
+                        </div>
+                        <div class="stub-row">
+                            <span>PRECIO</span>
+                            <span class="price-tag">
+                                ARS ${{ formFuncion.controls.precio.value || 0 }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="stub-barcode">
+                        <div class="barcode-lines">||||| ||| |||| |||||| |||</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="funcion-details-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">
+                    {{ esEdicion ? 'EDITAR FUNCIÓN' : 'CREAR FUNCIÓN' }}
+                </h2>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label class="form-label">PELÍCULA</label>
+                    <select formControlName="peliculaId" class="form-control">
+                        <option [ngValue]="null" disabled>SELECCIONAR PELÍCULA</option>
+                        @for (pelicula of peliculas(); track pelicula.id) {
+                        <option [ngValue]="pelicula.id">
+                            {{ pelicula.nombre }} ({{ pelicula.duracion }} MIN)
+                        </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">FORMATO</label>
+                    <div class="format-selector">
+                        @for (formato of formatosDisponibles; track formato) {
+                        <button type="button" class="format-btn"
+                            [class.selected]="formFuncion.controls.formato.value === formato"
+                            (click)="seleccionarFormato(formato)">
+                            {{ formato }}
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">FECHA DE PROYECCIÓN</label>
+                    <input type="date" formControlName="fecha" class="form-control" [min]="fechaMinima">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">HORARIO</label>
+                    <input type="time" formControlName="horario" class="form-control">
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label">IDIOMA</label>
+                    <div class="lang-selector">
+                        @for (idioma of idiomasDisponibles; track idioma) {
+                        <button type="button" class="lang-btn"
+                            [class.selected]="formFuncion.controls.idioma.value === idioma"
+                            (click)="seleccionarIdioma(idioma)">
+                            {{ idioma }}
+                        </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">PRECIO (ARS)</label>
+                    <input type="number" formControlName="precio" class="form-control" min="1" placeholder="2500">
+                </div>
+
+                <div class="form-group full-width">
+                    <p class="preventa-note">
+                        @if (esPreventaPreview) {
+                        La función se creará como preventa porque su fecha es futura.
+                        } @else {
+                        La función se creará como venta regular.
+                        }
+                    </p>
+                </div>
+            </div>
+
+            @if (errorMessage) {
+            <div class="error-banner">⚠️ {{ errorMessage }}</div>
+            }
+
+            <div class="panel-actions">
+                <button type="button" class="btn-pixel-outline" (click)="cancelar()">
+                    CANCELAR
+                </button>
+                <button type="submit" class="btn btn-pixel cyan" [disabled]="formFuncion.invalid">
+                    {{ esEdicion ? 'GUARDAR CAMBIOS' : 'CREAR FUNCIÓN' }}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    @if (mostrarLoader()) {
+    <app-loader message="GUARDANDO FUNCIÓN..."></app-loader>
+    }
+
+    <app-modal [isOpen]="mostrarModal()" [title]="esEdicion ? 'FUNCIÓN ACTUALIZADA' : 'FUNCIÓN CREADA'"
+        [subtitle]="resultado()" variant="cyan" (close)="cerrarModal()">
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+                ACEPTAR
+            </button>
+        </div>
+    </app-modal>
+</div>

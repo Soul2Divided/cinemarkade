@@ -12,8 +12,16 @@ export interface Funcion {
     idioma: IdiomaFuncion;
     precio: number;
     es_preventa: boolean;
+    activa: boolean;
 }
 
-export type FuncionInput = Omit<Funcion, 'id'>;
+export interface CrearFuncionInput {
+    peliculaId: number;
+    formato: FormatoSala;
+    fecha: string;
+    horario: string;
+    idioma: IdiomaFuncion;
+    precio: number;
+}
 
-export const IDIOMAS_FUNCION: IdiomaFuncion[] = ['Subtitulada', 'Doblada'];
+export type FuncionInput = Omit<Funcion, 'id' | 'activa'>;

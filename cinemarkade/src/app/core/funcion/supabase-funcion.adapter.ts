@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FuncionRepository } from './funcion.repository';
-import { FuncionInput, Funcion } from './funcion.model';
+import { Funcion, FuncionInput } from './funcion.model';
 import { SupabaseService } from '../services/supabase.service';
 
 @Injectable({ providedIn: 'root' })
@@ -8,9 +8,7 @@ export class SupabaseFuncionAdapter implements FuncionRepository {
     constructor(private supabaseService: SupabaseService) { }
 
     async listar(): Promise<Funcion[]> {
-        const supabase = this.supabaseService.supabaseClient;
-
-        const { data, error } = await supabase
+        const { data, error } = await this.supabaseService.supabaseClient
             .from('funcion')
             .select()
             .order('fecha', { ascending: true })
@@ -24,9 +22,7 @@ export class SupabaseFuncionAdapter implements FuncionRepository {
     }
 
     async obtenerPorId(id: number): Promise<Funcion> {
-        const supabase = this.supabaseService.supabaseClient;
-
-        const { data, error } = await supabase
+        const { data, error } = await this.supabaseService.supabaseClient
             .from('funcion')
             .select()
             .eq('id', id)
@@ -40,9 +36,7 @@ export class SupabaseFuncionAdapter implements FuncionRepository {
     }
 
     async listarPorPelicula(peliculaId: number): Promise<Funcion[]> {
-        const supabase = this.supabaseService.supabaseClient;
-
-        const { data, error } = await supabase
+        const { data, error } = await this.supabaseService.supabaseClient
             .from('funcion')
             .select()
             .eq('pelicula_id', peliculaId)
@@ -50,37 +44,78 @@ export class SupabaseFuncionAdapter implements FuncionRepository {
             .order('horario', { ascending: true });
 
         if (error) {
-            throw new Error(`Error al listar las funciones de la película: ${error.message}`);
+            throw new Error(
+                `Error al listar las funciones de la película: ${error.message}`
+            );
         }
 
         return data as Funcion[];
     }
 
-    async crearMuchas(funciones: FuncionInput[]): Promise<Funcion[]> {
-        const supabase = this.supabaseService.supabaseClient;
-
-        const { data, error } = await supabase
+    async crear(datos: FuncionInput): Promise<Funcion> {
+        const { data, error } = await this.supabaseService.supabaseClient
             .from('funcion')
-            .insert(funciones)
-            .select();
+            .insert(datos)
+            .select()
+            .single();
 
         if (error) {
-            throw new Error(`Error al crear las funciones: ${error.message}`);
+            throw new Error(`Error al crear la función: ${error.message}`);
         }
 
-        return data as Funcion[];
+        return data as Funcion;
     }
 
-    async eliminar(id: number): Promise<void> {
-        const supabase = this.supabaseService.supabaseClient;
-
-        const { error } = await supabase
+    async actualizar(id: number, datos: FuncionInput): Promise<Funcion> {
+        const { data, error } = await this.supabaseService.supabaseClient
             .from('funcion')
-            .delete()
+            .update(datos)
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) {
+            throw new Error(`Error al actualizar la función: ${error.message}`);
+        }
+
+        return data as Funcion;
+    }
+
+    async cambiarActiva(id: number, activa: boolean): Promise<void> {
+        const { error } = await this.supabaseService.supabaseClient
+            .from('funcion')
+            .update({ activa })
             .eq('id', id);
 
         if (error) {
-            throw new Error(`Error al eliminar la función: ${error.message}`);
+            throw new Error(
+                `Error al cambiar el estado de la función: ${error.message}`
+            );
         }
+    }
+
+    async existeFuncionActivaEnSala(
+        salaId: number,
+        excluirFuncionId?: number
+    ): Promise<boolean> {
+        let query = this.supabaseService.supabaseClient
+            .from('funcion')
+            .select('id', { count: 'exact', head: true })
+            .eq('sala_id', salaId)
+            .eq('activa', true);
+
+        if (excluirFuncionId !== undefined) {
+            query = query.neq('id', excluirFuncionId);
+        }
+
+        const { count, error } = await query;
+
+        if (error) {
+            throw new Error(
+                `Error al verificar la disponibilidad de la sala: ${error.message}`
+            );
+        }
+
+        return (count ?? 0) > 0;
     }
 }

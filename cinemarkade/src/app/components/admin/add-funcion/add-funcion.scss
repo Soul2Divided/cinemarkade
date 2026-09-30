@@ -1,0 +1,372 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.funcion-page-container {
+    @extend %pixel-text-rendering;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px);
+    padding: 4rem 2rem;
+    box-sizing: border-box;
+
+    @media (max-width: 1080px) {
+        padding: 2rem 1rem;
+    }
+}
+
+.funcion-card-panel {
+    position: relative;
+    display: flex;
+    background-color: #0d0d0d;
+    border: 4px solid theme.$arcade-yellow;
+    box-shadow: 10px 10px 0px #000, 0 0 20px rgba(255, 204, 0, 0.2);
+    padding: 2.5rem 2.5rem 2.5rem 180px;
+    width: 100%;
+    max-width: 950px;
+    box-sizing: border-box;
+    margin-left: 140px;
+
+    @media (max-width: 1080px) {
+        flex-direction: column;
+        padding: 2rem;
+        margin-left: 0;
+        max-width: 700px;
+    }
+}
+
+/* TICKET FLOTANTE PREVIEW */
+.floating-ticket-panel {
+    position: absolute;
+    left: -160px;
+    top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    width: 290px;
+    z-index: 10;
+
+    @media (max-width: 1080px) {
+        position: relative;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .ticket-preview-card {
+        background-color: #000;
+        border: 3px solid theme.$arcade-text-white;
+        box-shadow: 6px 6px 0px #000;
+        padding: 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+
+        .card-tag {
+            font-family: theme.$font-pixel;
+            font-size: 0.8rem;
+            color: theme.$arcade-yellow;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .ticket-stub {
+            background-color: #1a1a1a;
+            border: 2px dashed theme.$arcade-cyan;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+
+            .stub-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .brand {
+                    font-family: theme.$font-pixel;
+                    font-size: 0.75rem;
+                    color: theme.$arcade-yellow;
+                }
+
+                .stub-badge-preventa {
+                    font-family: theme.$font-pixel;
+                    font-size: 0.6rem;
+                    background-color: theme.$arcade-cyan;
+                    color: #000;
+                    padding: 0.2rem 0.4rem;
+                    font-weight: bold;
+                }
+            }
+
+            .stub-poster {
+                width: 100%;
+                height: 140px;
+                background-color: #000;
+                border: 1px solid #444;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+
+                .poster-img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+                .poster-placeholder {
+                    text-align: center;
+                    font-family: theme.$font-pixel;
+                    font-size: 0.65rem;
+                    color: #666;
+                }
+            }
+
+            .stub-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.4rem;
+
+                .stub-title {
+                    font-family: theme.$font-pixel;
+                    font-size: 0.95rem;
+                    color: theme.$arcade-text-white;
+                    margin: 0;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .stub-row {
+                    display: flex;
+                    justify-content: space-between;
+                    font-family: theme.$font-pixel;
+                    font-size: 0.7rem;
+                    color: #aaa;
+
+                    .highlight {
+                        color: theme.$arcade-yellow;
+                    }
+
+                    .price-tag {
+                        color: #00ff66;
+                        font-weight: bold;
+                    }
+                }
+            }
+
+            .stub-barcode {
+                border-top: 1px dashed #444;
+                padding-top: 0.5rem;
+                text-align: center;
+
+                .barcode-lines {
+                    font-family: monospace;
+                    letter-spacing: 2px;
+                    color: #888;
+                    font-size: 0.8rem;
+                }
+            }
+        }
+    }
+}
+
+/* FORMULARIO */
+.funcion-details-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px dashed #444;
+        padding-bottom: 1rem;
+
+        .panel-title {
+            font-family: theme.$font-pixel;
+            font-size: 1.4rem;
+            color: theme.$arcade-yellow;
+            margin: 0;
+            text-shadow: 3px 3px 0px theme.$arcade-blue-shadow;
+        }
+
+        .status-badge {
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            color: theme.$arcade-cyan;
+            background-color: #000;
+            border: 2px solid theme.$arcade-cyan;
+            padding: 0.4rem 0.7rem;
+        }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.2rem;
+
+        @media (max-width: 600px) {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .form-label {
+                font-family: theme.$font-pixel;
+                font-size: 0.8rem;
+                color: theme.$arcade-text-white;
+            }
+
+            .form-control {
+                font-family: theme.$font-pixel;
+                font-size: 0.85rem;
+                padding: 0.85rem;
+                background-color: #000;
+                border: 2px solid theme.$arcade-text-white;
+                color: theme.$arcade-yellow;
+                outline: none;
+
+                &:focus {
+                    border-color: theme.$arcade-yellow;
+                    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
+                }
+            }
+        }
+    }
+
+    .lang-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+
+        .lang-btn {
+            background-color: #000;
+            border: 2px solid theme.$arcade-text-white;
+            color: theme.$arcade-text-white;
+            font-family: theme.$font-pixel;
+            font-size: 0.8rem;
+            padding: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s ease;
+
+            &:hover {
+                border-color: theme.$arcade-yellow;
+                color: theme.$arcade-yellow;
+            }
+
+            &.selected {
+                border-color: theme.$arcade-yellow;
+                background-color: rgba(255, 204, 0, 0.2);
+                color: theme.$arcade-yellow;
+            }
+        }
+    }
+
+    .toggle-indicator {
+        width: 16px;
+        height: 16px;
+        border: 2px solid theme.$arcade-text-white;
+        background-color: #000;
+    }
+
+    .toggle-text {
+        font-family: theme.$font-pixel;
+        font-size: 0.8rem;
+        color: theme.$arcade-text-white;
+    }
+
+    &.active {
+        border-color: theme.$arcade-cyan;
+
+        .toggle-indicator {
+            background-color: theme.$arcade-cyan;
+            border-color: theme.$arcade-cyan;
+        }
+
+        .toggle-text {
+            color: theme.$arcade-cyan;
+        }
+    }
+}
+
+.panel-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.2rem;
+    border-top: 2px dashed #333;
+    padding-top: 1.5rem;
+}
+
+/* ERRORES Y VALIDACIONES */
+.field-error {
+    font-family: theme.$font-pixel;
+    font-size: 0.7rem;
+    color: theme.$arcade-red;
+    margin-top: 0.35rem;
+    display: block;
+}
+
+.label-error {
+    color: theme.$arcade-red !important;
+}
+
+.form-control.is-invalid,
+.lang-selector.is-invalid {
+    border-color: theme.$arcade-red !important;
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.35) !important;
+}
+
+.error-banner {
+    font-family: theme.$font-pixel;
+    font-size: 0.8rem;
+    color: theme.$arcade-red;
+    background-color: rgba(255, 0, 85, 0.1);
+    border: 2px solid theme.$arcade-red;
+    padding: 0.8rem;
+    text-align: center;
+}
+
+.format-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+.format-btn {
+    background: #000;
+    border: 2px solid theme.$arcade-text-white;
+    color: theme.$arcade-text-white;
+    font-family: theme.$font-pixel;
+    padding: 0.8rem 1.2rem;
+    cursor: pointer;
+
+    &.selected {
+        border-color: theme.$arcade-yellow;
+        color: theme.$arcade-yellow;
+        background: rgba(255, 204, 0, 0.2);
+    }
+}
+
+.preventa-note {
+    margin: 0;
+    color: theme.$arcade-cyan;
+    font-family: theme.$font-pixel;
+    font-size: 0.75rem;
+}

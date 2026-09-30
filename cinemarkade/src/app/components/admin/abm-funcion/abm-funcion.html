@@ -1,0 +1,75 @@
+<div class="abm-funciones-container">
+
+    <!-- CABECERA DE SECCIÓN Y BUSCADOR/FILTRO -->
+    <div class="abm-header">
+        <div class="header-title-group">
+            <h2 class="section-title">GESTIÓN DE FUNCIONES</h2>
+            <span class="total-badge">TOTAL: {{ funciones().length }}</span>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="form-control" placeholder="BUSCAR POR ID SALA, FECHA O ID PELÍCULA..."
+                (input)="onSearch($event)">
+        </div>
+    </div>
+
+    <!-- GRILLA DE FUNCIONES -->
+    @if (!funcionesCargadas()) {
+    <div class="funciones-grid">
+        @for (func of funcionesFiltradas(); track func.id) {
+        <div class="funcion-card" [class.preventa-card]="func.es_preventa">
+
+            <!-- BADGE DE FORMATO E IDIOMA -->
+            <div class="card-header-badge">
+                <span class="badge-format">{{ func.formato }}</span>
+                <span class="badge-lang">{{ func.idioma | uppercase }}</span>
+                @if (func.es_preventa) {
+                <span class="badge-preventa">PREVENTA</span>
+                }
+            </div>
+
+            <!-- DETALLES DE LA FUNCIÓN -->
+            <div class="card-body">
+                <h3 class="funcion-title">SALA #{{ func.sala_id }}</h3>
+
+                <div class="info-list">
+                    <span class="info-item">🎬 PELÍCULA ID: #{{ func.pelicula_id }}</span>
+                    <span class="info-item">📅 FECHA: {{ func.fecha }}</span>
+                    <span class="info-item">⏰ HORARIO: {{ func.horario }}</span>
+                    <span class="info-item price">💲 PRECIO: ARS ${{ func.precio }}</span>
+                </div>
+
+                <!-- BOTONES DE ACCIÓN -->
+                <div class="card-actions">
+                    <button type="button" class="btn-action edit" (click)="modificarFuncion(func.id)">
+                        ✏️ MODIFICAR
+                    </button>
+
+                    <button type="button" class="btn-action delete" (click)="eliminarFuncion(func.id)">
+                        ✖ ELIMINAR
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        } @empty {
+        <div class="empty-state">
+            <span class="empty-icon">⏰</span>
+            <p class="empty-text">[ NO HAY FUNCIONES PROGRAMADAS ]</p>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="loading-state">
+        <span class="loading-text">CARGANDO PROGRAMACIÓN DE FUNCIONES...</span>
+    </div>
+    }
+
+    <!-- BOTÓN FLOTANTE PARA AGREGAR FUNCIÓN -->
+    <button type="button" class="fab-add-funcion" (click)="irAAgregarFuncion()" title="Programar Nueva Función">
+        <span class="fab-icon">+</span>
+        <span class="fab-label">NUEVA FUNCIÓN</span>
+    </button>
+
+</div>

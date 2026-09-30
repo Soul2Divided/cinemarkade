@@ -32,26 +32,6 @@ export class SalaService {
         return this.salaRepository.cambiarActiva(id, activa);
     }
 
-    async buscarSala(formato: FormatoSala): Promise<Sala> {
-        const sala = await this.salaRepository.buscarSalaLibre(formato);
-        if (!sala) {
-            throw new Error(`No hay salas libres de formato ${formato}`);
-        }
-        return sala;
-    }
-
-    async buscarSalaAsignada(peliculaId: number, formato: FormatoSala): Promise<Sala | null> {
-        return this.salaRepository.buscarSalaAsignada(peliculaId, formato);
-    }
-
-    async asignarPelicula(salaId: number, peliculaId: number): Promise<void> {
-        return this.salaRepository.asignarPelicula(salaId, peliculaId);
-    }
-
-    async liberarSala(salaId: number): Promise<void> {
-        return this.salaRepository.liberarSala(salaId);
-    }
-
     private validarDatosBasicos(datos: SalaInput): void {
         if (!FORMATOS_SALA.includes(datos.formato)) {
             throw new Error('Debe seleccionar un formato de sala válido');

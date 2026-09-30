@@ -72,6 +72,30 @@ export const routes: Routes = [
             {
                 path: 'editar-producto/:id',
                 loadComponent: () => import('./components/admin/add-producto/add-producto').then((m) => m.AddProducto)
+            },
+            {
+                path: 'funciones',
+                loadComponent: () => import('./components/admin/abm-funcion/abm-funcion').then((m) => m.AbmFuncion)
+            },
+            {
+                path: 'nueva-funcion',
+                loadComponent: () => import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion)
+            },
+            {
+                path: 'editar-funcion/:id',
+                loadComponent: () => import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion)
+            },
+            {
+                path: 'cupones',
+                loadComponent: () => import('./components/admin/abm-cupon/abm-cupon').then((m) => m.AbmCupon)
+            },
+            {
+                path: 'nuevo-cupon',
+                loadComponent: () => import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon)
+            },
+            {
+                path: 'editar-cupon/:id',
+                loadComponent: () => import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon)
             }
         ],
     },

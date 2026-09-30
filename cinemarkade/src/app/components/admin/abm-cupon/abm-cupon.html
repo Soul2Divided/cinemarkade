@@ -1,0 +1,68 @@
+<div class="abm-cupones-container">
+
+    <div class="abm-header">
+        <div class="header-title-group">
+            <h2 class="section-title">GESTIÓN DE CUPONES</h2>
+            <span class="total-badge">TOTAL: {{ cupones().length }}</span>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="form-control" placeholder="BUSCAR POR CÓDIGO O DESCUENTO..."
+                (input)="onSearch($event)">
+        </div>
+    </div>
+
+    @if (!cargando()) {
+    <div class="cupones-grid">
+        @for (cupon of cuponesFiltrados(); track cupon.id) {
+        <div class="cupon-card">
+
+            <div class="card-header-badge">
+                <span class="badge-discount">{{ cupon.porcentajeDescuento }}% OFF</span>
+                @if (cupon.edadMinima > 0) {
+                <span class="badge-age">+{{ cupon.edadMinima }} AÑOS</span>
+                } @else {
+                <span class="badge-age">TODAS LAS EDADES</span>
+                }
+            </div>
+
+            <div class="card-body">
+                <h3 class="cupon-code">🎟️ {{ cupon.codigo | uppercase }}</h3>
+
+                <div class="info-list">
+                    <span class="info-item">📅 DESDE: {{ cupon.fechaInicio }}</span>
+                    <span class="info-item">⏳ HASTA: {{ cupon.fechaFin }}</span>
+                </div>
+
+                <div class="card-actions">
+                    <button type="button" class="btn-action edit" (click)="modificarCupon(cupon.id)">
+                        ✏️️ MODIFICAR
+                    </button>
+
+                    <button type="button" class="btn-action delete" (click)="eliminarCupon(cupon.id)">
+                        ✖ ELIMINAR
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        } @empty {
+        <div class="empty-state">
+            <span class="empty-icon">🏷️</span>
+            <p class="empty-text">[ NO HAY CUPONES REGISTRADOS ]</p>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="loading-state">
+        <span class="loading-text">CARGANDO CUPONES...</span>
+    </div>
+    }
+
+    <button type="button" class="fab-add-cupon" (click)="irAAgregarCupon()" title="Crear Nuevo Cupón">
+        <span class="fab-icon">+</span>
+        <span class="fab-label">NUEVO CUPÓN</span>
+    </button>
+
+</div>

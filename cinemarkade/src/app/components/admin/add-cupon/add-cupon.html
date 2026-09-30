@@ -1,0 +1,167 @@
+<div class="cupon-page-container">
+
+    <form class="cupon-card-panel" [formGroup]="formCupon" (ngSubmit)="onSubmit()">
+
+        <!-- PREVISUALIZACIÓN DEL TICKET RETRO DE CUPÓN -->
+        <div class="floating-ticket-panel">
+            <div class="ticket-preview-card">
+                <span class="card-tag">COUPON PREVIEW</span>
+
+                <div class="ticket-stub">
+                    <div class="stub-header">
+                        <span class="brand">CINEMARKADE</span>
+                        <span class="stub-badge-discount">
+                            {{ formCupon.get('porcentajeDescuento')?.value || 0 }}% OFF
+                        </span>
+                    </div>
+
+                    <div class="stub-code-display">
+                        <span class="code-text">
+                            {{ formCupon.get('codigo')?.value || 'CÓDIGO' }}
+                        </span>
+                    </div>
+
+                    <div class="stub-info">
+                        <div class="stub-row">
+                            <span>EDAD MÍN:</span>
+                            <span class="highlight">
+                                {{ (formCupon.get('edadMinima')?.value ?? 0) > 0 ? '+' +
+                                formCupon.get('edadMinima')?.value + ' AÑOS' : 'SIN LÍMITE' }}
+                            </span>
+                        </div>
+
+                        <div class="stub-row">
+                            <span>VALIDEZ:</span>
+                            <span>
+                                {{ formCupon.get('fechaInicio')?.value || 'INICIO' }}
+                            </span>
+                        </div>
+
+                        <div class="stub-row">
+                            <span>HASTA:</span>
+                            <span>
+                                {{ formCupon.get('fechaFin')?.value || 'FIN' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="stub-barcode">
+                        <div class="barcode-lines">||||| ||| |||| |||||| |||</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL DEL FORMULARIO -->
+        <div class="cupon-details-panel">
+            <div class="panel-header">
+                <h2 class="panel-title">{{ esEdicion ? 'EDITAR CUPÓN' : 'NUEVO CUPÓN' }}</h2>
+                <span class="status-badge">DISCOUNT CODE</span>
+            </div>
+
+            <div class="form-grid">
+
+                <!-- CÓDIGO DEL CUPÓN -->
+                <div class="form-group full-width">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('codigo')">
+                        CÓDIGO DEL CUPÓN
+                    </label>
+                    <input type="text" formControlName="codigo" class="form-control code-input"
+                        [class.is-invalid]="isFieldInvalid('codigo')" placeholder="EJ: ARCADE2026">
+
+                    @if (getFieldError('codigo')) {
+                    <small class="field-error">{{ getFieldError('codigo') }}</small>
+                    }
+                </div>
+
+                <!-- PORCENTAJE DE DESCUENTO -->
+                <div class="form-group">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('porcentajeDescuento')">
+                        DESCUENTO (%)
+                    </label>
+                    <input type="number" formControlName="porcentajeDescuento" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('porcentajeDescuento')" placeholder="20" min="1" max="100">
+
+                    @if (getFieldError('porcentajeDescuento')) {
+                    <small class="field-error">{{ getFieldError('porcentajeDescuento') }}</small>
+                    }
+                </div>
+
+                <!-- EDAD MÍNIMA -->
+                <div class="form-group">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('edadMinima')">
+                        EDAD MÍNIMA REQUERIDA
+                    </label>
+                    <input type="number" formControlName="edadMinima" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('edadMinima')" placeholder="0" min="0">
+
+                    @if (getFieldError('edadMinima')) {
+                    <small class="field-error">{{ getFieldError('edadMinima') }}</small>
+                    }
+                </div>
+
+                <!-- FECHA DE INICIO -->
+                <div class="form-group">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('fechaInicio')">
+                        FECHA DE INICIO
+                    </label>
+                    <input type="date" formControlName="fechaInicio" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('fechaInicio')">
+
+                    @if (getFieldError('fechaInicio')) {
+                    <small class="field-error">{{ getFieldError('fechaInicio') }}</small>
+                    }
+                </div>
+
+                <!-- FECHA DE FIN -->
+                <div class="form-group">
+                    <label class="form-label" [class.label-error]="isFieldInvalid('fechaFin')">
+                        FECHA DE VENCIMIENTO
+                    </label>
+                    <input type="date" formControlName="fechaFin" class="form-control"
+                        [class.is-invalid]="isFieldInvalid('fechaFin')">
+
+                    @if (getFieldError('fechaFin')) {
+                    <small class="field-error">{{ getFieldError('fechaFin') }}</small>
+                    }
+                </div>
+
+            </div>
+
+            @if (errorMessage) {
+            <div class="error-banner">
+                ⚠️ {{ errorMessage }}
+            </div>
+            }
+
+            <div class="panel-actions">
+                <button type="button" class="btn-pixel-outline" (click)="cancelar()">
+                    ◄ CANCELAR
+                </button>
+                <button type="submit" class="btn btn-pixel cyan" [disabled]="formCupon.invalid">
+                    {{ esEdicion ? 'GUARDAR CAMBIOS' : 'CREAR CUPÓN' }}
+                </button>
+            </div>
+        </div>
+
+    </form>
+    @if (mostrarLoader()) {
+    <app-loader message="AÑADIENDO CUPON..."></app-loader>
+    }
+
+    <app-modal [isOpen]="mostrarModal()" title="{{ esEdicion ? 'MODIFICADO CON EXITO' : 'CREADO CON EXITO' }}"
+        subtitle="NUEVO REGISTRO EN BASE DE DATOS" variant="cyan" (close)="cerrarModal()">
+
+        @if (esEdicion) {
+        <p>Cupon de <strong>{{ formCupon.get('descuento')?.value }} modificado correctamente</strong></p>
+        } @else {
+        <p>Cupon de <strong>{{ formCupon.get('descuento')?.value }} añadido correctamente</strong></p>
+        }
+
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
+                ACEPTAR
+            </button>
+        </div>
+    </app-modal>
+</div>

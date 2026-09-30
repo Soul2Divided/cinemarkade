@@ -11,6 +11,8 @@ import { ProductoRepository } from './core/producto/producto.repository';
 import { SupabaseProductoAdapter } from './core/producto/supabase-producto.adapter';
 import { FuncionRepository } from './core/funcion/funcion.repository';
 import { SupabaseFuncionAdapter } from './core/funcion/supabase-funcion.adapter';
+import { CuponRepository } from './core/cupon/cupon.repository';
+import { SupabaseCuponAdapter } from './core/cupon/supabase-cupon.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,6 +22,7 @@ export const appConfig: ApplicationConfig = {
     { provide: PeliculaRepository, useClass: SupabasePeliculaAdapter },
     { provide: SalaRepository, useClass: SupabaseSalaAdapter },
     { provide: ProductoRepository, useClass: SupabaseProductoAdapter },
-    { provide: FuncionRepository, useClass: SupabaseFuncionAdapter}
+    { provide: FuncionRepository, useClass: SupabaseFuncionAdapter},
+    { provide: CuponRepository, useClass: SupabaseCuponAdapter}
   ]
 };
