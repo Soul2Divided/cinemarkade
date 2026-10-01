@@ -172,7 +172,7 @@ export class AddProducto implements OnInit {
 
   cerrarModal(): void {
     this.mostrarModal.set(false);
-    this.router.navigate(['/admin/peliculas']);
+    this.router.navigate(['/admin/productos']);
   }
 
   cancelar(): void {

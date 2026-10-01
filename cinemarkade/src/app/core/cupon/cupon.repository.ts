@@ -7,5 +7,5 @@ export abstract class CuponRepository {
     abstract obtenerPorId(id: number): Promise<Cupon | null>;
     abstract crear(datos: CuponInput): Promise<Cupon>;
     abstract actualizar(id: number, datos: CuponInput): Promise<Cupon>;
-    abstract eliminar(id: number): Promise<void>;
+    abstract cambiarActiva(id: number, activa: boolean): Promise<void>;
 }

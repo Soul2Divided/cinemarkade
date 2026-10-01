@@ -1,0 +1,519 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.combo-page-container {
+  @extend %pixel-text-rendering;
+  display: flex;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  padding: 4rem 2rem;
+  box-sizing: border-box;
+  color: theme.$arcade-text-white;
+
+  @media (max-width: 1080px) {
+    padding: 2rem 1rem;
+  }
+}
+
+.combo-card-panel {
+  position: relative;
+  display: flex;
+  align-self: flex-start;
+  width: 100%;
+  max-width: 1050px;
+  margin: 1rem 0 1rem 135px;
+  padding: 2.5rem 2.5rem 2.5rem 180px;
+  box-sizing: border-box;
+  background: #0d0d0d;
+  border: 4px solid theme.$arcade-yellow;
+  box-shadow: 10px 10px 0 #000, 0 0 20px rgba(255, 204, 0, .2);
+
+  @media (max-width: 1080px) {
+    flex-direction: column;
+    max-width: 760px;
+    margin: 0;
+    padding: 2rem;
+  }
+}
+
+.floating-combo-panel {
+  position: absolute;
+  left: -155px;
+  top: 2.5rem;
+  width: 290px;
+  z-index: 2;
+
+  @media (max-width: 1080px) {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+}
+
+.image-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+  padding: .8rem;
+  background: #000;
+  border: 3px solid #fff;
+  box-shadow: 6px 6px #000;
+}
+
+.card-tag {
+  color: theme.$arcade-yellow;
+  text-align: center;
+  font: .75rem theme.$font-pixel;
+  letter-spacing: 1px;
+}
+
+.media-dropzone {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #111;
+  border: 2px dashed #555;
+  cursor: pointer;
+  transition: .15s ease;
+
+  &:hover {
+    border-color: theme.$arcade-yellow;
+    background: #1a1a14;
+  }
+}
+
+.media-img {
+  width: 100%;
+  height: 100%;
+  padding: .5rem;
+  box-sizing: border-box;
+  object-fit: contain;
+}
+
+.btn-remove-media {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 28px;
+  height: 28px;
+  color: #fff;
+  background: theme.$arcade-red;
+  border: 2px solid #fff;
+  box-shadow: 2px 2px #000;
+  cursor: pointer;
+  font: .7rem theme.$font-pixel;
+}
+
+.dropzone-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  padding: 1.5rem .8rem;
+  text-align: center;
+}
+
+.dropzone-placeholder .icon {
+  font-size: 2.5rem;
+}
+
+.dropzone-placeholder .label {
+  color: #fff;
+  font: .7rem theme.$font-pixel;
+  line-height: 1.4;
+}
+
+.dropzone-placeholder .sub {
+  color: #888;
+  font: .6rem theme.$font-pixel;
+}
+
+.corner {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: theme.$arcade-yellow;
+}
+
+.corner.top-l {
+  top: 3px;
+  left: 3px;
+}
+
+.corner.top-r {
+  top: 3px;
+  right: 3px;
+}
+
+.corner.bot-l {
+  bottom: 3px;
+  left: 3px;
+}
+
+.corner.bot-r {
+  right: 3px;
+  bottom: 3px;
+}
+
+.url-label {
+  margin-top: .2rem;
+  color: #aaa;
+  font: .55rem theme.$font-pixel;
+}
+
+.image-url-input {
+  font-size: .58rem;
+}
+
+.image-hint {
+  color: #888;
+  font: .55rem theme.$font-pixel;
+  line-height: 1.5;
+}
+
+.combo-details-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+  width: 100%;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px dashed #444;
+}
+
+.panel-title {
+  margin: 0;
+  color: theme.$arcade-yellow;
+  font: 1.3rem theme.$font-pixel;
+  text-shadow: 3px 3px theme.$arcade-blue-shadow;
+}
+
+.status-badge {
+  padding: .4rem .7rem;
+  color: theme.$arcade-cyan;
+  background: #000;
+  border: 2px solid theme.$arcade-cyan;
+  font: .65rem theme.$font-pixel;
+  white-space: nowrap;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  min-width: 0;
+}
+
+.form-label {
+  color: #fff;
+  font: .72rem theme.$font-pixel;
+}
+
+.optional-tag {
+  color: #999;
+  font-size: .6rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: .8rem;
+  box-sizing: border-box;
+  color: theme.$arcade-yellow;
+  background: #000;
+  border: 2px solid #fff;
+  outline: none;
+  font: .72rem theme.$font-pixel;
+}
+
+.form-control:focus {
+  border-color: theme.$arcade-yellow;
+  box-shadow: 0 0 10px rgba(255, 204, 0, .25);
+}
+
+.form-control.is-invalid {
+  border-color: theme.$arcade-red;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.items-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.items-count {
+  color: theme.$arcade-cyan;
+  font: .62rem theme.$font-pixel;
+}
+
+.combo-items {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+
+.combo-item-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 90px 38px;
+  align-items: center;
+  gap: .6rem;
+  padding: .65rem;
+  background: #080808;
+  border: 1px solid #343434;
+}
+
+.item-number {
+  color: theme.$arcade-cyan;
+  font: .7rem theme.$font-pixel;
+  text-align: center;
+}
+
+.product-select {
+  min-width: 0;
+}
+
+.quantity-field {
+  position: relative;
+  display: block;
+  height: 44px;
+  color: #aaa;
+  font: .55rem theme.$font-pixel;
+}
+
+.quantity-field span {
+  position: absolute;
+  top: -1rem;
+  left: 0;
+}
+
+.quantity-field input {
+  height: 44px;
+  padding: .6rem .3rem;
+  text-align: center;
+}
+
+.remove-item {
+  height: 44px;
+  color: theme.$arcade-red;
+  background: #000;
+  border: 1px solid theme.$arcade-red;
+  cursor: pointer;
+}
+
+.remove-item:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.add-item-button {
+  align-self: flex-start;
+  margin-top: .8rem;
+  padding: .65rem .8rem;
+  color: theme.$arcade-cyan;
+  background: #000;
+  border: 2px dashed theme.$arcade-cyan;
+  font: .65rem theme.$font-pixel;
+  cursor: pointer;
+}
+
+.add-item-button:hover {
+  color: #000;
+  background: theme.$arcade-cyan;
+}
+
+.price-summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: .25rem;
+  padding: .8rem 1rem;
+  background: #080808;
+  border-left: 3px solid theme.$arcade-cyan;
+  font: .6rem theme.$font-pixel;
+  color: #aaa;
+}
+
+.price-summary strong {
+  color: theme.$arcade-cyan;
+  font-size: .95rem;
+}
+
+.price-summary .final-price-label {
+  margin-top: .45rem;
+  padding-top: .45rem;
+  color: theme.$arcade-yellow;
+  border-top: 1px dashed #444;
+}
+
+.price-summary strong.final-price {
+  color: #00ff66;
+  font-size: 1.05rem;
+}
+
+.price-summary small {
+  color: #777;
+  font: .58rem theme.$font-pixel;
+}
+
+.featured-control {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  padding: .9rem 1rem;
+  color: #aaa;
+  background: #080808;
+  border: 2px solid #444;
+  cursor: pointer;
+  transition: .15s ease;
+}
+
+.featured-control input {
+  width: 20px;
+  height: 20px;
+  accent-color: theme.$arcade-yellow;
+}
+
+.featured-control.is-featured {
+  color: theme.$arcade-yellow;
+  border-color: theme.$arcade-yellow;
+  box-shadow: 0 0 10px rgba(255, 204, 0, .15);
+}
+
+.featured-copy {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  font: .65rem theme.$font-pixel;
+}
+
+.featured-copy small {
+  color: #888;
+  font: .58rem theme.$font-pixel;
+}
+
+.featured-star {
+  margin-left: auto;
+  font-size: 1.4rem;
+}
+
+.field-error {
+  color: theme.$arcade-red;
+  font: .62rem theme.$font-pixel;
+}
+
+.error-banner {
+  padding: .8rem;
+  color: theme.$arcade-red;
+  background: rgba(255, 0, 85, .1);
+  border: 2px solid theme.$arcade-red;
+  text-align: center;
+  font: .68rem theme.$font-pixel;
+}
+
+.panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.3rem;
+  border-top: 2px dashed #333;
+}
+
+.pricing-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  align-items: stretch;
+}
+
+.discount-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (max-width: 650px) {
+  .combo-page-container {
+    padding: 1rem .5rem 5rem;
+  }
+
+  .combo-card-panel {
+    padding: 1rem;
+  }
+
+  .panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .pricing-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: auto;
+  }
+
+  .combo-item-row {
+    grid-template-columns: 25px minmax(0, 1fr) 66px 32px;
+    gap: .35rem;
+    padding: .4rem;
+  }
+
+  .quantity-field,
+  .quantity-field input,
+  .remove-item {
+    height: 38px;
+  }
+
+  .form-control {
+    padding: .65rem .4rem;
+    font-size: .6rem;
+  }
+
+  .panel-actions {
+    flex-direction: column-reverse;
+  }
+}

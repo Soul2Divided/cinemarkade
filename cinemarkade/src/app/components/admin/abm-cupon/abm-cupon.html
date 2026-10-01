@@ -19,9 +19,9 @@
         <div class="cupon-card">
 
             <div class="card-header-badge">
-                <span class="badge-discount">{{ cupon.porcentajeDescuento }}% OFF</span>
-                @if (cupon.edadMinima > 0) {
-                <span class="badge-age">+{{ cupon.edadMinima }} AÑOS</span>
+                <span class="badge-discount">{{ cupon.porcentaje_descuento }}% OFF</span>
+                @if (cupon.edad_minima > 0) {
+                <span class="badge-age">+{{ cupon.edad_minima }} AÑOS</span>
                 } @else {
                 <span class="badge-age">TODAS LAS EDADES</span>
                 }
@@ -31,8 +31,8 @@
                 <h3 class="cupon-code">🎟️ {{ cupon.codigo | uppercase }}</h3>
 
                 <div class="info-list">
-                    <span class="info-item">📅 DESDE: {{ cupon.fechaInicio }}</span>
-                    <span class="info-item">⏳ HASTA: {{ cupon.fechaFin }}</span>
+                    <span class="info-item">📅 DESDE: {{ cupon.fecha_inicio }}</span>
+                    <span class="info-item">⏳ HASTA: {{ cupon.fecha_fin }}</span>
                 </div>
 
                 <div class="card-actions">
@@ -40,7 +40,7 @@
                         ✏️️ MODIFICAR
                     </button>
 
-                    <button type="button" class="btn-action delete" (click)="eliminarCupon(cupon.id)">
+                    <button type="button" class="btn-action delete" (click)="cambiarEstadoCupon(cupon.id, cupon.activa)">
                         ✖ ELIMINAR
                     </button>
                 </div>

@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { UpperCasePipe, CurrencyPipe } from '@angular/common';
 import { Producto } from '../../../core/producto/producto.model';
-import { ProductoRepository } from '../../../core/producto/producto.repository';
+import { ProductoService } from '../../../core/producto/producto.service';
 
 @Component({
   imports: [UpperCasePipe, CurrencyPipe],
@@ -11,7 +11,7 @@ import { ProductoRepository } from '../../../core/producto/producto.repository';
   templateUrl: './abm-producto.html',
 })
 export class AbmProducto {
-  private productoRepository = inject(ProductoRepository);
+  private productoService = inject(ProductoService);
   private router = inject(Router);
 
   productos = signal<Producto[]>([]);
@@ -30,7 +30,7 @@ export class AbmProducto {
 
   async ngOnInit(): Promise<void> {
     try {
-      const data = await this.productoRepository.listar();
+      const data = await this.productoService.listarProductos();
       this.productos.set(data || []);
     } catch (error) {
       console.error('Error al cargar catálogo del candybar:', error);
@@ -56,7 +56,7 @@ export class AbmProducto {
     const nuevoEstado = !active;
 
     try {
-      await this.productoRepository.cambiarActiva(id, nuevoEstado);
+      await this.productoService.cambiarActiva(id, nuevoEstado);
 
       this.productos.update(lista =>
         lista.map(prod =>

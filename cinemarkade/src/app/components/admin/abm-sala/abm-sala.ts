@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { SalaRepository } from '../../../core/sala/sala.repository';
+import { SalaService } from '../../../core/sala/sala.service';
 import { Sala } from '../../../core/sala/sala.model';
 
 @Component({
@@ -10,7 +10,7 @@ import { Sala } from '../../../core/sala/sala.model';
   templateUrl: './abm-sala.html',
 })
 export class AbmSala {
-  private salaRepository = inject(SalaRepository);
+  private salaService = inject(SalaService);
   private router = inject(Router);
 
   salas = signal<Sala[]>([]);
@@ -29,7 +29,7 @@ export class AbmSala {
 
   async ngOnInit(): Promise<void> {
     try {
-      const data = await this.salaRepository.listar();
+      const data = await this.salaService.listarSalas();
       this.salas.set(data || []);
     } catch (error) {
       console.error('Error al cargar lista de salas:', error);
@@ -55,7 +55,7 @@ export class AbmSala {
     const nuevoEstado = !active;
 
     try {
-      await this.salaRepository.cambiarActiva(id, nuevoEstado);
+      await this.salaService.cambiarActiva(id, nuevoEstado);
 
       this.salas.update(lista =>
         lista.map(sala =>

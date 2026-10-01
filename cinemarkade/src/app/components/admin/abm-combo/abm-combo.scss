@@ -1,0 +1,389 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+    display: block;
+    width: 100%;
+}
+
+.abm-combos-container {
+    @extend %pixel-text-rendering;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    padding-bottom: 5rem;
+    box-sizing: border-box;
+}
+
+.abm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 3px dashed #333;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+.header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.section-title {
+    margin: 0;
+    color: theme.$arcade-yellow;
+    font: 1.3rem theme.$font-pixel;
+    letter-spacing: 1px;
+    text-shadow: 3px 3px theme.$arcade-blue-shadow;
+}
+
+.total-badge {
+    padding: .5rem .8rem;
+    color: theme.$arcade-cyan;
+    background: #000;
+    border: 2px solid theme.$arcade-cyan;
+    font: .75rem theme.$font-pixel;
+    white-space: nowrap;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 320px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+}
+
+.search-icon {
+    position: absolute;
+    left: .9rem;
+    font-size: 1rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: .85rem .8rem .85rem 2.8rem;
+    color: theme.$arcade-yellow;
+    background: #000;
+    border: 2px solid #fff;
+    outline: none;
+    font: .72rem theme.$font-pixel;
+}
+
+.form-control:focus {
+    border-color: theme.$arcade-yellow;
+    box-shadow: 0 0 10px rgba(255, 204, 0, .25);
+}
+
+.combos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 2rem;
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.combo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.2rem;
+    background: #0d0d0d;
+    border: 3px solid theme.$arcade-yellow;
+    box-shadow: 6px 6px #000;
+    transition: .2s ease;
+
+    &:hover {
+        border-color: theme.$arcade-cyan;
+        box-shadow: 6px 6px theme.$arcade-cyan;
+        transform: translateY(-3px);
+    }
+
+    &.is-inactive {
+        opacity: .58;
+        filter: grayscale(.7);
+        border-color: #444;
+
+        &:hover {
+            opacity: .9;
+            filter: none;
+        }
+    }
+}
+
+.combo-image-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150px;
+    overflow: hidden;
+    background: #050505;
+    border: 1px solid #333;
+}
+
+.combo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    font-size: 3rem;
+}
+
+.featured-badge {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
+    padding: .35rem .5rem;
+    color: #000;
+    background: theme.$arcade-yellow;
+    font: .55rem theme.$font-pixel;
+}
+
+.card-topline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .5rem;
+}
+
+.offer-badge {
+    padding: .35rem .55rem;
+    color: #000;
+    background: theme.$arcade-yellow;
+    font: .62rem theme.$font-pixel;
+}
+
+.inactive-badge {
+    padding: .3rem .45rem;
+    color: #fff;
+    background: theme.$arcade-red;
+    border: 1px solid #fff;
+    font: .55rem theme.$font-pixel;
+}
+
+.card-details {
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+    flex: 1;
+}
+
+.combo-title {
+    margin: 0;
+    color: theme.$arcade-text-white;
+    font: 1rem theme.$font-pixel;
+    line-height: 1.35;
+}
+
+.combo-description {
+    margin: 0;
+    color: #aaa;
+    font-size: .85rem;
+    line-height: 1.4;
+}
+
+.included-products {
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+    padding: .8rem;
+    background: #050505;
+    border: 1px dashed #444;
+}
+
+.list-label {
+    margin-bottom: .15rem;
+    color: theme.$arcade-cyan;
+    font: .58rem theme.$font-pixel;
+}
+
+.included-item {
+    display: flex;
+    justify-content: space-between;
+    gap: .6rem;
+    color: #ddd;
+    font: .62rem theme.$font-pixel;
+}
+
+.included-item span:last-child {
+    color: #00ff66;
+    white-space: nowrap;
+}
+
+.no-items {
+    color: #888;
+    font: .62rem theme.$font-pixel;
+}
+
+.price-block {
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+}
+
+.price-label {
+    display: block;
+    color: #888;
+    font: .55rem theme.$font-pixel;
+}
+
+.list-price {
+    color: #aaa;
+    font: .7rem theme.$font-pixel;
+    text-decoration: line-through;
+}
+
+.combo-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: .65rem;
+    border-top: 1px dashed #444;
+    color: theme.$arcade-yellow;
+    font: .65rem theme.$font-pixel;
+}
+
+.combo-price strong {
+    color: #00ff66;
+    font: 1rem theme.$font-pixel;
+}
+
+.validity {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    color: #999;
+    font: .55rem theme.$font-pixel;
+}
+
+.card-actions {
+    display: flex;
+    gap: .6rem;
+    margin-top: auto;
+}
+
+.btn-action {
+    flex: 1;
+    padding: .65rem .4rem;
+    color: #fff;
+    background: #000;
+    border: 2px solid #fff;
+    cursor: pointer;
+    font: .58rem theme.$font-pixel;
+    transition: .15s ease;
+}
+
+.btn-action.edit:hover {
+    color: #000;
+    background: theme.$arcade-yellow;
+    border-color: theme.$arcade-yellow;
+}
+
+.btn-action.delete:hover {
+    color: #fff;
+    background: theme.$arcade-red;
+    border-color: theme.$arcade-red;
+}
+
+.btn-action.activate {
+    color: #00ff66;
+    border-color: #00ff66;
+
+    &:hover {
+        color: #000;
+        background: #00ff66;
+    }
+}
+
+.empty-state,
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 4rem 1rem;
+    border: 2px dashed #333;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 3rem;
+}
+
+.empty-text,
+.loading-text {
+    color: theme.$arcade-yellow;
+    font: .9rem theme.$font-pixel;
+}
+
+.error-banner {
+    padding: .8rem;
+    color: theme.$arcade-red;
+    background: rgba(255, 0, 85, .1);
+    border: 2px solid theme.$arcade-red;
+    font: .65rem theme.$font-pixel;
+}
+
+.fab-add-combo {
+    position: fixed;
+    right: 2.5rem;
+    bottom: 2.5rem;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: 1rem 1.6rem;
+    color: #000;
+    background: theme.$arcade-yellow;
+    border: 3px solid #000;
+    box-shadow: 6px 6px #000, 0 0 15px rgba(255, 204, 0, .4);
+    cursor: pointer;
+    font-family: theme.$font-pixel;
+    transition: transform .15s ease;
+
+    &:hover {
+        transform: translateY(-4px) scale(1.03);
+    }
+}
+
+.fab-icon {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.fab-label {
+    font-size: .75rem;
+}
+
+@media (max-width: 600px) {
+    .fab-add-combo {
+        right: 1.5rem;
+        bottom: 1.5rem;
+        padding: .8rem 1rem;
+    }
+
+    .fab-label {
+        display: none;
+    }
+
+    .header-title-group {
+        flex-wrap: wrap;
+    }
+}

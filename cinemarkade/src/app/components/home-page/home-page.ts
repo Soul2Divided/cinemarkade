@@ -4,6 +4,10 @@ import { Router } from '@angular/router';
 import { Navbar } from '../navbar/navbar';
 import { PeliculaService } from '../../core/pelicula/pelicula.service';
 import { Pelicula } from '../../core/pelicula/pelicula.model';
+import { ComboService } from '../../core/combo/combo.service';
+import { Combo } from '../../core/combo/combo.model';
+import { ProductoService } from '../../core/producto/producto.service';
+import { Producto } from '../../core/producto/producto.model';
 
 export interface ItemHero {
   id: number;
@@ -14,6 +18,7 @@ export interface ItemHero {
   restriccion_edad: string;
   sinopsis: string;
   esCombo?: boolean;
+  precio?: number;
 }
 
 @Component({
@@ -25,18 +30,38 @@ export interface ItemHero {
 
 export class HomePage implements OnInit {
   private peliculaService = inject(PeliculaService);
+  private comboService = inject(ComboService);
+  private productoService = inject(ProductoService);
   private router = inject(Router);
 
   peliculas = signal<Pelicula[]>([]);
+  combos = signal<Combo[]>([]);
+  productos = signal<Producto[]>([]);
   peliculaSeleccionada = signal<Pelicula | null>(null);
-  peliculaDestacada = computed(() => this.peliculas()[0] ?? null);
+  generoSeleccionado = signal<string | null>(null);
 
-  generos: string[] = ['Acción', 'Ciencia Ficción', 'Terror', 'Aventura', 'Comedia', 'Animación'];
+  generos = computed(() => {
+    const generosUnicos = new Map<string, string>();
+    for (const pelicula of this.peliculas()) {
+      const nombre = pelicula.genero?.trim();
+      if (!nombre) continue;
+      const clave = this.normalizarGenero(nombre);
+      if (!generosUnicos.has(clave)) generosUnicos.set(clave, nombre);
+    }
+    return [...generosUnicos.values()].sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+  });
+
+  peliculasPorGenero = computed(() => {
+    const seleccionado = this.generoSeleccionado();
+    if (!seleccionado) return [];
+    const clave = this.normalizarGenero(seleccionado);
+    return this.peliculas().filter(pelicula => this.normalizarGenero(pelicula.genero) === clave);
+  });
 
   indiceHeroActual: number = 0;
 
   elementosHero = computed<ItemHero[]>(() => {
-    const pelisBanner: ItemHero[] = this.peliculas()
+    const peliculasDestacadas = this.peliculas()
       .filter(p => p.banner && p.banner.trim() !== '')
       .slice(0, 3)
       .map(p => ({
@@ -47,50 +72,34 @@ export class HomePage implements OnInit {
         duracion: p.duracion,
         restriccion_edad: p.restriccion_edad,
         sinopsis: p.sinopsis,
-        esCombo: false
+        esCombo: false,
       }));
 
-    const promosCandy: ItemHero[] = [
-      {
-        id: -1,
-        nombre: 'COMBO POP & SODA',
-        banner: 'https://images.unsplash.com/photo-1578849278619-e73505e9610f?q=80&w=1000',
-        genero: 'CANDYBAR',
-        duracion: 0,
-        restriccion_edad: 'ATP',
-        sinopsis: '¡Llevate un balde de pochoclos gigante + 2 gaseosas con 20% de descuento!',
-        esCombo: true
-      },
-      {
-        id: -2,
-        nombre: 'CANDY ARCADE PACK',
-        banner: 'https://images.unsplash.com/photo-1585647347483-22b66260dfff?q=80&w=1000',
-        genero: 'PROMO',
-        duracion: 0,
-        restriccion_edad: 'ATP',
-        sinopsis: '2 Entradas + Pochoclos XL + Golosinas a elección para disfrutar en pareja.',
-        esCombo: true
-      }
-    ];
+    const combosDestacados = this.combos()
+      .filter(combo => combo.activo && combo.destacado && this.comboVigente(combo))
+      .map(combo => {
+        const primerProducto = combo.items?.map(item =>
+          this.productos().find(producto => producto.id === item.producto_id)
+        ).find((producto): producto is Producto => !!producto);
+        return {
+          id: -combo.id,
+          nombre: combo.nombre,
+          banner: combo.imagen || primerProducto?.imagen || '',
+          genero: 'CANDY BAR',
+          duracion: 0,
+          restriccion_edad: '',
+          sinopsis: combo.descripcion || 'Una oferta especial para disfrutar durante la película.',
+          esCombo: true,
+          precio: combo.precio,
+        };
+      })
+      .filter(combo => combo.banner.trim() !== '');
 
-    return [...pelisBanner, ...promosCandy];
-  });
-
-  heroActual = computed(() => {
-    const lista = this.elementosHero();
-    return lista[this.indiceHeroActual] ?? null;
-  });
-
-  peliculasTendencias = computed(() => {
-    return this.peliculas().slice(0, 4);
+    return [...peliculasDestacadas, ...combosDestacados];
   });
 
   peliculasEstrenos = computed(() => {
     return this.peliculas().slice(4, 8);
-  });
-
-  peliculasProximas = computed(() => {
-    return this.peliculas().slice(8, 12);
   });
 
   async ngOnInit(): Promise<void> {
@@ -100,6 +109,18 @@ export class HomePage implements OnInit {
     } catch (error) {
       console.error('Error al cargar la cartelera:', error);
     }
+
+    try {
+      const [combos, productos] = await Promise.all([
+        this.comboService.listarCombos(),
+        this.productoService.listarProductos(),
+      ]);
+      this.combos.set(combos || []);
+      this.productos.set((productos || []).filter(producto => producto.activa));
+    } catch (error) {
+      console.error('Error al cargar los combos destacados:', error);
+    }
+
   }
 
   seleccionarHero(index: number): void {
@@ -108,13 +129,38 @@ export class HomePage implements OnInit {
 
   ejecutarAccionHero(heroItem: ItemHero): void {
     if (heroItem.esCombo) {
-      this.router.navigate(['/candybar']);
-    } else {
-      const peliculaEncontrada = this.peliculas().find(p => p.id === heroItem.id);
-      if (peliculaEncontrada) {
-        this.seleccionarPelicula(peliculaEncontrada);
-      }
+      this.router.navigate(['/menu']);
+      return;
     }
+    const peliculaEncontrada = this.peliculas().find(p => p.id === heroItem.id);
+    if (peliculaEncontrada) {
+      this.seleccionarPelicula(peliculaEncontrada);
+    }
+  }
+
+  seleccionarGenero(genero: string): void {
+    this.generoSeleccionado.update(actual => actual === genero ? null : genero);
+  }
+
+  limpiarGeneroSeleccionado(): void {
+    this.generoSeleccionado.set(null);
+  }
+
+  contarPeliculasDelGenero(genero: string): number {
+    const clave = this.normalizarGenero(genero);
+    return this.peliculas().filter(pelicula => this.normalizarGenero(pelicula.genero) === clave).length;
+  }
+
+  iconoGenero(genero: string): string {
+    const clave = this.normalizarGenero(genero);
+    if (clave.includes('accion')) return '🥊';
+    if (clave.includes('ciencia')) return '👽';
+    if (clave.includes('terror')) return '👻';
+    if (clave.includes('aventura')) return '🧭';
+    if (clave.includes('comedia')) return '🎭';
+    if (clave.includes('animacion')) return '🎨';
+    if (clave.includes('drama')) return '🎬';
+    return '👾';
   }
 
   seleccionarPelicula(pelicula: Pelicula): void {
@@ -128,5 +174,16 @@ export class HomePage implements OnInit {
   irAFunciones(peliculaId: number): void {
     this.cerrarDetalle();
     this.router.navigate(['/funciones', peliculaId]);
+  }
+
+  private normalizarGenero(genero: string): string {
+    return genero.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+  }
+
+  private comboVigente(combo: Combo): boolean {
+    const hoy = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
+    const desde = combo.fecha_inicio?.slice(0, 10);
+    const hasta = combo.fecha_fin?.slice(0, 10);
+    return (!desde || desde <= hoy) && (!hasta || hasta >= hoy);
   }
 }

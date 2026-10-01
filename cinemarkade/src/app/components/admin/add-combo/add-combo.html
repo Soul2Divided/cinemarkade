@@ -1,0 +1,146 @@
+<div class="combo-page-container">
+  <form class="combo-card-panel" [formGroup]="formCombo" (ngSubmit)="onSubmit()">
+    <aside class="floating-combo-panel">
+      <div class="image-panel">
+        <div class="preview-card">
+          <span class="card-tag">IMAGEN DEL COMBO</span>
+          <div class="media-dropzone" (click)="comboFileInput.click()">
+            @if (imagePreviewUrl) {
+            <img [src]="imagePreviewUrl" alt="Vista previa del combo" class="media-img">
+            <button type="button" class="btn-remove-media" title="Quitar imagen"
+              (click)="removerImagen($event)">✖</button>
+            } @else {
+            <div class="dropzone-placeholder">
+              <span class="icon">🍿</span>
+              <span class="label">CLICK PARA CARGAR</span>
+              <span class="sub">[ IMAGEN PROMOCIONAL ]</span>
+            </div>
+            }
+            <div class="corner top-l"></div>
+            <div class="corner top-r"></div>
+            <div class="corner bot-l"></div>
+            <div class="corner bot-r"></div>
+          </div>
+          <input #comboFileInput type="file" accept="image/*" (change)="onFileSelected($event)" hidden>
+          <label class="url-label" for="combo-image-url">O PEGÁ UNA URL</label>
+          <input id="combo-image-url" class="form-control image-url-input" type="text" formControlName="imagen"
+            placeholder="HTTPS://..." (input)="onUrlInput($event)">
+          <small class="image-hint">Opcional. Si no cargás una, el Hero puede usar la imagen de un producto.</small>
+        </div>
+      </div>
+    </aside>
+
+    <section class="combo-details-panel">
+      <header class="panel-header">
+        <h2 class="panel-title">{{ esEdicion ? 'EDITAR COMBO' : 'NUEVO COMBO' }}</h2>
+        <span class="status-badge">CANDY BAR OFFER</span>
+      </header>
+
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label class="form-label" [class.label-error]="isFieldInvalid('nombre')">NOMBRE DEL COMBO</label>
+          <input class="form-control" type="text" formControlName="nombre" maxlength="100"
+            [class.is-invalid]="isFieldInvalid('nombre')" placeholder="EJ: COMBO FAMILIAR">
+          @if (isFieldInvalid('nombre')) { <small class="field-error">El nombre es obligatorio (máximo 100
+            caracteres).</small> }
+        </div>
+
+        <div class="form-group full-width">
+          <label class="form-label">DESCRIPCIÓN</label>
+          <textarea class="form-control textarea" rows="2" formControlName="descripcion"
+            placeholder="DESCRIBÍ BREVEMENTE LA OFERTA..."></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <div class="items-heading">
+            <label class="form-label">PRODUCTOS INCLUIDOS</label>
+            <span class="items-count">{{ items.length }} ÍTEM{{ items.length === 1 ? '' : 'S' }}</span>
+          </div>
+
+          <div class="combo-items" formArrayName="items">
+            @for (item of items.controls; track $index; let i = $index) {
+            <div class="combo-item-row" [formGroupName]="i">
+              <span class="item-number">{{ i + 1 }}</span>
+              <select class="form-control product-select" formControlName="productoId"
+                [class.is-invalid]="item.controls.productoId.touched && item.controls.productoId.invalid">
+                <option [ngValue]="null" disabled>SELECCIONÁ UN PRODUCTO</option>
+                @for (producto of productosParaFila(i); track producto.id) {
+                <option [ngValue]="producto.id" [disabled]="!producto.activa">
+                  {{ producto.nombre | uppercase }}{{ producto.activa ? '' : ' (INACTIVO)' }}
+                </option>
+                }
+              </select>
+              <label class="quantity-field">
+                <input class="form-control" type="number" min="1" step="1" formControlName="cantidad">
+              </label>
+              <button type="button" class="remove-item" title="Quitar producto" (click)="quitarItem(i)"
+                [disabled]="items.length === 1">✕</button>
+            </div>
+            }
+          </div>
+
+          <button type="button" class="add-item-button" (click)="agregarItem()">＋ AGREGAR PRODUCTO</button>
+          @if (productos().length === 0) {
+          <small class="field-error">No hay productos cargados. Primero agregá productos activos en Candy Bar.</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">VÁLIDO DESDE <small class="optional-tag">(OPCIONAL)</small></label>
+          <input class="form-control" type="date" formControlName="fechaInicio">
+        </div>
+        <div class="form-group">
+          <label class="form-label">VÁLIDO HASTA <small class="optional-tag">(OPCIONAL)</small></label>
+          <input class="form-control" type="date" formControlName="fechaFin">
+        </div>
+
+        <label class="featured-control full-width" [class.is-featured]="formCombo.controls.destacado.value">
+          <input type="checkbox" formControlName="destacado">
+          <span class="featured-copy">
+            <strong>DESTACAR EN LA HOMEPAGE</strong>
+            <small>Este combo podrá aparecer en el Hero principal.</small>
+          </span>
+          <span class="featured-star">★</span>
+        </label>
+
+        <div class="pricing-row full-width">
+          <div class="form-group discount-group">
+            <label class="form-label" [class.label-error]="isFieldInvalid('descuento')">DESCUENTO DEL COMBO (%)</label>
+            <input class="form-control" type="number" min="0" max="99" step="0.01" formControlName="descuento"
+              [class.is-invalid]="isFieldInvalid('descuento')" placeholder="20">
+            @if (isFieldInvalid('descuento')) { <small class="field-error">Ingresá un descuento entre 0% y 99%.</small>
+            }
+          </div>
+
+          <div class="price-summary">
+            <span>VALOR DE PRODUCTOS</span>
+            <strong>{{ totalPrecioLista | currency:'ARS':'symbol':'1.0-0' }}</strong>
+            <span class="final-price-label">PRECIO FINAL DEL COMBO</span>
+            <strong class="final-price">{{ precioFinalCombo | currency:'ARS':'symbol':'1.0-2' }}</strong>
+            <small>Se guarda el total después del descuento.</small>
+          </div>
+        </div>
+      </div>
+
+      @if (errorMessage()) { <div class="error-banner">⚠️ {{ errorMessage() }}</div> }
+
+      <div class="panel-actions">
+        <button type="button" class="btn-pixel-outline" (click)="cancelar()">◄ CANCELAR</button>
+        <button type="submit" class="btn btn-pixel cyan" [disabled]="formCombo.invalid || productos().length === 0">
+          {{ esEdicion ? 'GUARDAR CAMBIOS' : 'CREAR COMBO' }}
+        </button>
+      </div>
+    </section>
+  </form>
+
+  @if (mostrarLoader()) { <app-loader [message]="esEdicion ? 'ACTUALIZANDO COMBO...' : 'CREANDO COMBO...'"></app-loader>
+  }
+
+  <app-modal [isOpen]="mostrarModal()" [title]="esEdicion ? 'COMBO MODIFICADO' : 'COMBO CREADO'"
+    subtitle="OFERTA GUARDADA EN LA BASE DE DATOS" variant="cyan" (close)="cerrarModal()">
+    <p><strong>{{ formCombo.controls.nombre.value }} se guardó correctamente.</strong></p>
+    <div modal-actions>
+      <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">ACEPTAR</button>
+    </div>
+  </app-modal>
+</div>

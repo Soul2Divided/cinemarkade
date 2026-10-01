@@ -27,11 +27,17 @@ export class AdminLayout {
     { route: '/admin/combos', label: 'COMBOS & OFERTAS', icon: '🎟️' },
     { route: '/admin/puntos', label: 'RECOMPENSAS PUNTOS', icon: '🪙' },
 
+    // --- CUPONES ---
+    {route: '/admin/cupones', label: 'CUPONES', icon: '🏷️'},
+
     // --- METRICAS Y FACTURACIÓN ---
     { route: '/admin/reportes', label: 'REPORTES & PDF', icon: '📊' },
     { route: '/admin/estadisticas', label: 'ESTADÍSTICAS & VENTAS', icon: '📈' },
 
     // --- AUDITORÍA ---
-    { route: '/admin/log-actividad', label: 'LOG DE AUDITORÍA', icon: '📜' }
+    { route: '/admin/log-actividad', label: 'LOG DE AUDITORÍA', icon: '📜' },
+
+    // --- VISTA HOMEPAGE ---
+    { route: '/home', label: 'HOME', icon: '🏠' }
   ];
 }

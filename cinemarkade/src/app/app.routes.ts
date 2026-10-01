@@ -17,10 +17,6 @@ export const routes: Routes = [
         loadComponent: () => import('./components/guest-screen/guest-screen').then((m) => m.GuestScreen),
     },
     {
-        path: 'menu',
-        loadComponent: () => import('./components/menu/menu').then((m) => m.Menu)
-    },
-    {
         path: 'select-login',
         loadComponent: () => import('./components/select-login/select-login').then((m) => m.SelectLogin),
     },
@@ -72,6 +68,18 @@ export const routes: Routes = [
             {
                 path: 'editar-producto/:id',
                 loadComponent: () => import('./components/admin/add-producto/add-producto').then((m) => m.AddProducto)
+            },
+            {
+                path: 'combos',
+                loadComponent: () => import('./components/admin/abm-combo/abm-combo').then((m) => m.AbmCombo)
+            },
+            {
+                path: 'nuevo-combo',
+                loadComponent: () => import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo)
+            },
+            {
+                path: 'editar-combo/:id',
+                loadComponent: () => import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo)
             },
             {
                 path: 'funciones',

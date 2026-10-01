@@ -28,25 +28,25 @@ export class CuponService {
         return this.cuponRepository.actualizar(id, this.normalizar(datos));
     }
 
-    eliminarCupon(id: number): Promise<void> {
+    eliminarCupon(id: number, activa: boolean): Promise<void> {
         this.validarId(id);
-        return this.cuponRepository.eliminar(id);
+        return this.cuponRepository.cambiarActiva(id, activa);
     }
 
     private validarDatos(datos: CuponInput): void {
         if (!datos.codigo?.trim()) {
             throw new Error('El código del cupón es obligatorio.');
         }
-        if (!Number.isFinite(datos.porcentajeDescuento) || datos.porcentajeDescuento < 1 || datos.porcentajeDescuento > 100) {
+        if (!Number.isFinite(datos.porcentaje_descuento) || datos.porcentaje_descuento < 1 || datos.porcentaje_descuento > 100) {
             throw new Error('El descuento debe estar entre 1% y 100%.');
         }
-        if (!Number.isInteger(datos.edadMinima) || datos.edadMinima < 0) {
+        if (!Number.isInteger(datos.edad_minima) || datos.edad_minima < 0) {
             throw new Error('La edad mínima debe ser un entero igual o mayor a cero.');
         }
-        if (!this.esFechaValida(datos.fechaInicio) || !this.esFechaValida(datos.fechaFin)) {
+        if (!this.esFechaValida(datos.fecha_inicio) || !this.esFechaValida(datos.fecha_fin)) {
             throw new Error('Las fechas de vigencia son obligatorias y deben ser válidas.');
         }
-        if (datos.fechaFin < datos.fechaInicio) {
+        if (datos.fecha_fin < datos.fecha_inicio) {
             throw new Error('La fecha de vencimiento no puede ser anterior a la fecha de inicio.');
         }
     }

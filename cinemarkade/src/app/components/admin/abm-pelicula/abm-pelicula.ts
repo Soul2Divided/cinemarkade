@@ -1,18 +1,18 @@
 import { UpperCasePipe } from '@angular/common';
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 import { Pelicula } from '../../../core/pelicula/pelicula.model';
-import { PeliculaRepository } from '../../../core/pelicula/pelicula.repository';
+import { PeliculaService } from '../../../core/pelicula/pelicula.service';
 
 @Component({
-  imports: [UpperCasePipe, RouterOutlet],
+  imports: [UpperCasePipe],
   selector: 'app-abm-pelicula',
   styleUrl: './abm-pelicula.scss',
   templateUrl: './abm-pelicula.html',
 })
 
 export class AbmPelicula implements OnInit {
-  private peliculaRepository = inject(PeliculaRepository);
+  private peliculaService = inject(PeliculaService);
   private router = inject(Router);
 
   peliculas = signal<Pelicula[]>([]);
@@ -39,7 +39,7 @@ export class AbmPelicula implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      const data = await this.peliculaRepository.listar();
+      const data = await this.peliculaService.listarPeliculas();
       this.peliculas.set(data || []);
     } catch (error) {
       console.error('Error al cargar catálogo de películas:', error);
@@ -65,7 +65,7 @@ export class AbmPelicula implements OnInit {
     const nuevoEstado = !active;
 
     try {
-      await this.peliculaRepository.cambiarActiva(id, nuevoEstado);
+      await this.peliculaService.cambiarActiva(id, nuevoEstado);
       /*
        * Las Signals de Angular necesitan que se emita una nueva referencia de objeto/array mediante
        * update() para notificar a computed() (peliculasFiltradas()) que el estado ha cambiado.

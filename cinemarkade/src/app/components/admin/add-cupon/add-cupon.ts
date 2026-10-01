@@ -6,11 +6,12 @@ import { Loader } from '../../loader/loader';
 import { Modal } from '../../modal/modal';
 import { CuponInput } from '../../../core/cupon/cupon.model';
 import { CuponService } from '../../../core/cupon/cupon.service';
+import { UpperCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-add-cupon',
   standalone: true,
-  imports: [ReactiveFormsModule, Loader, Modal],
+  imports: [ReactiveFormsModule, Loader, Modal, UpperCasePipe],
   templateUrl: './add-cupon.html',
   styleUrls: ['./add-cupon.scss']
 })
@@ -27,7 +28,7 @@ export class AddCupon implements OnInit {
   mostrarLoader = signal<boolean>(false);
 
   formCupon = new FormGroup({
-    codigo: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    codigo: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(17)]),
     porcentajeDescuento: new FormControl<number | null>(null, [Validators.required, Validators.min(1), Validators.max(100)]),
     edadMinima: new FormControl<number>(0, [Validators.required, Validators.min(0)]),
     fechaInicio: new FormControl('', [Validators.required]),
@@ -49,10 +50,10 @@ export class AddCupon implements OnInit {
       if (cupon) {
         this.formCupon.patchValue({
           codigo: cupon.codigo,
-          porcentajeDescuento: cupon.porcentajeDescuento,
-          edadMinima: cupon.edadMinima,
-          fechaInicio: cupon.fechaInicio,
-          fechaFin: cupon.fechaFin
+          porcentajeDescuento: cupon.porcentaje_descuento,
+          edadMinima: cupon.edad_minima,
+          fechaInicio: cupon.fecha_inicio,
+          fechaFin: cupon.fecha_fin
         });
         this.cdr.detectChanges();
       }
@@ -94,6 +95,10 @@ export class AddCupon implements OnInit {
       return 'El código debe tener al menos 3 caracteres';
     }
 
+    if (field === 'codigo' && control.hasError('maxlength')) {
+      return 'El código debe tener 17 caracteres como maximo';
+    }
+
     return '';
   }
 
@@ -112,10 +117,10 @@ export class AddCupon implements OnInit {
 
       const datos: CuponInput = {
         codigo: valores.codigo!.toUpperCase().trim(),
-        porcentajeDescuento: Number(valores.porcentajeDescuento!),
-        edadMinima: Number(valores.edadMinima ?? 0),
-        fechaInicio: valores.fechaInicio!,
-        fechaFin: valores.fechaFin!
+        porcentaje_descuento: Number(valores.porcentajeDescuento!),
+        edad_minima: Number(valores.edadMinima ?? 0),
+        fecha_inicio: valores.fechaInicio!,
+        fecha_fin: valores.fechaFin!
       };
 
       if (this.esEdicion && this.cuponId) {

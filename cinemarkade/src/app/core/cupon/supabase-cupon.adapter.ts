@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from '../services/supabase.service';
-import { Cupon, CuponInput, CuponRow } from './cupon.model';
+import { Cupon, CuponInput } from './cupon.model';
 import { CuponRepository } from './cupon.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -14,7 +14,7 @@ export class SupabaseCuponAdapter implements CuponRepository {
             .order('fecha_inicio', { ascending: false });
 
         if (error) throw new Error(`Error al listar los cupones: ${error.message}`);
-        return (data ?? []).map(row => this.mapToModel(row as CuponRow));
+        return data as Cupon[];
     }
 
     async obtenerPorId(id: number): Promise<Cupon | null> {
@@ -25,59 +25,42 @@ export class SupabaseCuponAdapter implements CuponRepository {
             .maybeSingle();
 
         if (error) throw new Error(`Error al obtener el cupón: ${error.message}`);
-        return data ? this.mapToModel(data as CuponRow) : null;
+        return data as Cupon | null;
     }
 
     async crear(datos: CuponInput): Promise<Cupon> {
         const { data, error } = await this.supabaseService.supabaseClient
             .from('cupon')
-            .insert(this.mapToRow(datos))
+            .insert({ ...datos, activo: true })
             .select('*')
             .single();
 
         if (error) throw new Error(`Error al crear el cupón: ${error.message}`);
-        return this.mapToModel(data as CuponRow);
+        return data as Cupon;
     }
 
     async actualizar(id: number, datos: CuponInput): Promise<Cupon> {
         const { data, error } = await this.supabaseService.supabaseClient
             .from('cupon')
-            .update(this.mapToRow(datos))
+            .update(datos)
             .eq('id', id)
             .select('*')
             .single();
 
         if (error) throw new Error(`Error al actualizar el cupón: ${error.message}`);
-        return this.mapToModel(data as CuponRow);
+        return data as Cupon;
     }
 
-    async eliminar(id: number): Promise<void> {
-        const { error } = await this.supabaseService.supabaseClient
+    async cambiarActiva(id: number, activa: boolean): Promise<void> {
+        const supabase = this.supabaseService.supabaseClient;
+
+        const { error } = await supabase
             .from('cupon')
-            .delete()
+            .update({ activa })
             .eq('id', id);
 
-        if (error) throw new Error(`Error al eliminar el cupón: ${error.message}`);
-    }
-
-    private mapToModel(row: CuponRow): Cupon {
-        return {
-            id: row.id,
-            codigo: row.codigo,
-            porcentajeDescuento: Number(row.porcentaje_descuento),
-            edadMinima: Number(row.edad_minima),
-            fechaInicio: row.fecha_inicio,
-            fechaFin: row.fecha_fin,
-        };
-    }
-
-    private mapToRow(datos: CuponInput): Omit<CuponRow, 'id'> {
-        return {
-            codigo: datos.codigo,
-            porcentaje_descuento: datos.porcentajeDescuento,
-            edad_minima: datos.edadMinima,
-            fecha_inicio: datos.fechaInicio,
-            fecha_fin: datos.fechaFin,
-        };
+        if (error) {
+            throw new Error(`Error al cambiar el estado del cupon: ${error.message}`);
+        }
     }
 }

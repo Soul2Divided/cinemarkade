@@ -5,7 +5,7 @@
         <!-- PREVISUALIZACIÓN DEL TICKET RETRO DE CUPÓN -->
         <div class="floating-ticket-panel">
             <div class="ticket-preview-card">
-                <span class="card-tag">COUPON PREVIEW</span>
+                <span class="card-tag">CUPON PREVIEW</span>
 
                 <div class="ticket-stub">
                     <div class="stub-header">
@@ -17,7 +17,7 @@
 
                     <div class="stub-code-display">
                         <span class="code-text">
-                            {{ formCupon.get('codigo')?.value || 'CÓDIGO' }}
+                            {{ formCupon.get('codigo')?.value || 'CÓDIGO' | uppercase }}
                         </span>
                     </div>
 
@@ -146,16 +146,16 @@
 
     </form>
     @if (mostrarLoader()) {
-    <app-loader message="AÑADIENDO CUPON..."></app-loader>
+        <app-loader message="AÑADIENDO CUPON..."></app-loader>
     }
 
     <app-modal [isOpen]="mostrarModal()" title="{{ esEdicion ? 'MODIFICADO CON EXITO' : 'CREADO CON EXITO' }}"
         subtitle="NUEVO REGISTRO EN BASE DE DATOS" variant="cyan" (close)="cerrarModal()">
 
         @if (esEdicion) {
-        <p>Cupon de <strong>{{ formCupon.get('descuento')?.value }} modificado correctamente</strong></p>
+        <p>Cupon de <strong>{{ formCupon.get('porcentajeDescuento')?.value }}% modificado correctamente</strong></p>
         } @else {
-        <p>Cupon de <strong>{{ formCupon.get('descuento')?.value }} añadido correctamente</strong></p>
+        <p>Cupon de <strong>{{ formCupon.get('porcentajeDescuento')?.value }}% añadido correctamente</strong></p>
         }
 
         <div modal-actions>

@@ -24,9 +24,9 @@ export class AbmCupon implements OnInit {
 
     return this.cupones().filter(c =>
       c.codigo.toLowerCase().includes(query) ||
-      c.porcentajeDescuento.toString().includes(query) ||
-      c.fechaInicio.includes(query) ||
-      c.fechaFin.includes(query)
+      c.porcentaje_descuento.toString().includes(query) ||
+      c.fecha_inicio.includes(query) ||
+      c.fecha_fin.includes(query)
     );
   });
 
@@ -59,14 +59,22 @@ export class AbmCupon implements OnInit {
     this.router.navigate(['/admin/editar-cupon', id]);
   }
 
-  async eliminarCupon(id: number): Promise<void> {
-    if (confirm('¿Estás seguro de eliminar este cupón?')) {
-      try {
-        await this.cuponService.eliminarCupon(id);
-        this.cupones.update(lista => lista.filter(c => c.id !== id));
-      } catch (error) {
-        console.error('Error al eliminar cupón:', error);
-      }
+  async cambiarEstadoCupon(id: number, active: boolean): Promise<void> {
+    const nuevoEstado = !active;
+
+    try {
+      await this.cuponService.eliminarCupon(id, nuevoEstado);
+      /*
+       * Las Signals de Angular necesitan que se emita una nueva referencia de objeto/array mediante
+       * update() para notificar a computed() (cuponsFiltradas()) que el estado ha cambiado.
+       */
+      this.cupones.update(lista =>
+        lista.map(cupon =>
+          cupon.id === id ? { ...cupon, activa: nuevoEstado } : cupon
+        )
+      );
+    } catch (error) {
+      console.error('Error al cambiar el estado del cupon:', error);
     }
   }
 }

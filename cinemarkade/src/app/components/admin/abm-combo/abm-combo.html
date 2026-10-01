@@ -1,0 +1,89 @@
+<div class="abm-combos-container">
+  <div class="abm-header">
+    <div class="header-title-group">
+      <h2 class="section-title">COMBOS &amp; OFERTAS</h2>
+      <span class="total-badge">TOTAL: {{ combos().length }}</span>
+    </div>
+
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="form-control" placeholder="BUSCAR COMBO O PRODUCTO..." (input)="onSearch($event)">
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+  <div class="error-banner">⚠️ {{ errorMessage() }}</div>
+  }
+
+  @if (!cargando()) {
+  <div class="combos-grid">
+    @for (combo of combosFiltrados(); track combo.id) {
+    <article class="combo-card" [class.is-inactive]="!combo.activo">
+        <div class="combo-image-wrap">
+          @if (combo.imagen) {
+          <img [src]="combo.imagen" [alt]="combo.nombre" class="combo-image">
+          } @else {
+          <span class="image-placeholder">🍿</span>
+          }
+          @if (combo.destacado) { <span class="featured-badge">★ DESTACADO</span> }
+        </div>
+      <div class="card-topline">
+        <span class="offer-badge">🍿 COMBO CANDY</span>
+        @if (!combo.activo) { <span class="inactive-badge">INACTIVO</span> }
+      </div>
+
+      <div class="card-details">
+        <h3 class="combo-title">{{ combo.nombre | uppercase }}</h3>
+        @if (combo.descripcion) { <p class="combo-description">{{ combo.descripcion }}</p> }
+
+        <div class="included-products">
+          <span class="list-label">INCLUYE</span>
+          @for (item of combo.items ?? []; track item.id) {
+          <div class="included-item">
+            <span>{{ item.cantidad }}× {{ obtenerProducto(item.producto_id)?.nombre || 'Producto' }}</span>
+            <span>{{ (obtenerProducto(item.producto_id)?.precio ?? 0) * item.cantidad | currency:'ARS':'symbol':'1.0-0'
+              }}</span>
+          </div>
+          } @empty {
+          <span class="no-items">Sin productos asociados</span>
+          }
+        </div>
+
+        <div class="price-block">
+          <div><span class="price-label">VALOR POR SEPARADO</span><span class="list-price">{{ totalPrecioLista(combo) |
+              currency:'ARS':'symbol':'1.0-0' }}</span></div>
+          <div class="combo-price"><span>PRECIO COMBO</span><strong>{{ combo.precio | currency:'ARS':'symbol':'1.0-0'
+              }}</strong></div>
+        </div>
+
+        @if (combo.fecha_inicio || combo.fecha_fin) {
+        <div class="validity">
+          @if (combo.fecha_inicio) { <span>DESDE {{ combo.fecha_inicio | date:'dd/MM/yyyy' }}</span> }
+          @if (combo.fecha_fin) { <span>HASTA {{ combo.fecha_fin | date:'dd/MM/yyyy' }}</span> }
+        </div>
+        }
+
+        <div class="card-actions">
+          <button type="button" class="btn-action edit" (click)="modificarCombo(combo.id)">✏️ MODIFICAR</button>
+          <button type="button" class="btn-action" [class.delete]="combo.activo" [class.activate]="!combo.activo"
+            (click)="cambiarEstadoCombo(combo)">
+            {{ combo.activo ? '✖ DAR DE BAJA' : '✔ DAR DE ALTA' }}
+          </button>
+        </div>
+      </div>
+    </article>
+    } @empty {
+    <div class="empty-state">
+      <span class="empty-icon">🎟️</span>
+      <p class="empty-text">[ NO SE ENCONTRARON COMBOS ]</p>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="loading-state"><span class="loading-text">CARGANDO COMBOS...</span></div>
+  }
+
+  <button type="button" class="fab-add-combo" (click)="irAAgregarCombo()" title="Crear combo nuevo">
+    <span class="fab-icon">+</span><span class="fab-label">NUEVO COMBO</span>
+  </button>
+</div>

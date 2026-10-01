@@ -13,14 +13,14 @@
 
             <div class="hero-info">
                 <span class="badge-featured" [class.badge-combo]="elementosHero()[indiceHeroActual].esCombo">
-                    {{ elementosHero()[indiceHeroActual].esCombo ? 'PROMO CANDY' : 'DESTACADO' }}
+                    {{ elementosHero()[indiceHeroActual].esCombo ? 'COMBO DESTACADO' : 'DESTACADO' }}
                 </span>
 
                 <h1 class="hero-title">{{ elementosHero()[indiceHeroActual].nombre | uppercase }}</h1>
 
                 <p class="hero-meta">
                     @if (elementosHero()[indiceHeroActual].esCombo) {
-                    CANDYBAR | OFERTA ESPECIAL
+                    OFERTA CANDY BAR | {{ elementosHero()[indiceHeroActual].precio | currency:'ARS':'symbol-narrow':'1.0-0' }}
                     } @else {
                     {{ elementosHero()[indiceHeroActual].genero | uppercase }} |
                     {{ elementosHero()[indiceHeroActual].duracion }} MIN |
@@ -30,12 +30,14 @@
 
                 <p class="hero-synopsis">{{ elementosHero()[indiceHeroActual].sinopsis }}</p>
 
+                @if (!elementosHero()[indiceHeroActual].esCombo) {
                 <div class="hero-actions">
                     <button type="button" class="btn-pixel yellow"
                         (click)="ejecutarAccionHero(elementosHero()[indiceHeroActual])">
-                        {{ elementosHero()[indiceHeroActual].esCombo ? '🍿 PEDIR COMBO' : '🎟️ VER DETALLES' }}
+                        🎟️ VER DETALLES
                     </button>
                 </div>
+                }
             </div>
 
             <div class="hero-indicators">
@@ -50,28 +52,17 @@
 
         <section class="catalog-section">
             <div class="section-header">
-                <h2 class="section-title">TENDENCIAS DE LA SEMANA</h2>
-                <span class="see-more">VER MÁS ▶</span>
+                <h2 class="section-title">TOP 3 PELÍCULAS MÁS VISTAS</h2>
             </div>
-            <div class="top-ranking-grid">
-                @for (pelicula of peliculasTendencias(); track pelicula.id; let i = $index) {
-                <article class="ranking-card" (click)="seleccionarPelicula(pelicula)">
-                    <span class="ranking-number">{{ i + 1 }}</span>
-                    <div class="card-media">
-                        <img [src]="pelicula.imagen" [alt]="pelicula.nombre" />
-                    </div>
-                    <div class="card-details">
-                        <h4>{{ pelicula.nombre }}</h4>
-                    </div>
-                </article>
-                }
+            <div class="ranking-pending">
+                <span class="pending-icon">🏆</span>
+                <p>EL TOP 3 SE MOSTRARÁ CUANDO REGISTREMOS LAS VISUALIZACIONES DE CADA PELÍCULA.</p>
             </div>
         </section>
 
         <section class="catalog-section">
             <div class="section-header">
                 <h2 class="section-title">ESTRENOS EXCLUSIVOS</h2>
-                <span class="see-more">VER MÁS ▶</span>
             </div>
             <div class="posters-grid">
                 @for (pelicula of peliculasEstrenos(); track pelicula.id) {
@@ -88,16 +79,38 @@
         <section class="catalog-section">
             <div class="section-header">
                 <h2 class="section-title">EXPLORAR POR GÉNEROS</h2>
-                <span class="see-more">VER MÁS ▶</span>
             </div>
             <div class="genres-grid">
-                @for (genero of generos; track genero) {
-                <div class="genre-card">
-                    <span class="genre-icon">👾</span>
+                @for (genero of generos(); track genero) {
+                <button type="button" class="genre-card" [class.active]="generoSeleccionado() === genero"
+                    (click)="seleccionarGenero(genero)">
+                    <span class="genre-icon">{{ iconoGenero(genero) }}</span>
                     <span class="genre-name">{{ genero }}</span>
-                </div>
+                    <span class="genre-count">{{ contarPeliculasDelGenero(genero) }} PELÍCULAS</span>
+                </button>
+                } @empty {
+                <div class="genre-empty">NO HAY GÉNEROS CARGADOS EN LA CARTELERA</div>
                 }
             </div>
+
+            @if (generoSeleccionado(); as genero) {
+            <div class="genre-results">
+                <div class="section-header genre-results-header">
+                    <h3 class="section-title">PELÍCULAS DE {{ genero | uppercase }}</h3>
+                    <button type="button" class="clear-genre" (click)="limpiarGeneroSeleccionado()">✕ CERRAR</button>
+                </div>
+                <div class="posters-grid">
+                    @for (pelicula of peliculasPorGenero(); track pelicula.id) {
+                    <article class="poster-card" (click)="seleccionarPelicula(pelicula)">
+                        <div class="card-media"><img [src]="pelicula.imagen" [alt]="pelicula.nombre" /></div>
+                        <h4 class="card-title">{{ pelicula.nombre }}</h4>
+                    </article>
+                    } @empty {
+                    <p class="genre-empty">NO HAY PELÍCULAS PARA ESTE GÉNERO</p>
+                    }
+                </div>
+            </div>
+            }
         </section>
 
         <section class="catalog-section">
@@ -105,61 +118,17 @@
                 <h2 class="section-title">RECOMENDADO PARA TI</h2>
             </div>
             <div class="empty-recommendations">
-                <p>[ INICIÁ SESIÓN O MIRÁ PELÍCULAS PARA RECIBIR RECOMENDACIONES ]</p>
+                <p>LAS RECOMENDACIONES SE BASARÁN EN LOS GÉNEROS DE TUS DOS ÚLTIMAS PELÍCULAS VISTAS.</p>
             </div>
         </section>
 
         <section class="catalog-section upcoming-section">
             <div class="section-header">
-                <h2 class="section-title">PRÓXIMOS LANZAMIENTOS</h2>
-                <span class="see-more">VER MÁS ▶</span>
+                <h2 class="section-title">PRÓXIMAS FUNCIONES EN PREVENTA</h2>
             </div>
-            <div class="upcoming-container">
-
-                @if (peliculaDestacada(); as destacada) {
-                <div class="upcoming-featured">
-                    <img [src]="destacada.banner || destacada.imagen" [alt]="destacada.nombre" />
-                </div>
-                }
-
-                <div class="upcoming-list">
-                    @for (pelicula of peliculasProximas(); track pelicula.id) {
-                    <div class="upcoming-item">
-                        <div class="item-info">
-                            <h4>{{ pelicula.nombre }}</h4>
-                            <p>PRÓXIMAMENTE</p>
-                        </div>
-                        <button type="button" class="btn-pixel-sm">RECORDAR</button>
-                    </div>
-                    }
-                </div>
-
-            </div>
-        </section>
-
-        <section class="features-footer">
-            <h3 class="footer-title">¿POR QUÉ ELEGIR CINEMARKADE?</h3>
-            <div class="features-grid">
-                <div class="feature-item">
-                    <span class="feature-icon">📺</span>
-                    <h5>CALIDAD ULTRA HD</h5>
-                    <p>PROYECCIÓN RETRO DIGITAL</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🔊</span>
-                    <h5>AUDIO ESPACIAL</h5>
-                    <p>SONIDO ENVOLVENTE 8-BIT</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🚫</span>
-                    <h5>SIN PUBLICIDAD</h5>
-                    <p>ACCESO DIRECTO A SALA</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🎟️</span>
-                    <h5>TICKETS DIGITALES</h5>
-                    <p>CANJEA TU HIGH SCORE</p>
-                </div>
+            <div class="upcoming-placeholder">
+                <span class="pending-icon">⏳</span>
+                <p>LAS FUNCIONES EN PREVENTA APARECERÁN ACÁ CUANDO ESTÉ DISPONIBLE ESA INFORMACIÓN.</p>
             </div>
         </section>
 

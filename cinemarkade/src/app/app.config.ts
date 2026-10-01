@@ -13,6 +13,8 @@ import { FuncionRepository } from './core/funcion/funcion.repository';
 import { SupabaseFuncionAdapter } from './core/funcion/supabase-funcion.adapter';
 import { CuponRepository } from './core/cupon/cupon.repository';
 import { SupabaseCuponAdapter } from './core/cupon/supabase-cupon.adapter';
+import { ComboRepository } from './core/combo/combo.repository';
+import { SupabaseComboAdapter } from './core/combo/supabase-combo.adapter';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,6 +25,7 @@ export const appConfig: ApplicationConfig = {
     { provide: SalaRepository, useClass: SupabaseSalaAdapter },
     { provide: ProductoRepository, useClass: SupabaseProductoAdapter },
     { provide: FuncionRepository, useClass: SupabaseFuncionAdapter},
-    { provide: CuponRepository, useClass: SupabaseCuponAdapter}
+    { provide: CuponRepository, useClass: SupabaseCuponAdapter},
+    { provide: ComboRepository, useClass: SupabaseComboAdapter}
   ]
 };
