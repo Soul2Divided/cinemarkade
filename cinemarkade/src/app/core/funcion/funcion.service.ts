@@ -1,21 +1,18 @@
 import { Inject, Injectable } from '@angular/core';
 import { FuncionRepository } from './funcion.repository';
-import {
-    CrearFuncionInput,
-    Funcion,
-    FuncionInput,
-} from './funcion.model';
-import { FORMATOS_SALA, FormatoSala } from '../sala/sala.model';
+import { CrearFuncionInput, Funcion, FuncionInput } from './funcion.model';
+import { FORMATOS_SALA, FormatoSala, Sala } from '../sala/sala.model';
 import { PeliculaService } from '../pelicula/pelicula.service';
 import { SalaService } from '../sala/sala.service';
+import { calcularHorariosDisponibles } from '../../utils/horario-funcion.util';
 
 @Injectable({ providedIn: 'root' })
 export class FuncionService {
     constructor(
         @Inject(FuncionRepository)
-        private funcionRepository: FuncionRepository,
-        private peliculaService: PeliculaService,
-        private salaService: SalaService
+        private readonly funcionRepository: FuncionRepository,
+        private readonly peliculaService: PeliculaService,
+        private readonly salaService: SalaService
     ) { }
 
     listarFunciones(): Promise<Funcion[]> {
@@ -23,8 +20,7 @@ export class FuncionService {
     }
 
     async listarFuncionesActivas(): Promise<Funcion[]> {
-        const funciones = await this.funcionRepository.listar();
-        return funciones.filter(funcion => funcion.activa);
+        return (await this.funcionRepository.listar()).filter(funcion => funcion.activa);
     }
 
     async obtenerFuncionPorId(id: number): Promise<Funcion> {
@@ -37,51 +33,89 @@ export class FuncionService {
         return this.funcionRepository.listarPorPelicula(peliculaId);
     }
 
-    async crearFuncion(datos: CrearFuncionInput): Promise<Funcion> {
-        this.validarDatos(datos);
+    async crearFunciones(datos: CrearFuncionInput): Promise<Funcion[]> {
+        await this.validarDatos(datos);
 
         const pelicula = await this.peliculaService.obtenerPorId(datos.peliculaId);
         if (!pelicula.activa) {
             throw new Error('No se puede crear una función para una película inactiva.');
         }
 
-        const sala = await this.buscarSalaDisponible(datos.formato);
+        const salas = await this.salaService.listarSalas();
+        const asignaciones: Array<{ formato: FormatoSala; salaId: number }> = [];
 
-        const fila: FuncionInput = {
-            pelicula_id: datos.peliculaId,
-            sala_id: sala.id,
-            fecha: datos.fecha,
-            horario: datos.horario,
-            formato: datos.formato,
-            idioma: datos.idioma,
-            precio: datos.precio,
-            es_preventa: datos.fecha > this.fechaActualDelCine(),
-        };
+        // Primero se encuentran todas las salas. Así no se crea una programación
+        // parcial si falta una sala para alguno de los formatos seleccionados.
+        for (const formato of datos.formatos) {
+            let salaDisponible: Sala | undefined;
+            for (const candidata of salas.filter(item =>
+                item.activa &&
+                item.formato === formato &&
+                !asignaciones.some(asignacion => asignacion.salaId === item.id)
+            )) {
+                const ocupada = await this.funcionRepository.existeFuncionActivaEnSala(
+                    candidata.id,
+                    datos.fecha
+                );
+                if (!ocupada) {
+                    salaDisponible = candidata;
+                    break;
+                }
+            }
 
-        return this.funcionRepository.crear(fila);
-    }
-
-    async actualizarFuncion(
-        id: number,
-        datos: CrearFuncionInput
-    ): Promise<Funcion> {
-        this.validarId(id);
-        this.validarDatos(datos);
-
-        const actual = await this.funcionRepository.obtenerPorId(id);
-        if (!actual.activa) {
-            throw new Error('No se puede editar una función inactiva.');
+            if (!salaDisponible) {
+                throw new Error(`No hay una sala libre para ${formato} en la fecha seleccionada.`);
+            }
+            asignaciones.push({ formato, salaId: salaDisponible.id });
         }
 
+        const creadas: Funcion[] = [];
+        try {
+            for (const asignacion of asignaciones) {
+                const fila: FuncionInput = {
+                    pelicula_id: datos.peliculaId,
+                    sala_id: asignacion.salaId,
+                    fecha: datos.fecha,
+                    formato: asignacion.formato,
+                    idioma: datos.idioma,
+                    es_preventa: datos.esPreventa,
+                    activa: true,
+                };
+                creadas.push(await this.funcionRepository.crearConProyecciones(
+                    fila,
+                    datos.horariosSeleccionados
+                ));
+            }
+            return creadas;
+        } catch (error) {
+            await Promise.allSettled(
+                creadas.map(funcion => this.funcionRepository.cambiarActiva(funcion.id, false))
+            );
+            throw error;
+        }
+    }
+
+    async actualizarFuncion(id: number, datos: CrearFuncionInput): Promise<Funcion> {
+        this.validarId(id);
+        await this.validarDatos(datos);
+
+        if (datos.formatos.length !== 1) {
+            throw new Error('Al editar una función, seleccioná un solo formato.');
+        }
+
+        const actual = await this.funcionRepository.obtenerPorId(id);
         const pelicula = await this.peliculaService.obtenerPorId(datos.peliculaId);
         if (!pelicula.activa) {
             throw new Error('No se puede asignar una película inactiva.');
         }
 
+        const formato = datos.formatos[0];
+        const salas = await this.salaService.listarSalas();
+        const salaActual = salas.find(sala => sala.id === actual.sala_id);
         let salaId = actual.sala_id;
 
-        if (actual.formato !== datos.formato) {
-            const sala = await this.buscarSalaDisponible(datos.formato, id);
+        if (!salaActual?.activa || salaActual.formato !== formato || actual.fecha !== datos.fecha) {
+            const sala = await this.buscarSalaDisponible(formato, datos.fecha, id);
             salaId = sala.id;
         }
 
@@ -89,71 +123,107 @@ export class FuncionService {
             pelicula_id: datos.peliculaId,
             sala_id: salaId,
             fecha: datos.fecha,
-            horario: datos.horario,
-            formato: datos.formato,
+            formato,
             idioma: datos.idioma,
-            precio: datos.precio,
-            es_preventa: datos.fecha > this.fechaActualDelCine(),
+            es_preventa: datos.esPreventa,
+            activa: actual.activa,
         };
 
-        return this.funcionRepository.actualizar(id, fila);
+        return this.funcionRepository.actualizarConProyecciones(
+            id,
+            fila,
+            datos.horariosSeleccionados
+        );
+    }
+
+    async cambiarActiva(id: number, activa: boolean): Promise<void> {
+        this.validarId(id);
+        return this.funcionRepository.cambiarActiva(id, activa);
+    }
+
+    /** Da de baja la programación de una sala y luego la sala. */
+    async desactivarSalaConFunciones(salaId: number): Promise<void> {
+        this.validarId(salaId);
+        const funciones = (await this.funcionRepository.listar()).filter(
+            funcion => funcion.sala_id === salaId && funcion.activa
+        );
+        const desactivadas: Funcion[] = [];
+
+        try {
+            for (const funcion of funciones) {
+                await this.funcionRepository.cambiarActiva(funcion.id, false);
+                desactivadas.push(funcion);
+            }
+
+            await this.salaService.cambiarActiva(salaId, false);
+        } catch (error) {
+            // Si falla la operación, intenta dejar las funciones como estaban.
+            await Promise.allSettled(
+                desactivadas.map(funcion => this.funcionRepository.cambiarActiva(funcion.id, true))
+            );
+            throw error;
+        }
     }
 
     async eliminarFuncion(id: number): Promise<void> {
-        this.validarId(id);
-
-        const funcion = await this.funcionRepository.obtenerPorId(id);
-        if (!funcion.activa) return;
-
-        await this.funcionRepository.cambiarActiva(id, false);
+        return this.cambiarActiva(id, false);
     }
 
     private async buscarSalaDisponible(
         formato: FormatoSala,
+        fecha: string,
         excluirFuncionId?: number
     ) {
         const salas = await this.salaService.listarSalas();
-        const candidatas = salas.filter(
-            sala => sala.activa && sala.formato === formato
-        );
-
-        for (const sala of candidatas) {
-            const ocupada =
-                await this.funcionRepository.existeFuncionActivaEnSala(
-                    sala.id,
-                    excluirFuncionId
-                );
-
+        for (const sala of salas.filter(item => item.activa && item.formato === formato)) {
+            const ocupada = await this.funcionRepository.existeFuncionActivaEnSala(
+                sala.id,
+                fecha,
+                excluirFuncionId
+            );
             if (!ocupada) return sala;
         }
-
-        throw new Error(`No hay salas disponibles de formato ${formato}.`);
+        throw new Error(`No hay una sala disponible para el formato ${formato} en la fecha seleccionada.`);
     }
 
-    private validarDatos(datos: CrearFuncionInput): void {
+    private async validarDatos(datos: CrearFuncionInput): Promise<void> {
         this.validarId(datos.peliculaId);
 
-        if (!FORMATOS_SALA.includes(datos.formato)) {
-            throw new Error('El formato seleccionado no es válido.');
+        if (!Array.isArray(datos.formatos) || datos.formatos.length === 0) {
+            throw new Error('Seleccioná al menos un formato.');
         }
-
+        if (datos.formatos.some(formato => !FORMATOS_SALA.includes(formato))) {
+            throw new Error('Uno de los formatos seleccionados no es válido.');
+        }
+        if (new Set(datos.formatos).size !== datos.formatos.length) {
+            throw new Error('No repitas formatos.');
+        }
         if (!datos.fecha || datos.fecha < this.fechaActualDelCine()) {
             throw new Error('La fecha debe ser hoy o una fecha futura.');
         }
-
-        if (!/^\d{2}:\d{2}$/.test(datos.horario)) {
-            throw new Error('El horario debe tener formato HH:mm.');
-        }
-
-        if (!Number.isFinite(datos.precio) || datos.precio <= 0) {
-            throw new Error('El precio debe ser mayor que cero.');
-        }
-
-        if (
-            datos.idioma !== 'Subtitulada' &&
-            datos.idioma !== 'Doblada'
-        ) {
+        if (datos.idioma !== 'Subtitulada' && datos.idioma !== 'Doblada') {
             throw new Error('El idioma seleccionado no es válido.');
+        }
+        if (typeof datos.esPreventa !== 'boolean') {
+            throw new Error('Indicá si la función estará en preventa.');
+        }
+        if (!Array.isArray(datos.horariosSeleccionados) || datos.horariosSeleccionados.length === 0) {
+            throw new Error('Seleccioná al menos un horario disponible.');
+        }
+        if (new Set(datos.horariosSeleccionados).size !== datos.horariosSeleccionados.length) {
+            throw new Error('No repitas horarios.');
+        }
+
+        const pelicula = await this.peliculaService.obtenerPorId(datos.peliculaId);
+        const disponibles = calcularHorariosDisponibles(pelicula.duracion, datos.primerHorario);
+        if (datos.horariosSeleccionados.some(horario => !disponibles.includes(horario))) {
+            throw new Error('Hay horarios seleccionados que no son válidos para esta película.');
+        }
+        if (datos.fecha === this.fechaActualDelCine()) {
+            const ahora = this.horaActualDelCine();
+            if (datos.horariosSeleccionados.some(horario => horario <= ahora)) {
+                throw new Error('No podés programar horarios que ya pasaron.');
+            }
         }
     }
 
@@ -164,16 +234,28 @@ export class FuncionService {
     }
 
     private fechaActualDelCine(): string {
+        return this.partesFechaHoraDelCine().fecha;
+    }
+
+    private horaActualDelCine(): string {
+        return this.partesFechaHoraDelCine().hora;
+    }
+
+    private partesFechaHoraDelCine(): { fecha: string; hora: string } {
         const partes = new Intl.DateTimeFormat('en-CA', {
             timeZone: 'America/Argentina/Buenos_Aires',
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23',
         }).formatToParts(new Date());
+        const valor = (tipo: string) => partes.find(parte => parte.type === tipo)!.value;
 
-        const valor = (tipo: string) =>
-            partes.find(parte => parte.type === tipo)!.value;
-
-        return `${valor('year')}-${valor('month')}-${valor('day')}`;
+        return {
+            fecha: `${valor('year')}-${valor('month')}-${valor('day')}`,
+            hora: `${valor('hour')}:${valor('minute')}`,
+        };
     }
 }

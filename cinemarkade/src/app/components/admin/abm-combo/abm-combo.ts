@@ -5,10 +5,11 @@ import { Combo, ComboItem } from '../../../core/combo/combo.model';
 import { ComboService } from '../../../core/combo/combo.service';
 import { Producto } from '../../../core/producto/producto.model';
 import { ProductoService } from '../../../core/producto/producto.service';
+import { Modal } from '../../modal/modal';
 
 @Component({
   selector: 'app-abm-combo',
-  imports: [CommonModule],
+  imports: [CommonModule, Modal],
   templateUrl: './abm-combo.html',
   styleUrl: './abm-combo.scss',
 })
@@ -22,6 +23,8 @@ export class AbmCombo implements OnInit {
   readonly cargando = signal(true);
   readonly errorMessage = signal('');
   readonly filtroBusqueda = signal('');
+  readonly mostrarModal = signal(false);
+  private accionCambioEstadoPendiente: (() => Promise<void>) | null = null;
 
   readonly combosFiltrados = computed(() => {
     const query = this.filtroBusqueda().trim().toLocaleLowerCase();
@@ -87,6 +90,22 @@ export class AbmCombo implements OnInit {
   }
 
   async cambiarEstadoCombo(combo: Combo): Promise<void> {
+    this.accionCambioEstadoPendiente = () => this.aplicarCambioEstadoCombo(combo);
+    this.mostrarModal.set(true);
+  }
+
+  async confirmarCambioEstado(): Promise<void> {
+    const accion = this.accionCambioEstadoPendiente;
+    this.cancelarCambioEstado();
+    await accion?.();
+  }
+
+  cancelarCambioEstado(): void {
+    this.mostrarModal.set(false);
+    this.accionCambioEstadoPendiente = null;
+  }
+
+  private async aplicarCambioEstadoCombo(combo: Combo): Promise<void> {
     const nuevoEstado = !combo.activo;
     this.errorMessage.set('');
     try {

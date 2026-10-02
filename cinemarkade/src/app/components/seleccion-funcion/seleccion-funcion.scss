@@ -1,0 +1,55 @@
+:host { display: block; min-height: 100vh; background: #100f0d; color: #f4f0e8; }
+
+.schedule-page { max-width: 1320px; min-height: calc(100vh - 80px); margin: 0 auto; padding: 28px 5vw 110px; }
+.back-link { border: 0; background: transparent; color: #00e5dc; font: 700 12px monospace; letter-spacing: 1px; cursor: pointer; margin-bottom: 28px; }
+.schedule-layout { display: grid; grid-template-columns: minmax(260px, .8fr) minmax(450px, 1.2fr); gap: clamp(32px, 6vw, 84px); align-items: start; }
+.movie-panel { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 24px; align-items: start; }
+.poster { width: 100%; max-height: 390px; object-fit: cover; border-radius: 8px; box-shadow: 0 14px 36px #0009; }
+.eyebrow { color: #f3d500; font: 700 11px monospace; letter-spacing: 1.5px; }
+.movie-copy h1 { margin: 12px 0; font-size: clamp(25px, 3vw, 38px); line-height: 1.05; text-transform: uppercase; }
+.movie-meta { color: #a9a49d; font: 700 12px monospace; }
+.synopsis { color: #d3cec4; line-height: 1.65; font-size: 14px; }
+.showtimes-panel h2 { margin: 0 0 26px; font-size: 30px; text-transform: uppercase; }
+.date-list { display: flex; gap: 2px; overflow-x: auto; margin-bottom: 18px; }
+.date-list button { min-width: 94px; min-height: 68px; border: 0; background: #252320; color: #f5f3ef; cursor: pointer; font-weight: 800; }
+.date-list button span, .date-list button small { display: block; }
+.date-list button small { margin-top: 5px; color: #b4afa7; font-size: 11px; }
+.date-list button.selected { background: #f5f3ef; color: #171614; }
+.date-list button.selected small { color: #504d49; }
+.filters { display: flex; gap: 12px; margin: 18px 0 30px; }
+.filters label { display: grid; gap: 8px; color: #aaa59c; font: 700 10px monospace; letter-spacing: 1px; }
+.filters select { min-width: 150px; padding: 12px 14px; border: 1px solid #484541; border-radius: 5px; background: #242320; color: white; font: 600 13px Arial, sans-serif; }
+.showtime-groups { display: flex; flex-wrap: wrap; gap: 12px; }
+.showtime-card { min-width: 155px; display: grid; gap: 6px; padding: 14px 18px; border: 1px solid #514d47; border-radius: 6px; background: #292724; color: white; text-align: left; cursor: pointer; }
+.showtime-card strong { font-size: 20px; }
+.showtime-card span, .showtime-card small { color: #b9b4ac; font-size: 11px; }
+.showtime-card small { color: #f3d500; font: 700 9px monospace; }
+.showtime-card.selected { border-color: #00e5dc; box-shadow: 0 0 0 1px #00e5dc; }
+.empty-message, .state-message { padding: 22px; border: 1px dashed #494640; color: #bdb8b0; font: 12px monospace; }
+.state-message.error { color: #ff7878; }
+.selection-footer { position: fixed; z-index: 5; right: 0; bottom: 0; left: 0; min-height: 74px; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 0 max(5vw, calc((100vw - 1320px) / 2)); background: #242320; border-top: 1px solid #44413c; }
+.selection-footer div { color: #d4d0c8; font: 700 12px monospace; }
+.selection-footer button, .notice-card button { align-self: stretch; min-width: 230px; border: 0; background: #e3000b; color: white; font: 800 14px monospace; letter-spacing: .5px; cursor: pointer; }
+.selection-footer button:disabled { background: #484541; color: #aaa59c; cursor: not-allowed; }
+.notice-backdrop { position: fixed; z-index: 10; inset: 0; display: grid; place-items: center; padding: 20px; background: #000b; }
+.notice-card { width: min(480px, 100%); padding: 28px; border: 1px solid #00e5dc; background: #171614; box-shadow: 0 0 30px #00e5dc33; }
+.notice-card h2 { color: #f3d500; font-size: 24px; }
+.notice-card p { color: #d3cec4; line-height: 1.6; }
+.notice-card button { min-height: 46px; margin-top: 12px; }
+
+@media (max-width: 800px) {
+  .schedule-layout { grid-template-columns: 1fr; }
+  .movie-panel { grid-template-columns: 120px 1fr; }
+  .poster { max-height: 220px; }
+  .selection-footer { padding: 0 16px; }
+  .selection-footer button { min-width: 155px; font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+  .movie-panel { grid-template-columns: 1fr; }
+  .poster { width: 145px; }
+  .filters { flex-wrap: wrap; }
+  .selection-footer { align-items: stretch; }
+  .selection-footer div { align-self: center; font-size: 10px; }
+  .selection-footer button { min-width: 125px; padding: 0 10px; }
+}

@@ -5,6 +5,10 @@ import path from 'path';
 
 export const routes: Routes = [
     {
+        path: 'funciones/:id',
+        loadComponent: () => import('./components/seleccion-funcion/seleccion-funcion').then((m) => m.SeleccionFuncion),
+    },
+    {
         path: '',
         loadComponent: () => import('./components/home-page/home-page').then((m) => m.HomePage),
     },

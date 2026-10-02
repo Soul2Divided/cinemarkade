@@ -80,4 +80,13 @@
         <span class="fab-label">NUEVO PRODUCTO</span>
     </button>
 
+    <app-modal [isOpen]="mostrarModal()" title="CONFIRMAR CAMBIO DE ESTADO" variant="red"
+        (close)="cancelarCambioEstado()">
+        <p>¿Confirmás el cambio de estado?</p>
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cancelarCambioEstado()">CANCELAR</button>
+            <button type="button" class="btn btn-pixel red" (click)="confirmarCambioEstado()">CONFIRMAR</button>
+        </div>
+    </app-modal>
+
 </div>

@@ -3,9 +3,10 @@ import { Router } from '@angular/router';
 import { UpperCasePipe, CurrencyPipe } from '@angular/common';
 import { Producto } from '../../../core/producto/producto.model';
 import { ProductoService } from '../../../core/producto/producto.service';
+import { Modal } from '../../modal/modal';
 
 @Component({
-  imports: [UpperCasePipe, CurrencyPipe],
+  imports: [UpperCasePipe, CurrencyPipe, Modal],
   selector: 'app-abm-producto',
   styleUrl: './abm-producto.scss',
   templateUrl: './abm-producto.html',
@@ -17,6 +18,8 @@ export class AbmProducto {
   productos = signal<Producto[]>([]);
   productosCargados = signal<boolean>(false);
   filtroBusqueda = signal<string>('');
+  mostrarModal = signal(false);
+  private accionCambioEstadoPendiente: (() => Promise<void>) | null = null;
 
   productosFiltrados = computed(() => {
     const query = this.filtroBusqueda().toLowerCase().trim();
@@ -53,6 +56,22 @@ export class AbmProducto {
   }
 
   async cambiarEstadoProducto(id: number, active: boolean): Promise<void> {
+    this.accionCambioEstadoPendiente = () => this.aplicarCambioEstadoProducto(id, active);
+    this.mostrarModal.set(true);
+  }
+
+  async confirmarCambioEstado(): Promise<void> {
+    const accion = this.accionCambioEstadoPendiente;
+    this.cancelarCambioEstado();
+    await accion?.();
+  }
+
+  cancelarCambioEstado(): void {
+    this.mostrarModal.set(false);
+    this.accionCambioEstadoPendiente = null;
+  }
+
+  private async aplicarCambioEstadoProducto(id: number, active: boolean): Promise<void> {
     const nuevoEstado = !active;
 
     try {

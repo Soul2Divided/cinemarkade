@@ -1,6 +1,7 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
+import { provideServiceWorker } from '@angular/service-worker';
 import { UserRepository } from './core/user/user.repository';
 import { SupabaseUserAdapter } from './core/user/supabase-user.adapter';
 import { PeliculaRepository } from './core/pelicula/pelicula.repository';
@@ -19,6 +20,10 @@ import { SupabaseComboAdapter } from './core/combo/supabase-combo.adapter';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
     provideRouter(routes),
     { provide: UserRepository, useClass: SupabaseUserAdapter },
     { provide: PeliculaRepository, useClass: SupabasePeliculaAdapter },
@@ -26,6 +31,6 @@ export const appConfig: ApplicationConfig = {
     { provide: ProductoRepository, useClass: SupabaseProductoAdapter },
     { provide: FuncionRepository, useClass: SupabaseFuncionAdapter},
     { provide: CuponRepository, useClass: SupabaseCuponAdapter},
-    { provide: ComboRepository, useClass: SupabaseComboAdapter}
+    { provide: ComboRepository, useClass: SupabaseComboAdapter},
   ]
 };

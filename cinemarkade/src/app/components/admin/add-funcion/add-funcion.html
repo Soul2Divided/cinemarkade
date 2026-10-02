@@ -2,12 +2,11 @@
     <form class="funcion-card-panel" [formGroup]="formFuncion" (ngSubmit)="onSubmit()">
         <div class="floating-ticket-panel">
             <div class="ticket-preview-card">
-                <span class="card-tag">FUNCIÓN</span>
-
+                <span class="card-tag">PROGRAMACIÓN DIARIA</span>
                 <div class="ticket-stub">
                     <div class="stub-header">
                         <span class="brand">CINEMARKADE</span>
-                        @if (esPreventaPreview) {
+                        @if (formFuncion.controls.esPreventa.value) {
                         <span class="stub-badge-preventa">PREVENTA</span>
                         }
                     </div>
@@ -17,32 +16,23 @@
                         <img [src]="pelicula.imagen" [alt]="pelicula.nombre" class="poster-img">
                         } @else {
                         <div class="poster-placeholder">
-                            <span>🎟️</span>
+                            <span>🎬</span>
                             <p>SELECCIONÁ PELÍCULA</p>
                         </div>
                         }
                     </div>
 
                     <div class="stub-info">
-                        <h4 class="stub-title">
-                            {{ peliculaSeleccionada?.nombre || 'TÍTULO PELÍCULA' }}
-                        </h4>
+                        <h4 class="stub-title">{{ peliculaSeleccionada?.nombre || 'TÍTULO PELÍCULA' }}</h4>
                         <div class="stub-row">
-                            <span>{{ formFuncion.controls.formato.value || 'FORMATO' }}</span>
+                            <span>{{ formatosSeleccionadosTexto }}</span>
                             <span>{{ formFuncion.controls.idioma.value || 'IDIOMA' }}</span>
                         </div>
                         <div class="stub-row">
-                            <span>{{ formFuncion.controls.fecha.value || 'FECHA' }}</span>
-                            <span>{{ formFuncion.controls.horario.value || 'HORA' }}</span>
-                        </div>
-                        <div class="stub-row">
-                            <span>PRECIO</span>
-                            <span class="price-tag">
-                                ARS ${{ formFuncion.controls.precio.value || 0 }}
-                            </span>
+                            <span>{{ formFuncion.controls.fecha.value }}</span>
+                            <span>{{ horariosSeleccionados().length }} HORARIOS</span>
                         </div>
                     </div>
-
                     <div class="stub-barcode">
                         <div class="barcode-lines">||||| ||| |||| |||||| |||</div>
                     </div>
@@ -53,14 +43,15 @@
         <div class="funcion-details-panel">
             <div class="panel-header">
                 <h2 class="panel-title">
-                    {{ esEdicion ? 'EDITAR FUNCIÓN' : 'CREAR FUNCIÓN' }}
+                    {{ esEdicion ? 'EDITAR PROGRAMACIÓN' : 'NUEVA PROGRAMACIÓN' }}
                 </h2>
             </div>
 
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label class="form-label">PELÍCULA</label>
-                    <select formControlName="peliculaId" class="form-control">
+                    <select formControlName="peliculaId" class="form-control"
+                        (change)="recalcularHorarios()">
                         <option [ngValue]="null" disabled>SELECCIONAR PELÍCULA</option>
                         @for (pelicula of peliculas(); track pelicula.id) {
                         <option [ngValue]="pelicula.id">
@@ -71,11 +62,11 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label class="form-label">FORMATO</label>
+                    <label class="form-label">FORMATOS A PROYECTAR</label>
                     <div class="format-selector">
                         @for (formato of formatosDisponibles; track formato) {
                         <button type="button" class="format-btn"
-                            [class.selected]="formFuncion.controls.formato.value === formato"
+                            [class.selected]="formFuncion.controls.formatos.value.includes(formato)"
                             (click)="seleccionarFormato(formato)">
                             {{ formato }}
                         </button>
@@ -84,13 +75,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">FECHA DE PROYECCIÓN</label>
+                    <label class="form-label">FECHA</label>
                     <input type="date" formControlName="fecha" class="form-control" [min]="fechaMinima">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">HORARIO</label>
-                    <input type="time" formControlName="horario" class="form-control">
+                    <label class="form-label">PRIMER HORARIO</label>
+                    <input type="time" formControlName="primerHorario" class="form-control" step="300"
+                        (change)="recalcularHorarios()">
                 </div>
 
                 <div class="form-group full-width">
@@ -99,26 +91,32 @@
                         @for (idioma of idiomasDisponibles; track idioma) {
                         <button type="button" class="lang-btn"
                             [class.selected]="formFuncion.controls.idioma.value === idioma"
-                            (click)="seleccionarIdioma(idioma)">
+                            (click)="formFuncion.controls.idioma.setValue(idioma)">
                             {{ idioma }}
                         </button>
                         }
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">PRECIO (ARS)</label>
-                    <input type="number" formControlName="precio" class="form-control" min="1" placeholder="2500">
+                <div class="form-group full-width">
+                    <label class="form-label">HORARIOS POSIBLES</label>
+                    <div class="format-selector">
+                        @for (horario of horariosDisponibles(); track horario) {
+                        <button type="button" class="format-btn"
+                            [class.selected]="horariosSeleccionados().includes(horario)"
+                            [attr.aria-pressed]="horariosSeleccionados().includes(horario)"
+                            (click)="alternarHorario(horario)">
+                            {{ horario }}
+                        </button>
+                        }
+                    </div>
                 </div>
 
                 <div class="form-group full-width">
-                    <p class="preventa-note">
-                        @if (esPreventaPreview) {
-                        La función se creará como preventa porque su fecha es futura.
-                        } @else {
-                        La función se creará como venta regular.
-                        }
-                    </p>
+                    <label class="toggle-text">
+                        <input type="checkbox" formControlName="esPreventa">
+                        MARCAR ESTA PROGRAMACIÓN COMO PREVENTA
+                    </label>
                 </div>
             </div>
 
@@ -127,26 +125,23 @@
             }
 
             <div class="panel-actions">
-                <button type="button" class="btn-pixel-outline" (click)="cancelar()">
-                    CANCELAR
-                </button>
-                <button type="submit" class="btn btn-pixel cyan" [disabled]="formFuncion.invalid">
-                    {{ esEdicion ? 'GUARDAR CAMBIOS' : 'CREAR FUNCIÓN' }}
+                <button type="button" class="btn-pixel-outline" (click)="cancelar()">CANCELAR</button>
+                <button type="submit" class="btn btn-pixel cyan"
+                    [disabled]="formFuncion.invalid || horariosSeleccionados().length === 0 || mostrarLoader()">
+                    {{ esEdicion ? 'GUARDAR CAMBIOS' : 'CREAR PROGRAMACIÓN' }}
                 </button>
             </div>
         </div>
     </form>
 
     @if (mostrarLoader()) {
-    <app-loader message="GUARDANDO FUNCIÓN..."></app-loader>
+    <app-loader message="GUARDANDO PROGRAMACIÓN..."></app-loader>
     }
 
-    <app-modal [isOpen]="mostrarModal()" [title]="esEdicion ? 'FUNCIÓN ACTUALIZADA' : 'FUNCIÓN CREADA'"
+    <app-modal [isOpen]="mostrarModal()" [title]="esEdicion ? 'FUNCIÓN ACTUALIZADA' : 'PROGRAMACIÓN CREADA'"
         [subtitle]="resultado()" variant="cyan" (close)="cerrarModal()">
         <div modal-actions>
-            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
-                ACEPTAR
-            </button>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">ACEPTAR</button>
         </div>
     </app-modal>
 </div>

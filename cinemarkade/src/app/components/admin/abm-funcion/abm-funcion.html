@@ -1,6 +1,4 @@
 <div class="abm-funciones-container">
-
-    <!-- CABECERA DE SECCIÓN Y BUSCADOR/FILTRO -->
     <div class="abm-header">
         <div class="header-title-group">
             <h2 class="section-title">GESTIÓN DE FUNCIONES</h2>
@@ -9,49 +7,49 @@
 
         <div class="search-box">
             <span class="search-icon">🔍</span>
-            <input type="text" class="form-control" placeholder="BUSCAR POR ID SALA, FECHA O ID PELÍCULA..."
+            <input type="text" class="form-control" placeholder="BUSCAR POR SALA, FECHA, PELÍCULA U HORARIO..."
                 (input)="onSearch($event)">
         </div>
     </div>
 
-    <!-- GRILLA DE FUNCIONES -->
+    @if (errorMessage()) {
+    <div class="error-banner">⚠️ {{ errorMessage() }}</div>
+    }
+
     @if (!funcionesCargadas()) {
     <div class="funciones-grid">
-        @for (func of funcionesFiltradas(); track func.id) {
-        <div class="funcion-card" [class.preventa-card]="func.es_preventa">
-
-            <!-- BADGE DE FORMATO E IDIOMA -->
+        @for (funcion of funcionesFiltradas(); track funcion.id) {
+        <div class="funcion-card" [class.preventa-card]="funcion.es_preventa">
             <div class="card-header-badge">
-                <span class="badge-format">{{ func.formato }}</span>
-                <span class="badge-lang">{{ func.idioma | uppercase }}</span>
-                @if (func.es_preventa) {
+                <span class="badge-format">{{ funcion.formato }}</span>
+                <span class="badge-lang">{{ funcion.idioma | uppercase }}</span>
+                @if (funcion.es_preventa) {
                 <span class="badge-preventa">PREVENTA</span>
+                }
+                @if (!funcion.activa) {
+                <span class="badge-lang">INACTIVA</span>
                 }
             </div>
 
-            <!-- DETALLES DE LA FUNCIÓN -->
             <div class="card-body">
-                <h3 class="funcion-title">SALA #{{ func.sala_id }}</h3>
-
+                <h3 class="funcion-title">SALA #{{ funcion.sala_id }}</h3>
                 <div class="info-list">
-                    <span class="info-item">🎬 PELÍCULA ID: #{{ func.pelicula_id }}</span>
-                    <span class="info-item">📅 FECHA: {{ func.fecha }}</span>
-                    <span class="info-item">⏰ HORARIO: {{ func.horario }}</span>
-                    <span class="info-item price">💲 PRECIO: ARS ${{ func.precio }}</span>
+                    <span class="info-item">🎬 PELÍCULA ID: #{{ funcion.pelicula_id }}</span>
+                    <span class="info-item">📅 FECHA: {{ funcion.fecha }}</span>
+                    <span class="info-item">⏰ PROYECCIONES: {{ horariosFuncion(funcion) }}</span>
                 </div>
 
-                <!-- BOTONES DE ACCIÓN -->
                 <div class="card-actions">
-                    <button type="button" class="btn-action edit" (click)="modificarFuncion(func.id)">
+                    <button type="button" class="btn-action edit" (click)="modificarFuncion(funcion.id)"
+                        [disabled]="!funcion.activa">
                         ✏️ MODIFICAR
                     </button>
-
-                    <button type="button" class="btn-action delete" (click)="eliminarFuncion(func.id)">
-                        ✖ ELIMINAR
+                    <button type="button" class="btn-action" [class.delete]="funcion.activa"
+                        [class.edit]="!funcion.activa" (click)="alternarActiva(funcion)">
+                        {{ funcion.activa ? '✖ DAR DE BAJA' : '↻ REACTIVAR' }}
                     </button>
                 </div>
             </div>
-
         </div>
         } @empty {
         <div class="empty-state">
@@ -66,10 +64,17 @@
     </div>
     }
 
-    <!-- BOTÓN FLOTANTE PARA AGREGAR FUNCIÓN -->
     <button type="button" class="fab-add-funcion" (click)="irAAgregarFuncion()" title="Programar Nueva Función">
         <span class="fab-icon">+</span>
         <span class="fab-label">NUEVA FUNCIÓN</span>
     </button>
 
+    <app-modal [isOpen]="mostrarModal()" title="CONFIRMAR CAMBIO DE ESTADO" variant="red"
+        (close)="cancelarCambioEstado()">
+        <p>¿Confirmás el cambio de estado?</p>
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cancelarCambioEstado()">CANCELAR</button>
+            <button type="button" class="btn btn-pixel red" (click)="confirmarCambioEstado()">CONFIRMAR</button>
+        </div>
+    </app-modal>
 </div>

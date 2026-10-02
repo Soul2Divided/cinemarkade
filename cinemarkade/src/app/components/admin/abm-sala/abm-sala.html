@@ -44,7 +44,7 @@
                     </button>
 
                     <button type="button" class="btn-action" [class.delete]="sala.activa"
-                        [class.activate]="!sala.activa" (click)="cambiarEstadoSala(sala.id, sala.activa)">
+                        [class.activate]="!sala.activa" (click)="cambiarEstadoSala(sala)">
                         @if (sala.activa) {
                         ✖ DAR DE BAJA
                         } @else {
@@ -74,5 +74,23 @@
         <span class="fab-icon">+</span>
         <span class="fab-label">NUEVA SALA</span>
     </button>
+
+    <app-modal [isOpen]="mostrarModal()" title="DESACTIVAR SALA" subtitle="LA SALA Y SUS FUNCIONES ACTIVAS QUEDARÁN INACTIVAS" variant="red"
+        [closeOnBackdrop]="false"
+        (close)="cancelarCambioEstado()">
+        <p>¿Seguro que querés desactivar la sala #{{ salaPendiente()?.id }}?</p>
+        @if (funcionesPendientes() > 0) {
+        <p>Actualmente tiene {{ funcionesPendientes() }} función(es) activa(s). También se darán de baja.</p>
+        } @else {
+        <p>Actualmente no tiene funciones activas.</p>
+        }
+        @if (errorCambio()) { <p class="error-message">{{ errorCambio() }}</p> }
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" [disabled]="procesandoCambio()" (click)="cancelarCambioEstado()">CANCELAR</button>
+            <button type="button" class="btn btn-pixel red" [disabled]="procesandoCambio()" (click)="confirmarCambioEstado()">
+                {{ procesandoCambio() ? 'PROCESANDO...' : 'DESACTIVAR SALA' }}
+            </button>
+        </div>
+    </app-modal>
 
 </div>

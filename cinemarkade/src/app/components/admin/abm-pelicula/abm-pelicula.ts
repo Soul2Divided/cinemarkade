@@ -3,9 +3,10 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { Pelicula } from '../../../core/pelicula/pelicula.model';
 import { PeliculaService } from '../../../core/pelicula/pelicula.service';
+import { Modal } from '../../modal/modal';
 
 @Component({
-  imports: [UpperCasePipe],
+  imports: [UpperCasePipe, Modal],
   selector: 'app-abm-pelicula',
   styleUrl: './abm-pelicula.scss',
   templateUrl: './abm-pelicula.html',
@@ -18,6 +19,8 @@ export class AbmPelicula implements OnInit {
   peliculas = signal<Pelicula[]>([]);
   peliculasCargadas = signal<boolean>(false);
   filtroBusqueda = signal<string>('');
+  mostrarModal = signal(false);
+  private accionCambioEstadoPendiente: (() => Promise<void>) | null = null;
 
   peliculasFiltradas = computed(() => {
     /*
@@ -62,6 +65,22 @@ export class AbmPelicula implements OnInit {
   }
 
   async cambiarEstadoPelicula(id: number, active: boolean): Promise<void> {
+    this.accionCambioEstadoPendiente = () => this.aplicarCambioEstadoPelicula(id, active);
+    this.mostrarModal.set(true);
+  }
+
+  async confirmarCambioEstado(): Promise<void> {
+    const accion = this.accionCambioEstadoPendiente;
+    this.cancelarCambioEstado();
+    await accion?.();
+  }
+
+  cancelarCambioEstado(): void {
+    this.mostrarModal.set(false);
+    this.accionCambioEstadoPendiente = null;
+  }
+
+  private async aplicarCambioEstadoPelicula(id: number, active: boolean): Promise<void> {
     const nuevoEstado = !active;
 
     try {

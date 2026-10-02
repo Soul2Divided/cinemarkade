@@ -3,9 +3,10 @@ import { Router } from '@angular/router';
 import { UpperCasePipe } from '@angular/common';
 import { Cupon } from '../../../core/cupon/cupon.model';
 import { CuponService } from '../../../core/cupon/cupon.service';
+import { Modal } from '../../modal/modal';
 
 @Component({
-  imports: [UpperCasePipe],
+  imports: [UpperCasePipe, Modal],
   selector: 'app-abm-cupon',
   styleUrl: './abm-cupon.scss',
   templateUrl: './abm-cupon.html',
@@ -17,6 +18,8 @@ export class AbmCupon implements OnInit {
   cupones = signal<Cupon[]>([]);
   cargando = signal<boolean>(true);
   filtroBusqueda = signal<string>('');
+  mostrarModal = signal(false);
+  private accionCambioEstadoPendiente: (() => Promise<void>) | null = null;
 
   cuponesFiltrados = computed(() => {
     const query = this.filtroBusqueda().toLowerCase().trim();
@@ -60,6 +63,22 @@ export class AbmCupon implements OnInit {
   }
 
   async cambiarEstadoCupon(id: number, active: boolean): Promise<void> {
+    this.accionCambioEstadoPendiente = () => this.aplicarCambioEstadoCupon(id, active);
+    this.mostrarModal.set(true);
+  }
+
+  async confirmarCambioEstado(): Promise<void> {
+    const accion = this.accionCambioEstadoPendiente;
+    this.cancelarCambioEstado();
+    await accion?.();
+  }
+
+  cancelarCambioEstado(): void {
+    this.mostrarModal.set(false);
+    this.accionCambioEstadoPendiente = null;
+  }
+
+  private async aplicarCambioEstadoCupon(id: number, active: boolean): Promise<void> {
     const nuevoEstado = !active;
 
     try {

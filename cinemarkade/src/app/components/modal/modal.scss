@@ -119,7 +119,13 @@
     .modal-footer {
         display: flex;
         justify-content: center;
-        gap: 0.8rem;
+
+        /* ::ng-deep obliga a Angular a aplicar los estilos al div inyectado */
+        ::ng-deep div {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
 
         &:empty {
             display: none;

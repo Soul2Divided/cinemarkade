@@ -8,6 +8,7 @@ import { ComboService } from '../../core/combo/combo.service';
 import { Combo } from '../../core/combo/combo.model';
 import { ProductoService } from '../../core/producto/producto.service';
 import { Producto } from '../../core/producto/producto.model';
+import { FuncionService } from '../../core/funcion/funcion.service';
 
 export interface ItemHero {
   id: number;
@@ -32,6 +33,7 @@ export class HomePage implements OnInit {
   private peliculaService = inject(PeliculaService);
   private comboService = inject(ComboService);
   private productoService = inject(ProductoService);
+  private funcionService = inject(FuncionService);
   private router = inject(Router);
 
   peliculas = signal<Pelicula[]>([]);
@@ -163,7 +165,22 @@ export class HomePage implements OnInit {
     return '👾';
   }
 
-  seleccionarPelicula(pelicula: Pelicula): void {
+  async seleccionarPelicula(pelicula: Pelicula): Promise<void> {
+    try {
+      const funciones = await this.funcionService.listarFuncionesPorPelicula(pelicula.id);
+      const hoy = this.hoyEnBuenosAires();
+      const tieneHorarioDisponible = funciones.some(funcion =>
+        funcion.activa && funcion.fecha >= hoy && funcion.proyecciones.some(proyeccion =>
+          proyeccion.activa && (funcion.fecha > hoy || proyeccion.horario.slice(0, 5) > this.horaEnBuenosAires())
+        )
+      );
+      if (tieneHorarioDisponible) {
+        await this.router.navigate(['/funciones', pelicula.id]);
+        return;
+      }
+    } catch (error) {
+      console.error('No se pudieron consultar las funciones de la película:', error);
+    }
     this.peliculaSeleccionada.set(pelicula);
   }
 
@@ -185,5 +202,21 @@ export class HomePage implements OnInit {
     const desde = combo.fecha_inicio?.slice(0, 10);
     const hasta = combo.fecha_fin?.slice(0, 10);
     return (!desde || desde <= hoy) && (!hasta || hasta >= hoy);
+  }
+
+  private hoyEnBuenosAires(): string {
+    const partes = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Argentina/Buenos_Aires', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).formatToParts(new Date());
+    const get = (type: string) => partes.find(part => part.type === type)!.value;
+    return `${get('year')}-${get('month')}-${get('day')}`;
+  }
+
+  private horaEnBuenosAires(): string {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+    }).formatToParts(new Date());
+    const get = (type: string) => parts.find(part => part.type === type)!.value;
+    return `${get('hour')}:${get('minute')}`;
   }
 }
