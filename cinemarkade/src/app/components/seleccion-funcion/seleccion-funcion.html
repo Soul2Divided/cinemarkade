@@ -4,87 +4,99 @@
   <button class="back-link" type="button" (click)="volver()">← VOLVER A CARTELERA</button>
 
   @if (cargando()) {
-    <div class="state-message">CARGANDO FUNCIONES...</div>
+  <div class="state-message">CARGANDO FUNCIONES...</div>
   } @else if (error()) {
-    <div class="state-message error">{{ error() }}</div>
+  <div class="state-message error">{{ error() }}</div>
   } @else if (pelicula(); as peli) {
-    <div class="schedule-layout">
-      <section class="movie-panel">
-        <img class="poster" [src]="peli.imagen" [alt]="peli.nombre" />
-        <div class="movie-copy">
-          <span class="eyebrow">CARTELERA CINEMARKADE</span>
-          <h1>{{ peli.nombre }}</h1>
-          <p class="movie-meta">{{ peli.genero }} · {{ peli.duracion }} MIN · {{ peli.restriccion_edad }}</p>
-          <p class="synopsis">{{ peli.sinopsis }}</p>
-        </div>
-      </section>
-
-      <section class="showtimes-panel">
-        <h2>HORARIOS</h2>
-        @if (fechas().length > 0) {
-          <div class="date-list" aria-label="Seleccionar fecha">
-            @for (opcion of fechas(); track opcion.fecha) {
-              <button type="button" [class.selected]="fechaSeleccionada() === opcion.fecha"
-                (click)="cambiarFecha(opcion.fecha)">
-                <span>{{ opcion.etiqueta }}</span>
-                @if (opcion.etiqueta === 'HOY') { <small>{{ opcion.fecha | date:'dd/MM':'':'es-AR' }}</small> }
-              </button>
-            }
-          </div>
-
-          <div class="filters">
-            <label>FORMATO
-              <select [value]="formatoSeleccionado()" (change)="cambiarFormato($event)">
-                <option value="">Todos</option>
-                @for (formato of formatos(); track formato) { <option [value]="formato">{{ formato }}</option> }
-              </select>
-            </label>
-            <label>IDIOMA
-              <select [value]="idiomaSeleccionado()" (change)="cambiarIdioma($event)">
-                <option value="">Todos</option>
-                @for (idioma of idiomas(); track idioma) { <option [value]="idioma">{{ idioma }}</option> }
-              </select>
-            </label>
-          </div>
-
-          @if (horarios().length) {
-            <div class="showtime-groups">
-              @for (opcion of horarios(); track opcion.proyeccion.id) {
-                <button type="button" class="showtime-card"
-                  [class.selected]="horarioSeleccionado()?.proyeccion?.id === opcion.proyeccion.id"
-                  (click)="seleccionarHorario(opcion)">
-                  <strong>{{ formatoHora(opcion.proyeccion.horario) }}</strong>
-                  <span>{{ opcion.funcion.formato }} · {{ opcion.funcion.idioma }}</span>
-                  @if (opcion.funcion.es_preventa) { <small>PREVENTA</small> }
-                </button>
-              }
-            </div>
-          } @else {
-            <p class="empty-message">No hay horarios disponibles con esos filtros.</p>
-          }
-        } @else {
-          <p class="empty-message">Esta película todavía no tiene funciones futuras disponibles.</p>
-        }
-      </section>
-    </div>
-
-    <footer class="selection-footer">
-      <div>
-        @if (horarioSeleccionado(); as seleccion) {
-          <span>{{ seleccion.funcion.formato }} · {{ seleccion.funcion.idioma }} · {{ formatoHora(seleccion.proyeccion.horario) }}</span>
-        } @else { <span>SELECCIONÁ UN HORARIO PARA CONTINUAR</span> }
+  <div class="schedule-layout">
+    <section class="movie-panel">
+      <img class="poster" [src]="peli.imagen" [alt]="peli.nombre" />
+      <div class="movie-copy">
+        <span class="eyebrow">CARTELERA CINEMARKADE</span>
+        <h1>{{ peli.nombre }}</h1>
+        <p class="movie-meta">{{ peli.genero }} · {{ peli.duracion }} MIN · {{ peli.restriccion_edad }}</p>
+        <p class="synopsis">{{ peli.sinopsis }}</p>
       </div>
-      <button type="button" [disabled]="!horarioSeleccionado()" (click)="continuarCompra()">COMPRAR ENTRADAS →</button>
-    </footer>
+    </section>
+
+    <section class="showtimes-panel">
+      <h2>HORARIOS</h2>
+      @if (fechas().length > 0) {
+      <div class="date-pagination" aria-label="Fechas disponibles, hasta siete días">
+        @if (fechas().length > 4) {
+        <button type="button" class="date-arrow" aria-label="Ver fechas anteriores" [disabled]="!hayPaginaAnterior()"
+          (click)="paginaAnterior()">‹</button>
+        }
+        <div class="date-list" aria-label="Seleccionar fecha">
+          @for (opcion of fechasVisibles(); track opcion.fecha) {
+          <button type="button" [class.selected]="fechaSeleccionada() === opcion.fecha"
+            (click)="cambiarFecha(opcion.fecha)">
+            <span>{{ opcion.etiqueta }}</span>
+            @if (opcion.etiqueta === 'HOY') { <small>{{ opcion.fecha | date:'dd/MM':'':'es-AR' }}</small> }
+          </button>
+          }
+        </div>
+        @if (fechas().length > 4) {
+        <button type="button" class="date-arrow" aria-label="Ver fechas siguientes" [disabled]="!hayPaginaSiguiente()"
+          (click)="paginaSiguiente()">›</button>
+        }
+      </div>
+
+      <div class="filters">
+        <label>FORMATO
+          <select [value]="formatoSeleccionado()" (change)="cambiarFormato($event)">
+            <option value="">Todos</option>
+            @for (formato of formatos(); track formato) { <option [value]="formato">{{ formato }}</option> }
+          </select>
+        </label>
+        <label>IDIOMA
+          <select [value]="idiomaSeleccionado()" (change)="cambiarIdioma($event)">
+            <option value="">Todos</option>
+            @for (idioma of idiomas(); track idioma) { <option [value]="idioma">{{ idioma }}</option> }
+          </select>
+        </label>
+      </div>
+
+      @if (horarios().length) {
+      <div class="showtime-groups">
+        @for (opcion of horarios(); track opcion.proyeccion.id) {
+        <button type="button" class="showtime-card"
+          [class.selected]="horarioSeleccionado()?.proyeccion?.id === opcion.proyeccion.id"
+          (click)="seleccionarHorario(opcion)">
+          <strong>{{ formatoHora(opcion.proyeccion.horario) }}</strong>
+          <span>{{ opcion.funcion.formato }} · {{ opcion.funcion.idioma }}</span>
+          @if (opcion.funcion.es_preventa) { <small>PREVENTA</small> }
+        </button>
+        }
+      </div>
+      } @else {
+      <p class="empty-message">No hay horarios disponibles con esos filtros.</p>
+      }
+      } @else {
+      <p class="empty-message">Esta película todavía no tiene funciones futuras disponibles.</p>
+      }
+    </section>
+  </div>
+
+  <footer class="selection-footer">
+    <div>
+      @if (horarioSeleccionado(); as seleccion) {
+      <span>{{ seleccion.funcion.fecha | date:'dd/MM/yyyy':'':'es-AR' }} · {{ seleccion.funcion.formato }} · {{
+        seleccion.funcion.idioma }} · {{ formatoHora(seleccion.proyeccion.horario) }}</span>
+      } @else { <span>SELECCIONÁ UN HORARIO PARA CONTINUAR</span> }
+    </div>
+    <button type="button" [disabled]="!horarioSeleccionado()" (click)="continuarCompra()">COMPRAR ENTRADAS →</button>
+  </footer>
   }
 </main>
 
 @if (avisoCompra()) {
-  <div class="notice-backdrop" role="presentation" (click)="avisoCompra.set(false)">
-    <section class="notice-card" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-      <h2>FUNCIÓN SELECCIONADA</h2>
-      <p>Guardamos tu horario. La selección de entradas, productos y butacas se conectará en el siguiente paso de la compra.</p>
-      <button type="button" (click)="avisoCompra.set(false)">ENTENDIDO</button>
-    </section>
-  </div>
+<div class="notice-backdrop" role="presentation" (click)="avisoCompra.set(false)">
+  <section class="notice-card" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+    <h2>FUNCIÓN SELECCIONADA</h2>
+    <p>Guardamos tu horario. La selección de entradas, productos y butacas se conectará en el siguiente paso de la
+      compra.</p>
+    <button type="button" (click)="avisoCompra.set(false)">ENTENDIDO</button>
+  </section>
+</div>
 }

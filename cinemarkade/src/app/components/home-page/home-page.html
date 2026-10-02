@@ -20,7 +20,8 @@
 
                 <p class="hero-meta">
                     @if (elementosHero()[indiceHeroActual].esCombo) {
-                    OFERTA CANDY BAR | {{ elementosHero()[indiceHeroActual].precio | currency:'ARS':'symbol-narrow':'1.0-0' }}
+                    OFERTA CANDY BAR | {{ elementosHero()[indiceHeroActual].precio |
+                    currency:'ARS':'symbol-narrow':'1.0-0' }}
                     } @else {
                     {{ elementosHero()[indiceHeroActual].genero | uppercase }} |
                     {{ elementosHero()[indiceHeroActual].duracion }} MIN |
@@ -169,3 +170,5 @@
 
     </main>
 </div>
+
+@if (mostrarLoader()) { <app-loader message="CARGANDO FUNCIONES..."></app-loader> }

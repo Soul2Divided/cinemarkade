@@ -32,15 +32,20 @@ export class SeleccionFuncion implements OnInit {
   idiomaSeleccionado = signal('');
   horarioSeleccionado = signal<OpcionHorario | null>(null);
   avisoCompra = signal(false);
+  paginaFechas = signal(0);
 
   fechas = computed<OpcionFecha[]>(() => {
     const fechas = [...new Set(this.funciones()
-      .filter(f => f.activa && f.fecha >= this.hoy() && f.proyecciones.some(p =>
+      .filter(f => f.activa && f.fecha >= this.hoy() && f.fecha <= this.ultimoDiaVisible() && f.proyecciones.some(p =>
         p.activa && (f.fecha > this.hoy() || p.horario.slice(0, 5) > this.horaActual())
       ))
       .map(f => f.fecha))].sort();
     return fechas.map(fecha => ({ fecha, etiqueta: this.etiquetaFecha(fecha) }));
   });
+
+  fechasVisibles = computed(() => this.fechas().slice(this.paginaFechas() * 4, this.paginaFechas() * 4 + 4));
+  hayPaginaAnterior = computed(() => this.paginaFechas() > 0);
+  hayPaginaSiguiente = computed(() => (this.paginaFechas() + 1) * 4 < this.fechas().length);
 
   formatos = computed(() => [...new Set(this.funciones()
     .filter(f => f.fecha === this.fechaSeleccionada() && f.activa && f.proyecciones.some(p => p.activa))
@@ -93,6 +98,14 @@ export class SeleccionFuncion implements OnInit {
     this.horarioSeleccionado.set(null);
   }
 
+  paginaAnterior(): void {
+    if (this.hayPaginaAnterior()) this.paginaFechas.update(pagina => pagina - 1);
+  }
+
+  paginaSiguiente(): void {
+    if (this.hayPaginaSiguiente()) this.paginaFechas.update(pagina => pagina + 1);
+  }
+
   cambiarFormato(event: Event): void {
     this.formatoSeleccionado.set((event.target as HTMLSelectElement).value);
     this.idiomaSeleccionado.set('');
@@ -126,6 +139,12 @@ export class SeleccionFuncion implements OnInit {
   formatoHora(horario: string): string { return horario.slice(0, 5); }
   hoy(): string { return this.partesFechaHora().fecha; }
   private horaActual(): string { return this.partesFechaHora().hora; }
+
+  private ultimoDiaVisible(): string {
+    const ultimoDia = new Date(`${this.hoy()}T00:00:00Z`);
+    ultimoDia.setUTCDate(ultimoDia.getUTCDate() + 6);
+    return ultimoDia.toISOString().slice(0, 10);
+  }
 
   private partesFechaHora(): { fecha: string; hora: string } {
     const parts = new Intl.DateTimeFormat('en-CA', {

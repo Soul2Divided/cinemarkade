@@ -9,11 +9,6 @@
     </div>
 
     <div class="nav-actions">
-        <!-- CARRITO -->
-        <button type="button" class="nav-btn cart-btn" routerLink="/cart" aria-label="Carrito">
-            <span class="icon">🛒</span>
-            <span class="cart-badge">0</span>
-        </button>
 
         @if (authService.usuarioActual(); as usuario) {
         <div class="menu-perfil-container">

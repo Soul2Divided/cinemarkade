@@ -48,6 +48,7 @@ export class AddFuncion implements OnInit {
       nonNullable: true,
       validators: Validators.required,
     }),
+    semanas: new FormControl(1, { nonNullable: true, validators: Validators.required }),
     primerHorario: new FormControl('10:00', {
       nonNullable: true,
       validators: Validators.required,
@@ -99,6 +100,7 @@ export class AddFuncion implements OnInit {
         peliculaId: funcion.pelicula_id,
         formatos: [funcion.formato],
         fecha: funcion.fecha,
+        semanas: 1,
         primerHorario: horarios[0] ?? '10:00',
         idioma: funcion.idioma,
         esPreventa: funcion.es_preventa,
@@ -191,6 +193,7 @@ export class AddFuncion implements OnInit {
       peliculaId: valores.peliculaId,
       formatos: valores.formatos,
       fecha: valores.fecha,
+      semanas: this.esEdicion ? 1 : valores.semanas,
       primerHorario: valores.primerHorario,
       horariosSeleccionados: horariosOrdenados,
       idioma: valores.idioma,
@@ -207,7 +210,7 @@ export class AddFuncion implements OnInit {
       } else {
         const funciones = await this.funcionService.crearFunciones(datos);
         this.resultado.set(
-          `Se crearon ${funciones.length} funciones, una por formato, con ${horariosOrdenados.length} horarios cada una.`
+          `Se crearon ${funciones.length} funciones: ${datos.semanas * 7} días por cada uno de los ${datos.formatos.length} formatos, con ${horariosOrdenados.length} horarios por día.`
         );
       }
       this.mostrarModal.set(true);

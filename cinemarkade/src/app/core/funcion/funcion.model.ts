@@ -2,7 +2,6 @@ import { FormatoSala } from '../sala/sala.model';
 
 export type IdiomaFuncion = 'Subtitulada' | 'Doblada';
 
-/** Una programación diaria de una película en una sala y formato. */
 export interface Funcion {
     id: number;
     pelicula_id: number;
@@ -15,7 +14,6 @@ export interface Funcion {
     proyecciones: Proyeccion[];
 }
 
-/** Un horario concreto dentro de una función diaria. */
 export interface Proyeccion {
     id: number;
     funcion_id: number;
@@ -37,6 +35,7 @@ export interface CrearFuncionInput {
     peliculaId: number;
     formatos: FormatoSala[];
     fecha: string;
+    semanas: number;
     primerHorario: string;
     horariosSeleccionados: string[];
     idioma: IdiomaFuncion;

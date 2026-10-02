@@ -75,11 +75,24 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">FECHA</label>
+                    <label class="form-label">FECHA DE INICIO</label>
                     <input type="date" formControlName="fecha" class="form-control" [min]="fechaMinima">
                 </div>
 
+                @if (!esEdicion) {
                 <div class="form-group">
+                    <label class="form-label">DURACIÓN DE LA PROGRAMACIÓN</label>
+                    <select formControlName="semanas" class="form-control">
+                        <option [ngValue]="1">1 SEMANA</option>
+                        <option [ngValue]="2">2 SEMANAS</option>
+                        <option [ngValue]="3">3 SEMANAS</option>
+                        <option [ngValue]="4">4 SEMANAS</option>
+                    </select>
+                    <small class="field-hint">Se programará todos los días desde la fecha de inicio.</small>
+                </div>
+                }
+
+                <div class="form-group" [class.full-width]="esEdicion">
                     <label class="form-label">PRIMER HORARIO</label>
                     <input type="time" formControlName="primerHorario" class="form-control" step="300"
                         (change)="recalcularHorarios()">

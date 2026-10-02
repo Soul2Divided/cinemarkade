@@ -9,6 +9,7 @@ import { Combo } from '../../core/combo/combo.model';
 import { ProductoService } from '../../core/producto/producto.service';
 import { Producto } from '../../core/producto/producto.model';
 import { FuncionService } from '../../core/funcion/funcion.service';
+import { Loader } from '../loader/loader';
 
 export interface ItemHero {
   id: number;
@@ -23,7 +24,7 @@ export interface ItemHero {
 }
 
 @Component({
-  imports: [Navbar, CommonModule, UpperCasePipe],
+  imports: [Navbar, CommonModule, UpperCasePipe, Loader],
   selector: 'app-home-page',
   styleUrl: './home-page.scss',
   templateUrl: './home-page.html',
@@ -41,6 +42,8 @@ export class HomePage implements OnInit {
   productos = signal<Producto[]>([]);
   peliculaSeleccionada = signal<Pelicula | null>(null);
   generoSeleccionado = signal<string | null>(null);
+
+  mostrarLoader = signal<boolean>(false);
 
   generos = computed(() => {
     const generosUnicos = new Map<string, string>();
@@ -105,24 +108,23 @@ export class HomePage implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    try {
-      const data = await this.peliculaService.listarPeliculas();
-      this.peliculas.set((data || []).filter(p => p.activa));
-    } catch (error) {
-      console.error('Error al cargar la cartelera:', error);
-    }
+    this.mostrarLoader.set(true);
 
     try {
-      const [combos, productos] = await Promise.all([
+      const [peliculas, combos, productos] = await Promise.all([
+        this.peliculaService.listarPeliculas(),
         this.comboService.listarCombos(),
         this.productoService.listarProductos(),
       ]);
+
+      this.peliculas.set((peliculas || []).filter(p => p.activa));
       this.combos.set(combos || []);
       this.productos.set((productos || []).filter(producto => producto.activa));
     } catch (error) {
-      console.error('Error al cargar los combos destacados:', error);
+      console.error('Error al cargar los datos de la homepage:', error);
+    } finally {
+      this.mostrarLoader.set(false);
     }
-
   }
 
   seleccionarHero(index: number): void {

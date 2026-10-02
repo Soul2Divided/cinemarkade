@@ -42,31 +42,33 @@ export class FuncionService {
         }
 
         const salas = await this.salaService.listarSalas();
-        const asignaciones: Array<{ formato: FormatoSala; salaId: number }> = [];
+        const asignaciones: Array<{ fecha: string; formato: FormatoSala; salaId: number }> = [];
+        const fechas = this.generarFechas(datos.fecha, datos.semanas);
 
-        // Primero se encuentran todas las salas. Así no se crea una programación
-        // parcial si falta una sala para alguno de los formatos seleccionados.
-        for (const formato of datos.formatos) {
-            let salaDisponible: Sala | undefined;
-            for (const candidata of salas.filter(item =>
-                item.activa &&
-                item.formato === formato &&
-                !asignaciones.some(asignacion => asignacion.salaId === item.id)
-            )) {
-                const ocupada = await this.funcionRepository.existeFuncionActivaEnSala(
-                    candidata.id,
-                    datos.fecha
-                );
-                if (!ocupada) {
-                    salaDisponible = candidata;
-                    break;
+        // Se valida cada fecha antes de insertar para evitar una programación parcial.
+        for (const fecha of fechas) {
+            const salasAsignadasEseDia: number[] = [];
+            for (const formato of datos.formatos) {
+                let salaDisponible: Sala | undefined;
+                for (const candidata of salas.filter(item =>
+                    item.activa && item.formato === formato && !salasAsignadasEseDia.includes(item.id)
+                )) {
+                    const ocupada = await this.funcionRepository.existeFuncionActivaEnSala(
+                        candidata.id,
+                        fecha
+                    );
+                    if (!ocupada) {
+                        salaDisponible = candidata;
+                        break;
+                    }
                 }
-            }
 
-            if (!salaDisponible) {
-                throw new Error(`No hay una sala libre para ${formato} en la fecha seleccionada.`);
+                if (!salaDisponible) {
+                    throw new Error(`No hay una sala libre para ${formato} el ${fecha}.`);
+                }
+                salasAsignadasEseDia.push(salaDisponible.id);
+                asignaciones.push({ fecha, formato, salaId: salaDisponible.id });
             }
-            asignaciones.push({ formato, salaId: salaDisponible.id });
         }
 
         const creadas: Funcion[] = [];
@@ -75,7 +77,7 @@ export class FuncionService {
                 const fila: FuncionInput = {
                     pelicula_id: datos.peliculaId,
                     sala_id: asignacion.salaId,
-                    fecha: datos.fecha,
+                    fecha: asignacion.fecha,
                     formato: asignacion.formato,
                     idioma: datos.idioma,
                     es_preventa: datos.esPreventa,
@@ -201,6 +203,9 @@ export class FuncionService {
         if (!datos.fecha || datos.fecha < this.fechaActualDelCine()) {
             throw new Error('La fecha debe ser hoy o una fecha futura.');
         }
+        if (!Number.isInteger(datos.semanas) || datos.semanas < 1 || datos.semanas > 4) {
+            throw new Error('La duración debe ser de una a cuatro semanas.');
+        }
         if (datos.idioma !== 'Subtitulada' && datos.idioma !== 'Doblada') {
             throw new Error('El idioma seleccionado no es válido.');
         }
@@ -225,6 +230,16 @@ export class FuncionService {
                 throw new Error('No podés programar horarios que ya pasaron.');
             }
         }
+    }
+
+    private generarFechas(fechaInicio: string, semanas: number): string[] {
+        const cantidadDias = semanas * 7;
+        const fecha = new Date(`${fechaInicio}T00:00:00Z`);
+        return Array.from({ length: cantidadDias }, (_, indice) => {
+            const dia = new Date(fecha);
+            dia.setUTCDate(fecha.getUTCDate() + indice);
+            return dia.toISOString().slice(0, 10);
+        });
     }
 
     private validarId(id: number): void {

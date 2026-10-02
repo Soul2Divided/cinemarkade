@@ -5,10 +5,19 @@
             <span class="total-badge">TOTAL: {{ funciones().length }}</span>
         </div>
 
-        <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input type="text" class="form-control" placeholder="BUSCAR POR SALA, FECHA, PELÍCULA U HORARIO..."
-                (input)="onSearch($event)">
+        <div class="header-tools">
+            <label class="format-filter">
+                FORMATO
+                <select [value]="formatoFiltro()" (change)="cambiarFormatoFiltro($event)">
+                    <option value="">TODOS</option>
+                    @for (formato of formatos; track formato) { <option [value]="formato">{{ formato }}</option> }
+                </select>
+            </label>
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="form-control" placeholder="BUSCAR SALA, FECHA, PELÍCULA U HORARIO..."
+                    (input)="onSearch($event)">
+            </div>
         </div>
     </div>
 
@@ -18,39 +27,44 @@
 
     @if (!funcionesCargadas()) {
     <div class="funciones-grid">
-        @for (funcion of funcionesFiltradas(); track funcion.id) {
-        <div class="funcion-card" [class.preventa-card]="funcion.es_preventa">
-            <div class="card-header-badge">
-                <span class="badge-format">{{ funcion.formato }}</span>
-                <span class="badge-lang">{{ funcion.idioma | uppercase }}</span>
-                @if (funcion.es_preventa) {
-                <span class="badge-preventa">PREVENTA</span>
-                }
-                @if (!funcion.activa) {
-                <span class="badge-lang">INACTIVA</span>
+        @for (grupo of peliculasAgrupadas(); track grupo.peliculaId) {
+        <section class="movie-function-group">
+            <button type="button" class="movie-group-toggle" [attr.aria-expanded]="grupoAbierto() === grupo.peliculaId"
+                (click)="alternarGrupo(grupo.peliculaId)">
+                <span class="group-title"><span class="group-caret">{{ grupoAbierto() === grupo.peliculaId ? '▼' : '▶' }}</span>{{ grupo.nombre }}</span>
+                <span class="group-count">{{ grupo.funciones.length }} FUNCIÓN(ES)</span>
+            </button>
+
+            @if (grupoAbierto() === grupo.peliculaId) {
+            <div class="funciones-grid grouped-grid">
+                @for (funcion of grupo.funciones; track funcion.id) {
+                <div class="funcion-card" [class.preventa-card]="funcion.es_preventa">
+                    <div class="card-header-badge">
+                        <span class="badge-format">{{ funcion.formato }}</span>
+                        <span class="badge-lang">{{ funcion.idioma | uppercase }}</span>
+                        @if (funcion.es_preventa) { <span class="badge-preventa">PREVENTA</span> }
+                        @if (!funcion.activa) { <span class="badge-lang">INACTIVA</span> }
+                    </div>
+                    <div class="card-body">
+                        <h3 class="funcion-title">SALA #{{ funcion.sala_id }}</h3>
+                        <div class="info-list">
+                            <span class="info-item">📅 FECHA: {{ funcion.fecha }}</span>
+                            <span class="info-item">⏰ PROYECCIONES: {{ horariosFuncion(funcion) }}</span>
+                        </div>
+                        <div class="card-actions">
+                            <button type="button" class="btn-action edit" (click)="modificarFuncion(funcion.id)"
+                                [disabled]="!funcion.activa">✏️ MODIFICAR</button>
+                            <button type="button" class="btn-action" [class.delete]="funcion.activa"
+                                [class.edit]="!funcion.activa" (click)="alternarActiva(funcion)">
+                                {{ funcion.activa ? '✖ DAR DE BAJA' : '↻ REACTIVAR' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 }
             </div>
-
-            <div class="card-body">
-                <h3 class="funcion-title">SALA #{{ funcion.sala_id }}</h3>
-                <div class="info-list">
-                    <span class="info-item">🎬 PELÍCULA ID: #{{ funcion.pelicula_id }}</span>
-                    <span class="info-item">📅 FECHA: {{ funcion.fecha }}</span>
-                    <span class="info-item">⏰ PROYECCIONES: {{ horariosFuncion(funcion) }}</span>
-                </div>
-
-                <div class="card-actions">
-                    <button type="button" class="btn-action edit" (click)="modificarFuncion(funcion.id)"
-                        [disabled]="!funcion.activa">
-                        ✏️ MODIFICAR
-                    </button>
-                    <button type="button" class="btn-action" [class.delete]="funcion.activa"
-                        [class.edit]="!funcion.activa" (click)="alternarActiva(funcion)">
-                        {{ funcion.activa ? '✖ DAR DE BAJA' : '↻ REACTIVAR' }}
-                    </button>
-                </div>
-            </div>
-        </div>
+            }
+        </section>
         } @empty {
         <div class="empty-state">
             <span class="empty-icon">⏰</span>
@@ -77,4 +91,6 @@
             <button type="button" class="btn btn-pixel red" (click)="confirmarCambioEstado()">CONFIRMAR</button>
         </div>
     </app-modal>
+
+    @if (mostrarLoader()) { <app-loader message="CARGANDO FUNCIONES..."></app-loader> }
 </div>
