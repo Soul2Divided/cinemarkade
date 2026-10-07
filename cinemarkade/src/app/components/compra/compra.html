@@ -206,7 +206,7 @@
         la compra.</div>
 
       <button type="button" class="continue-button" [disabled]="tarifaBase() === null" (click)="continuar()">
-        CONTINUAR A BUTACAS <span>→</span>
+        SELECCIONAR BUTACAS <span>→</span>
       </button>
       @if (mensajeContinuar()) { <p class="next-step-message">{{ mensajeContinuar() }}</p> }
       <button type="button" class="cancel-button" (click)="cancelar()">CANCELAR COMPRA</button>

@@ -24,3 +24,27 @@ export type CompraInput = Omit<
     codigo_qr?: string | null;
     url_pdf?: string | null;
 };
+
+export interface ConfirmarCompraInput {
+    proyeccion_id: number;
+    total: number;
+    creditos_usados: number;
+    puntos_generados: number;
+    butacas: {
+        butaca_proyeccion_id: number;
+        medio_pago: MedioPagoCompra;
+        precio_unitario: number;
+        puntos_usados: number;
+    }[];
+    detalles: {
+        producto_id: number | null;
+        combo_id: number | null;
+        tipo_item: 'producto' | 'combo';
+        nombre_item: string;
+        cantidad: number;
+        precio_unitario: number;
+        medio_pago: MedioPagoCompra;
+        puntos_usados: number;
+        puntos_generados: number;
+    }[];
+}

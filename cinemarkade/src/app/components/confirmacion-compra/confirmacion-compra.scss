@@ -1,0 +1,323 @@
+@use '../../../styles/themes/arcade-theme' as theme;
+@use '../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+  @extend %pixel-text-rendering;
+  display: block;
+  min-height: 100vh;
+  color: theme.$arcade-text-white;
+}
+
+.confirmation-page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100vh - 70px);
+  padding: 2rem 1rem 5rem;
+}
+
+.page-heading {
+  width: min(100%, 760px);
+  margin: 0 auto 1.5rem;
+  text-align: center;
+
+  .eyebrow {
+    color: theme.$arcade-yellow;
+    font: 1rem theme.$font-pixel;
+    letter-spacing: .1em;
+  }
+
+  h1 {
+    margin: .8rem 0 .5rem;
+    color: theme.$arcade-yellow;
+    font: clamp(1.5rem, 3vw, 2.4rem) theme.$font-pixel;
+  }
+
+  p {
+    margin: 0;
+    color: #aaa;
+    font-size: 1.15rem;
+    line-height: 1.6;
+  }
+}
+
+.ticket-card {
+  width: min(100%, 760px);
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #101014;
+  border: 1px solid #55555e;
+  border-top: 4px solid theme.$arcade-yellow;
+  box-shadow: 8px 8px 0 #000, 0 0 32px rgba(255, 204, 0, .08);
+}
+
+.ticket-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  color: theme.$arcade-yellow;
+  background: #17171c;
+  border-bottom: 1px dashed #55555e;
+  font: .95rem theme.$font-pixel;
+}
+
+.ticket-topline span:last-child {
+  color: theme.$arcade-cyan;
+  text-align: right;
+}
+
+.ticket-main {
+  padding: clamp(1.3rem, 4vw, 2.5rem);
+}
+
+.ticket-brand {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #36363d;
+}
+
+.ticket-icon {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  height: 66px;
+  flex: 0 0 auto;
+  color: #000;
+  background: theme.$arcade-yellow;
+  font-size: 2.2rem;
+}
+
+.ticket-brand small,
+.ticket-facts small,
+.ticket-seats small,
+.confirmation-code small {
+  display: block;
+  color: #92929a;
+  font: .78rem theme.$font-pixel;
+  letter-spacing: .06em;
+}
+
+.ticket-brand h2 {
+  margin: .5rem 0 0;
+  color: #fff;
+  font: clamp(1.2rem, 2.5vw, 1.8rem) theme.$font-pixel;
+  line-height: 1.5;
+}
+
+.ticket-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #36363d;
+}
+
+.ticket-facts strong,
+.ticket-seats strong {
+  display: block;
+  margin-top: .5rem;
+  color: #fff;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  text-transform: capitalize;
+}
+
+.ticket-seats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 1.3rem 0;
+  border-bottom: 1px dashed #55555e;
+}
+
+.ticket-items {
+  padding: 1.2rem 0 .4rem;
+}
+
+.ticket-items h3 {
+  margin: 0 0 .8rem;
+  color: theme.$arcade-cyan;
+  font: .95rem theme.$font-pixel;
+}
+
+.ticket-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .45rem 0;
+  color: #ccc;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.ticket-line strong {
+  flex: 0 0 auto;
+  color: #fff;
+}
+
+.ticket-line.muted {
+  color: #85858d;
+}
+
+.ticket-coupon {
+  margin-top: .8rem;
+  padding: .7rem;
+  color: theme.$arcade-cyan;
+  border: 1px dashed theme.$arcade-cyan;
+  font: .78rem theme.$font-pixel;
+  line-height: 1.6;
+}
+
+.vip-line {
+  margin: 0 clamp(1.3rem, 4vw, 2.5rem);
+  border-top: 1px dashed #55555e;
+  color: theme.$arcade-yellow;
+}
+
+.vip-line strong {
+  color: theme.$arcade-yellow;
+}
+
+.ticket-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin: .5rem clamp(1.3rem, 4vw, 2.5rem) 0;
+  padding: 1.3rem 0;
+  border-top: 2px solid theme.$arcade-yellow;
+  font: 1rem theme.$font-pixel;
+}
+
+.ticket-total strong {
+  color: theme.$arcade-yellow;
+  font: clamp(1.5rem, 3vw, 2.15rem) theme.$font-pixel;
+}
+
+.ticket-points {
+  padding: .85rem 1rem;
+  color: #aaa;
+  background: #19191e;
+  text-align: center;
+  font: .8rem theme.$font-pixel;
+  line-height: 1.7;
+}
+
+.ticket-points strong {
+  color: theme.$arcade-yellow;
+}
+
+.confirmation-code {
+  padding: 1.2rem;
+  text-align: center;
+  border-top: 1px dashed #55555e;
+}
+
+.confirmation-code strong {
+  display: block;
+  margin-top: .55rem;
+  color: theme.$arcade-cyan;
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.confirm-button,
+.back-button,
+.secondary-button {
+  width: min(100%, 760px);
+  margin-top: 1rem;
+  padding: 1.3rem;
+  font: 1rem theme.$font-pixel;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.confirm-button {
+  color: #000;
+  background: theme.$arcade-yellow;
+  border: 2px solid theme.$arcade-yellow;
+}
+
+.confirm-button:hover:not(:disabled) {
+  color: theme.$arcade-yellow;
+  background: transparent;
+}
+
+.confirm-button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.back-button,
+.secondary-button {
+  color: #aaa;
+  background: transparent;
+  border: 1px solid #55555e;
+}
+
+.modal-action {
+  width: auto;
+  margin: 0;
+  padding: .9rem 1rem;
+  font-size: .72rem;
+}
+
+.ticket-download-link {
+  display: block;
+  width: fit-content;
+  margin: .75rem auto 0;
+  padding: .4rem;
+  color: theme.$arcade-yellow;
+  font: .72rem theme.$font-pixel;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.action-error,
+.error-panel {
+  width: min(100%, 760px);
+  color: #ff7777;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.state-panel {
+  box-sizing: border-box;
+  margin: auto;
+  padding: 2rem;
+  border: 1px dashed #555;
+}
+
+@media (max-width: 520px) {
+  .confirmation-page {
+    padding-inline: .75rem;
+  }
+
+  .ticket-topline {
+    padding: .85rem;
+    font-size: .72rem;
+  }
+
+  .ticket-facts {
+    gap: .9rem;
+  }
+
+  .ticket-facts strong,
+  .ticket-seats strong {
+    font-size: 1rem;
+  }
+
+  .ticket-line {
+    font-size: .92rem;
+  }
+
+  .confirm-button,
+  .back-button {
+    padding: 1rem;
+    font-size: .8rem;
+  }
+}

@@ -1,0 +1,121 @@
+<app-navbar></app-navbar>
+
+<main class="seat-page">
+  <button class="back-link" type="button" (click)="volver()">← VOLVER A ENTRADAS Y CANDY</button>
+
+  @if (mostrarLoader()) {
+  <app-loader message="CARGANDO BUTACAS..." />
+  } @else if (error()) {
+  <section class="state-panel error-panel">
+    <p>{{ error() }}</p>
+    <button type="button" class="outline-button" (click)="volver()">VOLVER A LA COMPRA</button>
+  </section>
+  } @else if (borrador(); as compra) {
+  <header class="page-heading">
+    <span class="eyebrow">PASO 2 DE 3 · SELECCIÓN DE BUTACAS</span>
+    <h1>ELEGÍ TUS BUTACAS</h1>
+    <p>Seleccioná {{ cantidadRequerida() }} butaca(s), una por cada entrada.</p>
+  </header>
+
+  <div class="seat-layout">
+    <section class="seat-content">
+      <div class="screen-wrap">
+        <div class="screen-shape"></div><span>PANTALLA</span>
+      </div>
+
+      <div class="seat-grid" aria-label="Grilla de butacas">
+        @for (fila of filas(); track fila.nombre) {
+        <div class="seat-row" [class.seat-row--special]="fila.nombre === 'K'">
+          <strong class="row-label">{{ fila.nombre }}</strong>
+          @for (bloque of fila.bloques; track bloque.nombre) {
+          <div class="seat-block" [class.seat-block--empty-space]="bloque.butacas.length === 0">
+            @for (butaca of bloque.butacas; track butaca.id) {
+            <button type="button" class="seat" [class.seat--normal]="butaca.butaca.tipo === 'normal'"
+              [class.seat--vip]="butaca.butaca.tipo === 'vip'"
+              [class.seat--accessible]="butaca.butaca.tipo === 'discapacidad'"
+              [class.seat--selected]="butacaSeleccionada(butaca.id)"
+              [class.seat--occupied]="butaca.estado === 'ocupada'"
+              [class.seat--reserved]="butaca.estado === 'reservada'" [disabled]="butacaDeshabilitada(butaca)"
+              [attr.aria-label]="etiquetaButaca(butaca) + (butaca.estado === 'libre' ? ', disponible' : ', no disponible')"
+              [attr.aria-pressed]="butacaSeleccionada(butaca.id)"
+              [style.grid-column]="columnaVisual(fila.nombre, bloque.nombre, butaca)" (click)="alternarButaca(butaca)">
+              {{ etiquetaButaca(butaca) }}
+            </button>
+            }
+          </div>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="seat-legend">
+        <span><i class="legend-seat legend-seat--normal"></i> Normal</span>
+        <span><i class="legend-seat legend-seat--accessible"></i> Accesible</span>
+        <span><i class="legend-seat legend-seat--vip"></i> VIP</span>
+        <span><i class="legend-seat legend-seat--selected"></i> Seleccionada</span>
+        <span><i class="legend-seat legend-seat--occupied"></i> No disponible</span>
+      </div>
+    </section>
+
+    <aside class="order-summary">
+      <div class="summary-heading">
+        <span class="eyebrow">TU PEDIDO</span>
+        <h2>RESUMEN</h2>
+      </div>
+
+      <div class="summary-block">
+        <strong>Película</strong>
+        <span>{{ nombrePelicula() }}</span>
+        <small>{{ compra.proyeccion.formato }} · {{ compra.proyeccion.idioma }}</small>
+      </div>
+
+      <div class="summary-block">
+        <strong>Cine, día y horario</strong>
+        <span>Sala {{ compra.proyeccion.salaId }}</span>
+        <small>{{ compra.proyeccion.fecha | date:'dd/MM/yyyy' }} · {{ compra.proyeccion.horario.slice(0, 5) }}</small>
+      </div>
+
+      <div class="summary-block">
+        <strong>Entradas · {{ compra.cantidadEntradas }}</strong>
+        <span>{{ subtotalLineaEntradas() | currency:'ARS':'symbol':'1.0-0' }}</span>
+      </div>
+
+      @for (item of compra.combos; track item.id) {
+      <div class="summary-line"><span>{{ item.cantidad }} × {{ nombreCombo(item.id) }}</span><strong>{{
+          precioCombo(item.id) * item.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+      }
+
+      @for (item of compra.productos; track item.id) {
+      <div class="summary-line"><span>{{ item.cantidad }} × {{ nombreProducto(item.id) }}</span><strong>{{
+          precioProducto(item.id) * item.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+      }
+
+      @if (cantidadButacasVip() > 0) {
+      <div class="summary-line vip-surcharge">
+        <span>Recargo VIP · {{ cantidadButacasVip() }} × {{ recargoPorButacaVip | currency:'ARS':'symbol':'1.0-0' }}</span>
+        <strong>{{ recargoVip() | currency:'ARS':'symbol':'1.0-0' }}</strong>
+      </div>
+      }
+
+      <div class="summary-block selected-seats">
+        <strong>Butacas · {{ seleccionadas().length }}/{{ cantidadRequerida() }}</strong>
+        <span>{{ seleccionadas().length ? etiquetasSeleccionadas() : 'Todavía no seleccionaste butacas' }}</span>
+      </div>
+
+      <div class="summary-total">
+        <span>TOTAL</span><strong>{{ total() | currency:'ARS':'symbol':'1.0-0' }}</strong>
+      </div>
+      
+      <button type="button" class="continue-button" [disabled]="!puedeContinuar()" (click)="confirmarSeleccion()">
+        GUARDAR BUTACAS <span>→</span>
+      </button>
+      
+      @if (mensaje()) { 
+        <p class="feedback-message">{{ mensaje() }}</p> 
+      }
+      
+      <button type="button" class="cancel-button" (click)="volver()">VOLVER A LA COMPRA</button>
+    </aside>
+  </div>
+  }
+</main>

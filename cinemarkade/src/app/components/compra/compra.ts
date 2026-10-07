@@ -216,7 +216,8 @@ export class Compra implements OnInit {
       total: this.total(),
       puntosEstimados: this.puntosEstimados(),
     }));
-    this.mensajeContinuar.set('Selección guardada. Cuando esté creado el componente de butacas, conectamos este paso con la grilla.');
+    this.mensajeContinuar.set('');
+    void this.router.navigate(['/butacas']);
   }
 
   formatoHora(horario: string): string {

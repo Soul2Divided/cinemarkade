@@ -37,6 +37,14 @@ export const routes: Routes = [
         loadComponent: () => import('./components/compra/compra').then((m) => m.Compra),
     },
     {
+        path: 'butacas',
+        loadComponent: () => import('./components/seleccion-butacas/seleccion-butacas').then((m) => m.SeleccionButacas),
+    },
+    {
+        path: 'confirmacion-compra',
+        loadComponent: () => import('./components/confirmacion-compra/confirmacion-compra').then((m) => m.ConfirmacionCompra),
+    },
+    {
         path: 'admin',
         canActivate: [adminGuard],
         loadComponent: () => import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),

@@ -1,0 +1,118 @@
+<app-navbar></app-navbar>
+
+<main class="confirmation-page">
+  @if (cargando()) {
+  <app-loader message="PREPARANDO TU TICKET..." />
+  } @else if (error() && !borrador()) {
+  <section class="state-panel error-panel">
+    <p>{{ error() }}</p>
+    <button type="button" class="secondary-button" (click)="cancelar()">VOLVER AL INICIO</button>
+  </section>
+  } @else if (borrador(); as compra) {
+  <header class="page-heading">
+    <span class="eyebrow">PASO 3 DE 3 · CONFIRMACIÓN</span>
+    <h1>{{ compraId() ? 'COMPRA CONFIRMADA' : 'REVISÁ TU TICKET' }}</h1>
+    <p>{{ compraId() ? 'Tu compra quedó registrada.' : 'Verificá los datos antes de confirmar la compra.' }}</p>
+  </header>
+
+  <article class="ticket-card">
+    <div class="ticket-topline"><span>CINEMARKADE</span><span>{{ compraId() ? 'TICKET CONFIRMADO' : 'PREVIEW DE COMPRA'
+        }}</span></div>
+    <div class="ticket-main">
+      <div class="ticket-brand"><span class="ticket-icon">▣</span>
+        <div><small>ENTRADA DE CINE</small>
+          <h2>{{ nombrePelicula() }}</h2>
+        </div>
+      </div>
+      <div class="ticket-facts">
+        <div><small>FECHA</small><strong>{{ compra.proyeccion.fecha | date:'EEEE d MMMM yyyy':'':'es-AR' }}</strong>
+        </div>
+        <div><small>HORARIO</small><strong>{{ compra.proyeccion.horario.slice(0, 5) }}</strong></div>
+        <div><small>SALA</small><strong>{{ compra.proyeccion.salaId }}</strong></div>
+        <div><small>FORMATO · IDIOMA</small><strong>{{ compra.proyeccion.formato }} · {{ compra.proyeccion.idioma
+            }}</strong></div>
+      </div>
+      <div class="ticket-seats">
+        <div><small>ENTRADAS</small><strong>{{ compra.cantidadEntradas }} · GENERAL</strong></div>
+        <div><small>BUTACAS</small><strong>{{ compra.butacasSeleccionadas?.join(' · ') || 'Sin seleccionar' }}</strong>
+        </div>
+      </div>
+      <section class="ticket-items">
+        <h3>CANDY BAR</h3>
+        @for (item of compra.combos; track item.id) {
+        <div class="ticket-line"><span>{{ item.cantidad }} × {{ nombreCombo(item.id) }}</span><strong>{{
+            precioCombo(item.id) * item.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+        }
+        @for (item of compra.productos; track item.id) {
+        <div class="ticket-line"><span>{{ item.cantidad }} × {{ nombreProducto(item.id) }}</span><strong>{{
+            cantidadProducto(item.id) * item.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+        }
+        @if (!compra.combos.length && !compra.productos.length) {
+        <div class="ticket-line muted"><span>Sin productos de candy</span><strong>—</strong></div>
+        }
+      </section>
+      @if (compra.cupon?.codigo) {
+      <div class="ticket-coupon">CUPÓN APLICADO · {{ compra.cupon?.codigo }} ({{ compra.cupon?.porcentaje_descuento }}%
+        OFF)</div>
+      }
+      @if (compra.recargoButacasVip) {
+      <div class="ticket-line vip-line"><span>Recargo por butacas VIP</span><strong>{{ compra.recargoButacasVip |
+          currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+      }
+    </div>
+    <div class="ticket-total"><span>TOTAL</span><strong>{{ compra.total | currency:'ARS':'symbol':'1.0-0' }}</strong>
+    </div>
+    <div class="ticket-points">{{ compraId() ? 'PUNTOS ACREDITADOS' : 'PUNTOS QUE VAS A SUMAR' }} · <strong>{{
+        compra.puntosEstimados | number }}</strong></div>
+    @if (compraId()) {
+    <div class="confirmation-code"><small>CÓDIGO DE COMPRA</small><strong>{{ compraId() }}</strong></div>
+    }
+  </article>
+
+  @if (error()) { <p class="action-error">{{ error() }}</p> }
+  @if (!compraId()) {
+  <button type="button" class="confirm-button" [disabled]="confirmando()" (click)="abrirModalConfirmacion()">
+    FINALIZAR COMPRA
+  </button>
+  <button type="button" class="back-button" (click)="cancelar()">CANCELAR</button>
+  } @else {
+  @if (ticketPdf()) {
+  <button type="button" class="confirm-button" (click)="descargarTicket()">DESCARGAR TICKET PDF</button>
+  }
+  }
+  }
+</main>
+
+@if (confirmando()) {
+<app-loader message="REGISTRANDO TU COMPRA..." />
+}
+
+<app-modal [isOpen]="mostrarModalConfirmacion()" title="CONFIRMAR COMPRA"
+  subtitle="SE REGISTRARÁN TUS ENTRADAS Y PRODUCTOS" variant="yellow" [closeOnBackdrop]="false"
+  (close)="cerrarModalConfirmacion()">
+  <p>¿Querés finalizar la compra con los datos y las butacas seleccionadas?</p>
+  <div modal-actions>
+    <button type="button" class="back-button modal-action" (click)="cerrarModalConfirmacion()">CERRAR</button>
+    <button type="button" class="confirm-button modal-action" (click)="confirmarCompra()">CONFIRMAR COMPRA</button>
+  </div>
+</app-modal>
+
+<app-modal [isOpen]="mostrarModalExito()" title="COMPRA REALIZADA CON ÉXITO"
+  subtitle="TUS ENTRADAS YA ESTÁN REGISTRADAS" variant="cyan" (close)="cerrarModalExito()">
+  @if (compraAnonima()) {
+    <p>La compra quedó confirmada. Iniciamos la descarga del ticket con el QR; si el navegador la bloqueó, podés descargarlo desde acá.</p>
+  } @else {
+    <p>La compra quedó confirmada. El QR se identificará con el código de compra.</p>
+  }
+  @if (ticketPdf()) {
+    <a class="ticket-download-link" href="" (click)="$event.preventDefault(); descargarTicket()">DESCARGAR TICKET PDF</a>
+  }
+  <div modal-actions>
+    @if (compraAnonima()) {
+      <button type="button" class="confirm-button modal-action" (click)="volverAlInicio()">VOLVER AL INICIO</button>
+    } @else {
+      <button type="button" class="confirm-button modal-action" (click)="irAMisEntradas()">IR A MIS ENTRADAS</button>
+      <button type="button" class="back-button modal-action" (click)="volverAlInicio()">VOLVER</button>
+    }
+  </div>
+</app-modal>

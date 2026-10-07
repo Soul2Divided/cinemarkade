@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { CompraRepository } from './compra.repository';
-import { Compra, CompraInput, EstadoCompra } from './compra.model';
+import { Compra, CompraInput, ConfirmarCompraInput, EstadoCompra } from './compra.model';
 
 @Injectable({ providedIn: 'root' })
 export class CompraService {
@@ -44,6 +44,22 @@ export class CompraService {
             ...datos,
             creditos_usados: datos.creditos_usados ?? 0,
         });
+    }
+
+    async confirmarCompra(datos: ConfirmarCompraInput): Promise<string> {
+        if (!Number.isInteger(datos.proyeccion_id) || datos.proyeccion_id <= 0) {
+            throw new Error('La proyección indicada no es válida.');
+        }
+        this.validarImporte(datos.total);
+        this.validarPuntos(datos.creditos_usados);
+        this.validarPuntos(datos.puntos_generados);
+        if (datos.butacas.length === 0) {
+            throw new Error('La compra debe incluir al menos una butaca.');
+        }
+        if (datos.butacas.some(butaca => !Number.isInteger(butaca.butaca_proyeccion_id) || butaca.butaca_proyeccion_id <= 0)) {
+            throw new Error('Hay una butaca seleccionada que no es válida.');
+        }
+        return this.compraRepository.confirmarCompra(datos);
     }
 
     async cambiarEstado(id: string, estado: EstadoCompra): Promise<void> {

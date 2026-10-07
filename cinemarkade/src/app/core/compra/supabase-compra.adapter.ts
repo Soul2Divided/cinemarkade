@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Compra, CompraInput, EstadoCompra } from './compra.model';
+import { Compra, CompraInput, ConfirmarCompraInput, EstadoCompra } from './compra.model';
 import { CompraRepository } from './compra.repository';
 import { SupabaseService } from '../services/supabase.service';
 
@@ -47,6 +47,26 @@ export class SupabaseCompraAdapter implements CompraRepository {
         }
 
         return data as Compra;
+    }
+
+    async confirmarCompra(datos: ConfirmarCompraInput): Promise<string> {
+        const { data, error } = await this.supabaseService.supabaseClient
+            .rpc('confirmar_compra', {
+                p_proyeccion_id: datos.proyeccion_id,
+                p_total: datos.total,
+                p_creditos_usados: datos.creditos_usados,
+                p_puntos_generados: datos.puntos_generados,
+                p_butacas: datos.butacas,
+                p_detalles: datos.detalles,
+            });
+
+        if (error) {
+            throw new Error(`No se pudo confirmar la compra: ${error.message}`);
+        }
+        if (typeof data !== 'string' || !data) {
+            throw new Error('Supabase no devolvió el identificador de la compra confirmada.');
+        }
+        return data;
     }
 
     async cambiarEstado(id: string, estado: EstadoCompra): Promise<void> {
