@@ -31,7 +31,6 @@ export class SeleccionFuncion implements OnInit {
   formatoSeleccionado = signal('');
   idiomaSeleccionado = signal('');
   horarioSeleccionado = signal<OpcionHorario | null>(null);
-  avisoCompra = signal(false);
   paginaFechas = signal(0);
 
   fechas = computed<OpcionFecha[]>(() => {
@@ -132,7 +131,7 @@ export class SeleccionFuncion implements OnInit {
       idioma: seleccion.funcion.idioma,
       salaId: seleccion.funcion.sala_id,
     }));
-    this.avisoCompra.set(true);
+    void this.router.navigate(['/compra']);
   }
 
   volver(): void { void this.router.navigate(['/']); }

@@ -1,0 +1,216 @@
+<app-navbar></app-navbar>
+
+<main class="purchase-page">
+  <button class="back-link" type="button" (click)="cancelar()">← CANCELAR Y VOLVER A HORARIOS</button>
+
+  @if (mostrarLoader()) {
+  <app-loader message="PREPARANDO TU COMPRA..."></app-loader>
+  } @else if (error()) {
+  <div class="state-panel error-panel">
+    <p>{{ error() }}</p>
+    <button type="button" class="outline-button" (click)="cancelar()">VOLVER A HORARIOS</button>
+  </div>
+  } @else if (seleccion(); as funcion) {
+  <header class="page-heading">
+    <span class="eyebrow">PASO 1 DE 3 · ENTRADAS Y CANDY BAR</span>
+    <h1>ARMÁ TU COMPRA</h1>
+    <p>Elegí tus entradas y agregá productos o combos para disfrutar la función.</p>
+  </header>
+
+  <div class="purchase-layout">
+    <section class="purchase-content">
+      <section class="purchase-section ticket-section">
+        <div class="section-heading">
+          <div>
+            <span class="step-index">01</span>
+            <h2>ENTRADAS</h2>
+          </div>
+          <span class="section-caption">{{ funcion.formato }} · {{ funcion.idioma }}</span>
+        </div>
+
+        <article class="ticket-card">
+          <div class="ticket-icon">🎟</div>
+          <div class="ticket-copy">
+            <h3>Entrada general</h3>
+            <p>{{ funcion.fecha | date:'EEEE d MMMM':'':'es-AR' }} · {{ formatoHora(funcion.horario) }} · Sala {{
+              funcion.salaId }}</p>
+            @if (esDiaPromocional()) {
+            <span class="weekday-discount">LUNES A MIÉRCOLES · 50% OFF EN ENTRADAS</span>
+            }
+            <span class="ticket-price">
+              @if (esDiaPromocional()) {
+              <del>{{ tarifaBase() | currency:'ARS':'symbol':'1.0-0' }}</del>
+              }
+              {{ precioEntrada() | currency:'ARS':'symbol':'1.0-0' }} por entrada
+            </span>
+          </div>
+          <div class="quantity-control" aria-label="Cantidad de entradas">
+            <button type="button" aria-label="Quitar una entrada" [disabled]="cantidadEntradas() <= 1"
+              (click)="cambiarCantidadEntradas(-1)">−</button>
+            <strong>{{ cantidadEntradas() }}</strong>
+            <button type="button" aria-label="Agregar una entrada" [disabled]="cantidadEntradas() >= 8"
+              (click)="cambiarCantidadEntradas(1)">+</button>
+          </div>
+        </article>
+        <p class="seat-hint">Vas a seleccionar una butaca por cada entrada en el siguiente paso.</p>
+      </section>
+
+      <section class="purchase-section">
+        <div class="section-heading">
+          <div>
+            <span class="step-index">02</span>
+            <h2>COMBOS Y OFERTAS</h2>
+          </div>
+          <span class="section-caption">AHORRÁ CON UN COMBO</span>
+        </div>
+
+        <div class="items-grid">
+          @for (combo of combos(); track combo.id) {
+          <article class="item-card combo-card">
+            <div class="item-image">
+              @if (combo.imagen) { <img [src]="combo.imagen" [alt]="combo.nombre"> }
+              @else { <span>🍿</span> }
+              <span class="item-badge">COMBO</span>
+            </div>
+            <div class="item-info">
+              <h3>{{ combo.nombre }}</h3>
+              <p>{{ combo.descripcion || 'Una combinación para disfrutar durante la película.' }}</p>
+              <strong>{{ combo.precio | currency:'ARS':'symbol':'1.0-0' }}</strong>
+            </div>
+            <div class="item-quantity">
+              @if (cantidadCombo(combo.id) > 0) {
+              <button type="button" [attr.aria-label]="'Quitar un ' + combo.nombre"
+                (click)="cambiarCantidadCombo(combo.id, -1)">−</button>
+              <span>{{ cantidadCombo(combo.id) }}</span>
+              }
+              <button type="button" class="add-button" [attr.aria-label]="'Agregar ' + combo.nombre"
+                (click)="cambiarCantidadCombo(combo.id, 1)">
+                {{ cantidadCombo(combo.id) > 0 ? '+' : 'AGREGAR' }}
+              </button>
+            </div>
+          </article>
+          } @empty {
+          <p class="empty-items">No hay combos disponibles para esta fecha.</p>
+          }
+        </div>
+      </section>
+
+      <section class="purchase-section">
+        <div class="section-heading">
+          <div>
+            <span class="step-index">03</span>
+            <h2>PRODUCTOS DEL CANDY</h2>
+          </div>
+          <span class="section-caption">AGREGÁ TUS FAVORITOS</span>
+        </div>
+
+        <div class="items-grid">
+          @for (producto of productos(); track producto.id) {
+          <article class="item-card product-card">
+            <div class="item-image">
+              <img [src]="producto.imagen" [alt]="producto.nombre">
+              <span class="item-badge">{{ producto.categoria }}</span>
+            </div>
+            <div class="item-info">
+              <h3>{{ producto.nombre }}</h3>
+              <p>{{ producto.descripcion }}</p>
+              <strong>{{ producto.precio | currency:'ARS':'symbol':'1.0-0' }}</strong>
+            </div>
+            <div class="item-quantity">
+              @if (cantidadProducto(producto.id) > 0) {
+              <button type="button" [attr.aria-label]="'Quitar un ' + producto.nombre"
+                (click)="cambiarCantidadProducto(producto.id, -1)">−</button>
+              <span>{{ cantidadProducto(producto.id) }}</span>
+              }
+              <button type="button" class="add-button" [attr.aria-label]="'Agregar ' + producto.nombre"
+                (click)="cambiarCantidadProducto(producto.id, 1)">
+                {{ cantidadProducto(producto.id) > 0 ? '+' : 'AGREGAR' }}
+              </button>
+            </div>
+          </article>
+          } @empty {
+          <p class="empty-items">No hay productos disponibles en el candy.</p>
+          }
+        </div>
+      </section>
+
+      <section class="coupon-section">
+        <div>
+          <span class="step-index">04</span>
+          <h2>¿TENÉS UN CUPÓN?</h2>
+          <p>Podés aplicar un solo cupón por compra.</p>
+        </div>
+        @if (!cuponAplicado()) {
+        <div class="coupon-entry">
+          <input type="text" maxlength="40" placeholder="INGRESÁ TU CÓDIGO" [value]="codigoCupon()"
+            (input)="actualizarCodigoCupon($event)" (keydown.enter)="aplicarCupon()">
+          <button type="button" class="outline-button" (click)="aplicarCupon()">APLICAR</button>
+        </div>
+        } @else {
+        <button type="button" class="remove-coupon" (click)="quitarCupon()">QUITAR {{ cuponAplicado()?.codigo }}
+          ✕</button>
+        }
+        @if (mensajeCupon()) { <p class="coupon-message" [class.success]="cuponAplicado()">{{ mensajeCupon() }}</p> }
+      </section>
+    </section>
+
+    <aside class="order-summary">
+      <div class="summary-heading">
+        <span class="eyebrow">TU PEDIDO</span>
+        <h2>RESUMEN</h2>
+      </div>
+
+      <div class="summary-movie">
+        <span class="summary-icon">🎬</span>
+        <div>
+          <strong>Función</strong>
+          <span>{{ funcion.fecha | date:'dd/MM/yyyy':'':'es-AR' }} · {{ formatoHora(funcion.horario) }}</span>
+          <span>{{ funcion.formato }} · {{ funcion.idioma }} · Sala {{ funcion.salaId }}</span>
+        </div>
+      </div>
+
+      <div class="summary-lines">
+        <div class="summary-line">
+          <span>{{ cantidadEntradas() }} × Entrada general</span>
+          <strong>{{ subtotalEntradas() | currency:'ARS':'symbol':'1.0-0' }}</strong>
+        </div>
+        @for (item of combosSeleccionados(); track item.id) {
+        <div class="summary-line">
+          <span>{{ item.cantidad }} × {{ nombreCombo(item.id) }}</span>
+          <strong>{{ precioCombo(item.id) * item.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong>
+        </div>
+        }
+        @for (item of productosSeleccionados(); track item.id) {
+        <div class="summary-line">
+          <span>{{ item.cantidad }} × {{ nombreProducto(item.id) }}</span>
+          <strong>{{ precioProducto(item.id) * item.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong>
+        </div>
+        }
+        @if (cuponAplicado()) {
+        <div class="summary-line discount-line">
+          <span>Cupón · {{ cuponAplicado()?.porcentaje_descuento }}%</span>
+          <strong>−{{ descuentoCupon() | currency:'ARS':'symbol':'1.0-0' }}</strong>
+        </div>
+        }
+      </div>
+
+      @if (esDiaPromocional()) {
+      <div class="weekday-note">Descuento de día aplicado a las entradas.</div>
+      }
+
+      <div class="summary-total">
+        <span>TOTAL</span>
+        <strong>{{ total() | currency:'ARS':'symbol':'1.0-0' }}</strong>
+      </div>
+      <div class="points-note">Vas a sumar aproximadamente <strong>{{ puntosEstimados() }} puntos</strong> al confirmar
+        la compra.</div>
+
+      <button type="button" class="continue-button" [disabled]="tarifaBase() === null" (click)="continuar()">
+        CONTINUAR A BUTACAS <span>→</span>
+      </button>
+      @if (mensajeContinuar()) { <p class="next-step-message">{{ mensajeContinuar() }}</p> }
+      <button type="button" class="cancel-button" (click)="cancelar()">CANCELAR COMPRA</button>
+    </aside>
+  </div>
+  }
+</main>

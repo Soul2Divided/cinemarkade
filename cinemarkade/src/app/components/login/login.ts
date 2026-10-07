@@ -4,7 +4,7 @@ import { Navbar } from '../navbar/navbar';
 import { Router } from '@angular/router';
 import { Modal } from '../modal/modal';
 import { Loader } from '../loader/loader';
-import { UserService } from '../../core/user/user.service';
+import { AuthService } from '../../auth/auth.service';
 
 
 @Component({
@@ -24,7 +24,7 @@ export class Login {
     password: new FormControl('', [Validators.required])
   });
 
-  constructor(private router: Router, private userService: UserService) {
+  constructor(private router: Router, private authService: AuthService) {
     
   }
 
@@ -41,7 +41,7 @@ export class Login {
 
     try {
       const { email, password } = this.formLogin.getRawValue();
-      const usuario = await this.userService.iniciarSesion(email ?? '', password ?? '');
+      const usuario = await this.authService.iniciarSesion(email ?? '', password ?? '');
       this.rolLogueado = usuario.rol;
       this.mostrarModal.set(true);
     } catch (error) {

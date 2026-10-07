@@ -5,10 +5,6 @@ import path from 'path';
 
 export const routes: Routes = [
     {
-        path: 'funciones/:id',
-        loadComponent: () => import('./components/seleccion-funcion/seleccion-funcion').then((m) => m.SeleccionFuncion),
-    },
-    {
         path: '',
         loadComponent: () => import('./components/home-page/home-page').then((m) => m.HomePage),
     },
@@ -31,6 +27,14 @@ export const routes: Routes = [
     {
         path: 'register',
         loadComponent: () => import('./components/register/register').then((m) => m.Register)
+    },
+    {
+        path: 'funciones/:id',
+        loadComponent: () => import('./components/seleccion-funcion/seleccion-funcion').then((m) => m.SeleccionFuncion),
+    },
+    {
+        path: 'compra',
+        loadComponent: () => import('./components/compra/compra').then((m) => m.Compra),
     },
     {
         path: 'admin',

@@ -6,5 +6,6 @@ import type { CrearUserCommand, User } from './user.model';
 export abstract class UserRepository {
     abstract createUser(command: CrearUserCommand): Promise<User>;
     abstract findByEmail(mail: string): Promise<User | null>;
+    abstract findById(id: string): Promise<User | null>;
     abstract signIn(mail: string, password: string): Promise<User>;
 }

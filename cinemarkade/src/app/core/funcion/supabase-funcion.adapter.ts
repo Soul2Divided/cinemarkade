@@ -60,7 +60,7 @@ export class SupabaseFuncionAdapter implements FuncionRepository {
                 .from('funcion')
                 .update({ activa: false })
                 .eq('id', data.id);
-            throw new Error('La función se guardó sin sus horarios y fue dada de baja. Revisá las políticas de proyeccion en Supabase.');
+            throw new Error('La función se guardó sin sus horarios y fue dada de baja.');
         }
 
         return { ...data, proyecciones } as Funcion;

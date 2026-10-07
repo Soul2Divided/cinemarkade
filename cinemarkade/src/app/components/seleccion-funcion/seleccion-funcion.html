@@ -90,13 +90,3 @@
   }
 </main>
 
-@if (avisoCompra()) {
-<div class="notice-backdrop" role="presentation" (click)="avisoCompra.set(false)">
-  <section class="notice-card" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-    <h2>FUNCIÓN SELECCIONADA</h2>
-    <p>Guardamos tu horario. La selección de entradas, productos y butacas se conectará en el siguiente paso de la
-      compra.</p>
-    <button type="button" (click)="avisoCompra.set(false)">ENTENDIDO</button>
-  </section>
-</div>
-}

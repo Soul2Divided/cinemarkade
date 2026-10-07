@@ -50,8 +50,7 @@
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label class="form-label">PELÍCULA</label>
-                    <select formControlName="peliculaId" class="form-control"
-                        (change)="recalcularHorarios()">
+                    <select formControlName="peliculaId" class="form-control">
                         <option [ngValue]="null" disabled>SELECCIONAR PELÍCULA</option>
                         @for (pelicula of peliculas(); track pelicula.id) {
                         <option [ngValue]="pelicula.id">
@@ -82,20 +81,26 @@
                 @if (!esEdicion) {
                 <div class="form-group">
                     <label class="form-label">DURACIÓN DE LA PROGRAMACIÓN</label>
-                    <select formControlName="semanas" class="form-control">
-                        <option [ngValue]="1">1 SEMANA</option>
-                        <option [ngValue]="2">2 SEMANAS</option>
-                        <option [ngValue]="3">3 SEMANAS</option>
-                        <option [ngValue]="4">4 SEMANAS</option>
+                    <select formControlName="dias" class="form-control">
+                        <option [ngValue]="1">1 DÍA</option>
+                        <option [ngValue]="7">1 SEMANA</option>
+                        <option [ngValue]="14">2 SEMANAS</option>
+                        <option [ngValue]="21">3 SEMANAS</option>
+                        <option [ngValue]="28">4 SEMANAS</option>
                     </select>
                     <small class="field-hint">Se programará todos los días desde la fecha de inicio.</small>
                 </div>
                 }
 
                 <div class="form-group" [class.full-width]="esEdicion">
-                    <label class="form-label">PRIMER HORARIO</label>
-                    <input type="time" formControlName="primerHorario" class="form-control" step="300"
-                        (change)="recalcularHorarios()">
+                    <label class="form-label">AGREGAR HORARIO DE INICIO</label>
+                    <div class="format-selector">
+                        <input type="time" formControlName="primerHorario" class="form-control" step="300"
+                            (change)="validarHorarioActual()">
+                        <button type="button" class="btn btn-pixel cyan" (click)="agregarHorario()">
+                            AGREGAR HORARIO
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group full-width">
@@ -112,15 +117,15 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label class="form-label">HORARIOS POSIBLES</label>
+                    <label class="form-label">HORARIOS AGREGADOS ({{ horariosSeleccionados().length }})</label>
                     <div class="format-selector">
-                        @for (horario of horariosDisponibles(); track horario) {
-                        <button type="button" class="format-btn"
-                            [class.selected]="horariosSeleccionados().includes(horario)"
-                            [attr.aria-pressed]="horariosSeleccionados().includes(horario)"
-                            (click)="alternarHorario(horario)">
-                            {{ horario }}
+                        @for (horario of horariosSeleccionados(); track horario) {
+                        <button type="button" class="format-btn selected" (click)="quitarHorario(horario)"
+                            [attr.aria-label]="'Quitar horario ' + horario">
+                            {{ horario }} ×
                         </button>
+                        } @empty {
+                        <small class="field-hint">Todavía no agregaste horarios.</small>
                         }
                     </div>
                 </div>

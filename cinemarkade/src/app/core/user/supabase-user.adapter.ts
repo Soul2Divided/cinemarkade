@@ -76,6 +76,20 @@ export class SupabaseUserAdapter implements UserRepository {
         return data as User | null;
     }
 
+    async findById(id: string): Promise<User | null> {
+        const { data, error } = await this.supabaseService.supabaseClient
+            .from('usuario')
+            .select('*')
+            .eq('id', id)
+            .maybeSingle();
+
+        if (error) {
+            throw new Error(`Error al buscar el perfil del usuario: ${error.message}`);
+        }
+
+        return data ? this.mapToModel(data as User) : null;
+    }
+
     async signIn(mail: string, password: string): Promise<User> {
         const supabase = this.supabaseService.supabaseClient;
         const { data: authData, error: authError } = await supabase.auth.signInWithPassword({

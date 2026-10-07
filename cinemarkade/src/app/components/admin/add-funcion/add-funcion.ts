@@ -8,7 +8,7 @@ import { FuncionService } from '../../../core/funcion/funcion.service';
 import { PeliculaService } from '../../../core/pelicula/pelicula.service';
 import { Pelicula } from '../../../core/pelicula/pelicula.model';
 import { FORMATOS_SALA, FormatoSala } from '../../../core/sala/sala.model';
-import { calcularHorariosDisponibles } from '../../../utils/horario-funcion.util';
+import { validarHorarioFuncion, validarHorarioIndividual, validarHorariosFuncion } from '../../../utils/horario-funcion.util';
 
 @Component({
   selector: 'app-add-funcion',
@@ -28,7 +28,6 @@ export class AddFuncion implements OnInit {
   readonly fechaMinima = this.fechaActualDelCine();
 
   peliculas = signal<Pelicula[]>([]);
-  horariosDisponibles = signal<string[]>([]);
   horariosSeleccionados = signal<string[]>([]);
   mostrarLoader = signal(false);
   mostrarModal = signal(false);
@@ -48,10 +47,9 @@ export class AddFuncion implements OnInit {
       nonNullable: true,
       validators: Validators.required,
     }),
-    semanas: new FormControl(1, { nonNullable: true, validators: Validators.required }),
+    dias: new FormControl(1, { nonNullable: true, validators: Validators.required }),
     primerHorario: new FormControl('10:00', {
       nonNullable: true,
-      validators: Validators.required,
     }),
     idioma: new FormControl<IdiomaFuncion | null>(null, Validators.required),
     esPreventa: new FormControl(false, { nonNullable: true }),
@@ -100,16 +98,13 @@ export class AddFuncion implements OnInit {
         peliculaId: funcion.pelicula_id,
         formatos: [funcion.formato],
         fecha: funcion.fecha,
-        semanas: 1,
+        dias: 1,
         primerHorario: horarios[0] ?? '10:00',
         idioma: funcion.idioma,
         esPreventa: funcion.es_preventa,
       });
 
-      this.recalcularHorarios(false);
-      this.horariosSeleccionados.set(
-        horarios.filter(horario => this.horariosDisponibles().includes(horario))
-      );
+      this.horariosSeleccionados.set(horarios);
 
       if (!funcion.activa) {
         this.errorMessage = 'Esta función está inactiva y no se puede editar.';
@@ -121,30 +116,26 @@ export class AddFuncion implements OnInit {
     }
   }
 
-  recalcularHorarios(limpiarSeleccion = true): void {
+  agregarHorario(): void {
+    this.errorMessage = '';
     const pelicula = this.peliculaSeleccionada;
-    const primerHorario = this.formFuncion.controls.primerHorario.value;
-
-    if (!pelicula || !primerHorario) {
-      this.horariosDisponibles.set([]);
-      this.horariosSeleccionados.set([]);
+    const horario = this.formFuncion.controls.primerHorario.value;
+    if (!pelicula) {
+      this.errorMessage = 'Seleccioná una película antes de agregar horarios.';
       return;
     }
-
     try {
-      this.horariosDisponibles.set(
-        calcularHorariosDisponibles(pelicula.duracion, primerHorario)
+      this.horariosSeleccionados.set(
+        validarHorarioFuncion(pelicula.duracion, horario, this.horariosSeleccionados())
       );
-      if (limpiarSeleccion) this.horariosSeleccionados.set([]);
-      else {
-        this.horariosSeleccionados.update(actuales =>
-          actuales.filter(horario => this.horariosDisponibles().includes(horario))
-        );
-      }
-    } catch {
-      this.horariosDisponibles.set([]);
-      this.horariosSeleccionados.set([]);
+      this.formFuncion.controls.primerHorario.setValue('');
+    } catch (error) {
+      this.errorMessage = error instanceof Error ? error.message : 'El horario ingresado no es válido.';
     }
+  }
+
+  quitarHorario(horario: string): void {
+    this.horariosSeleccionados.update(actuales => actuales.filter(actual => actual !== horario));
   }
 
   seleccionarFormato(formato: FormatoSala): void {
@@ -159,14 +150,6 @@ export class AddFuncion implements OnInit {
     this.formFuncion.controls.formatos.markAsTouched();
   }
 
-  alternarHorario(horario: string): void {
-    this.horariosSeleccionados.update(actuales =>
-      actuales.includes(horario)
-        ? actuales.filter(actual => actual !== horario)
-        : [...actuales, horario].sort()
-    );
-  }
-
   async onSubmit(): Promise<void> {
     this.errorMessage = '';
     this.formFuncion.markAllAsTouched();
@@ -175,8 +158,17 @@ export class AddFuncion implements OnInit {
       this.errorMessage = 'Completá los campos obligatorios.';
       return;
     }
-    if (this.horariosSeleccionados().length === 0) {
-      this.errorMessage = 'Seleccioná al menos un horario disponible.';
+    const pelicula = this.peliculaSeleccionada;
+    if (this.horariosSeleccionados().length === 0 || !pelicula) {
+      this.errorMessage = 'Agregá al menos un horario.';
+      return;
+    }
+
+    let horariosOrdenados: string[];
+    try {
+      horariosOrdenados = validarHorariosFuncion(pelicula.duracion, this.horariosSeleccionados());
+    } catch (error) {
+      this.errorMessage = error instanceof Error ? error.message : 'Los horarios ingresados no son válidos.';
       return;
     }
 
@@ -186,15 +178,12 @@ export class AddFuncion implements OnInit {
       return;
     }
 
-    const horariosOrdenados = this.horariosDisponibles().filter(horario =>
-      this.horariosSeleccionados().includes(horario)
-    );
     const datos: CrearFuncionInput = {
       peliculaId: valores.peliculaId,
       formatos: valores.formatos,
       fecha: valores.fecha,
-      semanas: this.esEdicion ? 1 : valores.semanas,
-      primerHorario: valores.primerHorario,
+      dias: this.esEdicion ? 1 : valores.dias,
+      primerHorario: horariosOrdenados[0],
       horariosSeleccionados: horariosOrdenados,
       idioma: valores.idioma,
       esPreventa: valores.esPreventa,
@@ -210,7 +199,7 @@ export class AddFuncion implements OnInit {
       } else {
         const funciones = await this.funcionService.crearFunciones(datos);
         this.resultado.set(
-          `Se crearon ${funciones.length} funciones: ${datos.semanas * 7} días por cada uno de los ${datos.formatos.length} formatos, con ${horariosOrdenados.length} horarios por día.`
+          `Se crearon ${funciones.length} funciones: ${datos.dias} ${datos.dias === 1 ? 'día' : 'días'} por cada uno de los ${datos.formatos.length} formatos, con ${horariosOrdenados.length} horarios por día.`
         );
       }
       this.mostrarModal.set(true);
@@ -220,6 +209,18 @@ export class AddFuncion implements OnInit {
         : 'No se pudo guardar la función.';
     } finally {
       this.mostrarLoader.set(false);
+    }
+  }
+
+  validarHorarioActual(): void {
+    this.errorMessage = '';
+    const pelicula = this.peliculaSeleccionada;
+    const horario = this.formFuncion.controls.primerHorario.value;
+    if (!pelicula || !horario) return;
+    try {
+      validarHorarioIndividual(pelicula.duracion, horario);
+    } catch (error) {
+      this.errorMessage = error instanceof Error ? error.message : 'El horario ingresado no es válido.';
     }
   }
 

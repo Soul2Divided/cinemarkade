@@ -4,7 +4,7 @@ import { CrearFuncionInput, Funcion, FuncionInput } from './funcion.model';
 import { FORMATOS_SALA, FormatoSala, Sala } from '../sala/sala.model';
 import { PeliculaService } from '../pelicula/pelicula.service';
 import { SalaService } from '../sala/sala.service';
-import { calcularHorariosDisponibles } from '../../utils/horario-funcion.util';
+import { validarHorariosFuncion } from '../../utils/horario-funcion.util';
 
 @Injectable({ providedIn: 'root' })
 export class FuncionService {
@@ -43,9 +43,8 @@ export class FuncionService {
 
         const salas = await this.salaService.listarSalas();
         const asignaciones: Array<{ fecha: string; formato: FormatoSala; salaId: number }> = [];
-        const fechas = this.generarFechas(datos.fecha, datos.semanas);
-
-        // Se valida cada fecha antes de insertar para evitar una programación parcial.
+        const fechas = this.generarFechas(datos.fecha, datos.dias);
+        
         for (const fecha of fechas) {
             const salasAsignadasEseDia: number[] = [];
             for (const formato of datos.formatos) {
@@ -159,7 +158,6 @@ export class FuncionService {
 
             await this.salaService.cambiarActiva(salaId, false);
         } catch (error) {
-            // Si falla la operación, intenta dejar las funciones como estaban.
             await Promise.allSettled(
                 desactivadas.map(funcion => this.funcionRepository.cambiarActiva(funcion.id, true))
             );
@@ -203,8 +201,8 @@ export class FuncionService {
         if (!datos.fecha || datos.fecha < this.fechaActualDelCine()) {
             throw new Error('La fecha debe ser hoy o una fecha futura.');
         }
-        if (!Number.isInteger(datos.semanas) || datos.semanas < 1 || datos.semanas > 4) {
-            throw new Error('La duración debe ser de una a cuatro semanas.');
+        if (![1, 7, 14, 21, 28].includes(datos.dias)) {
+            throw new Error('La duración debe ser de un día o de una a cuatro semanas.');
         }
         if (datos.idioma !== 'Subtitulada' && datos.idioma !== 'Doblada') {
             throw new Error('El idioma seleccionado no es válido.');
@@ -220,10 +218,7 @@ export class FuncionService {
         }
 
         const pelicula = await this.peliculaService.obtenerPorId(datos.peliculaId);
-        const disponibles = calcularHorariosDisponibles(pelicula.duracion, datos.primerHorario);
-        if (datos.horariosSeleccionados.some(horario => !disponibles.includes(horario))) {
-            throw new Error('Hay horarios seleccionados que no son válidos para esta película.');
-        }
+        validarHorariosFuncion(pelicula.duracion, datos.horariosSeleccionados);
         if (datos.fecha === this.fechaActualDelCine()) {
             const ahora = this.horaActualDelCine();
             if (datos.horariosSeleccionados.some(horario => horario <= ahora)) {
@@ -232,8 +227,7 @@ export class FuncionService {
         }
     }
 
-    private generarFechas(fechaInicio: string, semanas: number): string[] {
-        const cantidadDias = semanas * 7;
+    private generarFechas(fechaInicio: string, cantidadDias: number): string[] {
         const fecha = new Date(`${fechaInicio}T00:00:00Z`);
         return Array.from({ length: cantidadDias }, (_, indice) => {
             const dia = new Date(fecha);

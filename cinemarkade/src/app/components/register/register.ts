@@ -119,7 +119,6 @@ export class Register {
     return '';
   }
 
-  @HostListener('document:keydown.enter')
   async onSubmit(): Promise<void> {
     if (!this.formRegister.valid) {
       this.formRegister.markAllAsTouched();

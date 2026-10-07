@@ -46,6 +46,10 @@ export class UserService {
         return this.userRepository.findByEmail(mail);
     }
 
+    async buscarPorId(id: string): Promise<User | null> {
+        return this.userRepository.findById(id);
+    }
+
     async iniciarSesion(mail: string, password: string): Promise<User> {
         return this.userRepository.signIn(mail, password);
     }

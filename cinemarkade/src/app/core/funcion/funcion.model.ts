@@ -35,7 +35,7 @@ export interface CrearFuncionInput {
     peliculaId: number;
     formatos: FormatoSala[];
     fecha: string;
-    semanas: number;
+    dias: number;
     primerHorario: string;
     horariosSeleccionados: string[];
     idioma: IdiomaFuncion;
