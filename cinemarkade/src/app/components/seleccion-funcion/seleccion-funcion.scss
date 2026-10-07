@@ -75,6 +75,47 @@
   line-height: 1.6;
 }
 
+.age-warning {
+  display: grid;
+  gap: 7px;
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 2px solid #ff334f;
+  background: repeating-linear-gradient(135deg, #4b1018, #4b1018 10px, #310b12 10px, #310b12 20px);
+  color: #fff;
+  box-shadow: 0 0 18px #ff334f66;
+  animation: age-alert-pulse 1.6s ease-in-out infinite alternate;
+}
+
+.age-warning strong {
+  color: #fff;
+  font: 900 1.3rem monospace;
+  letter-spacing: .08em;
+}
+
+.age-warning span {
+  font: 700 .75rem/1.5 monospace;
+}
+
+.age-modal-button {
+  padding: 12px 18px;
+  border: 1px solid #ff334f;
+  background: #8c2020;
+  color: #fff;
+  font: 700 13px monospace;
+  cursor: pointer;
+}
+
+@keyframes age-alert-pulse {
+  from {
+    box-shadow: 0 0 8px #ff334f44;
+  }
+
+  to {
+    box-shadow: 0 0 22px #ff334faa;
+  }
+}
+
 .synopsis {
   color: #e2ded6;
   line-height: 1.7;

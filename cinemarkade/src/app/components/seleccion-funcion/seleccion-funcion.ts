@@ -6,6 +6,8 @@ import { Funcion, Proyeccion } from '../../core/funcion/funcion.model';
 import { FuncionService } from '../../core/funcion/funcion.service';
 import { Pelicula } from '../../core/pelicula/pelicula.model';
 import { PeliculaService } from '../../core/pelicula/pelicula.service';
+import { AuthService } from '../../auth/auth.service';
+import { Modal } from '../modal/modal';
 
 interface OpcionFecha { fecha: string; etiqueta: string; }
 interface OpcionHorario { funcion: Funcion; proyeccion: Proyeccion; }
@@ -13,7 +15,7 @@ interface OpcionHorario { funcion: Funcion; proyeccion: Proyeccion; }
 @Component({
   selector: 'app-seleccion-funcion',
   standalone: true,
-  imports: [CommonModule, Navbar],
+  imports: [CommonModule, Navbar, Modal],
   templateUrl: './seleccion-funcion.html',
   styleUrl: './seleccion-funcion.scss',
 })
@@ -22,6 +24,7 @@ export class SeleccionFuncion implements OnInit {
   private router = inject(Router);
   private peliculaService = inject(PeliculaService);
   private funcionService = inject(FuncionService);
+  private authService = inject(AuthService);
 
   pelicula = signal<Pelicula | null>(null);
   funciones = signal<Funcion[]>([]);
@@ -32,6 +35,10 @@ export class SeleccionFuncion implements OnInit {
   idiomaSeleccionado = signal('');
   horarioSeleccionado = signal<OpcionHorario | null>(null);
   paginaFechas = signal(0);
+  mostrarModalEdad = signal(false);
+  mensajeEdad = signal('');
+
+  esPeliculaMas18 = computed(() => this.edadMinima(this.pelicula()?.restriccion_edad ?? '') >= 18);
 
   fechas = computed<OpcionFecha[]>(() => {
     const fechas = [...new Set(this.funciones()
@@ -118,11 +125,24 @@ export class SeleccionFuncion implements OnInit {
 
   seleccionarHorario(opcion: OpcionHorario): void { this.horarioSeleccionado.set(opcion); }
 
-  continuarCompra(): void {
+  async continuarCompra(): Promise<void> {
     const seleccion = this.horarioSeleccionado();
-    if (!seleccion) return;
+    const pelicula = this.pelicula();
+    if (!seleccion || !pelicula) return;
+
+    const edadMinima = this.edadMinima(pelicula.restriccion_edad);
+    if (edadMinima > 0 && await this.authService.haySesionActiva()) {
+      await this.authService.refrescarUsuarioActual();
+      const fechaNacimiento = this.authService.usuarioActual()?.fecha_nacimiento;
+      if (fechaNacimiento && this.calcularEdad(fechaNacimiento) < edadMinima) {
+        this.mensajeEdad.set(`Tu perfil indica que todavía no tenés ${edadMinima} años. No podés comprar esta entrada.`);
+        this.mostrarModalEdad.set(true);
+        return;
+      }
+    }
+
     sessionStorage.setItem('cinemarkade-proyeccion-seleccionada', JSON.stringify({
-      peliculaId: this.pelicula()?.id,
+      peliculaId: pelicula.id,
       funcionId: seleccion.funcion.id,
       proyeccionId: seleccion.proyeccion.id,
       fecha: seleccion.funcion.fecha,
@@ -132,6 +152,22 @@ export class SeleccionFuncion implements OnInit {
       salaId: seleccion.funcion.sala_id,
     }));
     void this.router.navigate(['/compra']);
+  }
+
+  cerrarModalEdad(): void { this.mostrarModalEdad.set(false); }
+
+  private edadMinima(restriccion: string): number {
+    const coincidencia = restriccion.match(/\+(\d+)/);
+    return coincidencia ? Number(coincidencia[1]) : 0;
+  }
+
+  private calcularEdad(fechaNacimiento: string): number {
+    const nacimiento = new Date(`${fechaNacimiento.slice(0, 10)}T12:00:00Z`);
+    const hoy = new Date(`${this.hoy()}T12:00:00Z`);
+    let edad = hoy.getUTCFullYear() - nacimiento.getUTCFullYear();
+    const diferenciaMes = hoy.getUTCMonth() - nacimiento.getUTCMonth();
+    if (diferenciaMes < 0 || (diferenciaMes === 0 && hoy.getUTCDate() < nacimiento.getUTCDate())) edad--;
+    return edad;
   }
 
   volver(): void { void this.router.navigate(['/']); }

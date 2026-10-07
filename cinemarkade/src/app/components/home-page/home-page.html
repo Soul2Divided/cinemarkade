@@ -94,24 +94,24 @@
                 }
             </div>
 
-            @if (generoSeleccionado(); as genero) {
             <div class="genre-results">
                 <div class="section-header genre-results-header">
-                    <h3 class="section-title">PELÍCULAS DE {{ genero | uppercase }}</h3>
-                    <button type="button" class="clear-genre" (click)="limpiarGeneroSeleccionado()">✕ CERRAR</button>
+                    <h3 class="section-title">{{ generoSeleccionado() ? 'PELÍCULAS DE ' + (generoSeleccionado() | uppercase) : 'PELÍCULAS EN CARTELERA' }}</h3>
+                    @if (generoSeleccionado()) {
+                    <button type="button" class="clear-genre" (click)="limpiarGeneroSeleccionado()">✕ VER TODAS</button>
+                    }
                 </div>
                 <div class="posters-grid">
-                    @for (pelicula of peliculasPorGenero(); track pelicula.id) {
+                    @for (pelicula of peliculasVisibles(); track pelicula.id) {
                     <article class="poster-card" (click)="seleccionarPelicula(pelicula)">
                         <div class="card-media"><img [src]="pelicula.imagen" [alt]="pelicula.nombre" /></div>
                         <h4 class="card-title">{{ pelicula.nombre }}</h4>
                     </article>
                     } @empty {
-                    <p class="genre-empty">NO HAY PELÍCULAS PARA ESTE GÉNERO</p>
+                    <p class="genre-empty">NO HAY PELÍCULAS PARA MOSTRAR</p>
                     }
                 </div>
             </div>
-            }
         </section>
 
         <section class="catalog-section">
@@ -143,7 +143,7 @@
                 <!-- COLUMNA IZQUIERDA: POSTER -->
                 <div class="modal-media">
                     <img [src]="peli.imagen" [alt]="peli.nombre" class="modal-poster" />
-                    <span class="badge-rating">{{ peli.restriccion_edad }}</span>
+                    <span class="badge-rating" [class.age-restricted]="peli.restriccion_edad === '+18'">{{ peli.restriccion_edad }}</span>
                 </div>
 
                 <!-- COLUMNA DERECHA: INFORMACIÓN -->
@@ -156,6 +156,13 @@
                     </div>
 
                     <p class="modal-synopsis">{{ peli.sinopsis }}</p>
+
+                    @if (peli.restriccion_edad === '+18') {
+                    <div class="age-warning-inline" role="alert">
+                        <strong>PELÍCULA +18</strong>
+                        <span>Solo mayores de 18 años. Los menores deben asistir acompañados por un adulto.</span>
+                    </div>
+                    }
 
                     <div class="modal-actions">
                         <button type="button" class="btn-pixel yellow" (click)="irAFunciones(peli.id)">

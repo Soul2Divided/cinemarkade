@@ -63,6 +63,10 @@ export class HomePage implements OnInit {
     return this.peliculas().filter(pelicula => this.normalizarGenero(pelicula.genero) === clave);
   });
 
+  peliculasVisibles = computed(() => this.generoSeleccionado()
+    ? this.peliculasPorGenero()
+    : this.peliculas());
+
   indiceHeroActual: number = 0;
 
   elementosHero = computed<ItemHero[]>(() => {

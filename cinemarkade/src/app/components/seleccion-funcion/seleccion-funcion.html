@@ -14,6 +14,12 @@
       <div class="movie-copy">
         <span class="eyebrow">CARTELERA CINEMARKADE</span>
         <h1>{{ peli.nombre }}</h1>
+        @if (esPeliculaMas18()) {
+        <div class="age-warning" role="alert">
+          <strong>PELÍCULA +18</strong>
+          <span>SOLO MAYORES DE 18 AÑOS. LOS MENORES DEBEN ASISTIR ACOMPAÑADOS POR UN ADULTO.</span>
+        </div>
+        }
         <p class="movie-meta">{{ peli.genero }} · {{ peli.duracion }} MIN · {{ peli.restriccion_edad }}</p>
         <p class="synopsis">{{ peli.sinopsis }}</p>
       </div>
@@ -89,4 +95,12 @@
   </footer>
   }
 </main>
+
+<app-modal [isOpen]="mostrarModalEdad()" title="COMPRA NO PERMITIDA"
+  subtitle="RESTRICCIÓN DE EDAD" variant="red" (close)="cerrarModalEdad()">
+  <p>{{ mensajeEdad() }}</p>
+  <div modal-actions>
+    <button type="button" class="age-modal-button" (click)="cerrarModalEdad()">ENTENDIDO</button>
+  </div>
+</app-modal>
 
