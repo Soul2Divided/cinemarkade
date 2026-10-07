@@ -30,7 +30,7 @@ export class UserService {
             puntos: null,
         };
 
-        return this.userRepository.createUser(usuario);
+        return this.userRepository.createEmployee(usuario);
     }
 
     private validarDatosBasicos(datos: CrearUserCommand): void {

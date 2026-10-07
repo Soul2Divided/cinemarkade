@@ -7,6 +7,42 @@ import { SupabaseService } from '../services/supabase.service';
 export class SupabaseUserAdapter implements UserRepository {
     constructor(private supabaseService: SupabaseService) { }
 
+    async createEmployee(user: CrearUserData): Promise<User> {
+        const supabase = this.supabaseService.supabaseClient;
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw new Error(`No se pudo recuperar la sesión del administrador: ${sessionError.message}`);
+        const sesionAdmin = sessionData.session;
+        let sesionRestaurada = false;
+
+        try {
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: user.mail,
+                password: user.password,
+            });
+            if (authError) throw new Error(`Error al crear usuario en auth: ${authError.message}`);
+            if (!authData.user) throw new Error('No se pudo crear el usuario');
+
+            if (sesionAdmin) {
+                const { error } = await supabase.auth.setSession({
+                    access_token: sesionAdmin.access_token,
+                    refresh_token: sesionAdmin.refresh_token,
+                });
+                if (error) throw new Error(`No se pudo restaurar la sesión del administrador: ${error.message}`);
+                sesionRestaurada = true;
+            }
+
+            return await this.insertarPerfil(authData.user.id, user);
+        } finally {
+            if (sesionAdmin && !sesionRestaurada) {
+                const { error } = await supabase.auth.setSession({
+                    access_token: sesionAdmin.access_token,
+                    refresh_token: sesionAdmin.refresh_token,
+                });
+                if (error) console.error('No se pudo restaurar la sesión del administrador:', error);
+            }
+        }
+    }
+
     async createUser(user: CrearUserData): Promise<User> {
         const supabase = this.supabaseService.supabaseClient;
 
@@ -22,10 +58,14 @@ export class SupabaseUserAdapter implements UserRepository {
             throw new Error('No se pudo crear el usuario');
         }
 
-        const { data: perfil, error: perfilError } = await supabase
+        return this.insertarPerfil(authData.user.id, user);
+    }
+
+    private async insertarPerfil(id: string, user: CrearUserData): Promise<User> {
+        const { data: perfil, error: perfilError } = await this.supabaseService.supabaseClient
             .from('usuario')
             .insert({
-                id: authData.user.id,
+                id,
                 nombre: user.nombre,
                 apellido: user.apellido,
                 mail: user.mail,

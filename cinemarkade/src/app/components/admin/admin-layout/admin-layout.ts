@@ -30,6 +30,9 @@ export class AdminLayout {
     // --- CUPONES ---
     {route: '/admin/cupones', label: 'CUPONES', icon: '🏷️'},
 
+    // --- EMPLEADOS ---
+    { route: '/admin/nuevo-empleado', label: 'DAR DE ALTA EMPLEADO', icon: '👤' },
+
     // --- METRICAS Y FACTURACIÓN ---
     { route: '/admin/reportes', label: 'REPORTES & PDF', icon: '📊' },
     { route: '/admin/estadisticas', label: 'ESTADÍSTICAS & VENTAS', icon: '📈' },

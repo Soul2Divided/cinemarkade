@@ -48,3 +48,20 @@ export interface ConfirmarCompraInput {
         puntos_generados: number;
     }[];
 }
+
+export interface CompraValidadaQr {
+    compra: Compra;
+    pelicula: string;
+    fecha: string;
+    horario: string;
+    sala_id: number;
+    formato: string;
+    idioma: string;
+    butacas: { fila: string; columna: number; tipo: string; precio_unitario: number }[];
+    detalles: {
+        nombre_item: string;
+        cantidad: number;
+        precio_unitario: number;
+        tipo_item: 'producto' | 'combo';
+    }[];
+}

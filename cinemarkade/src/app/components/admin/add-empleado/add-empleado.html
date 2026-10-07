@@ -1,0 +1,106 @@
+<div class="login-container">
+  <form class="form-login" [formGroup]="formRegister" (ngSubmit)="onSubmit()" [class.error-shake]="errorMessage">
+    <div class="form-header">
+      <h2 class="form-login-heading">DAR DE ALTA EMPLEADO</h2>
+      <div class="stage-badge">STAGE {{ pasoActual }} / 2</div>
+    </div>
+
+    @if (errorMessage) {
+      <div class="error-message"><span class="error-icon">⚠️</span> {{ errorMessage }}</div>
+    }
+
+    @if (pasoActual === 1) {
+      <div class="step-content">
+        <span class="step-subtitle">[ PASO 1: DATOS DE CUENTA ]</span>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('nombre')">
+          <label class="form-label">NOMBRE</label>
+          <input type="text" formControlName="nombre" class="form-control" placeholder="NOMBRE">
+          @if (getFieldError('nombre')) { <small class="field-error">{{ getFieldError('nombre') }}</small> }
+        </div>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('apellido')">
+          <label class="form-label">APELLIDO</label>
+          <input type="text" formControlName="apellido" class="form-control" placeholder="APELLIDO">
+          @if (getFieldError('apellido')) { <small class="field-error">{{ getFieldError('apellido') }}</small> }
+        </div>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('mail')">
+          <label class="form-label">EMAIL</label>
+          <input type="email" formControlName="mail" class="form-control" placeholder="ALGUIEN@CINEMARKADE.COM">
+          @if (getFieldError('mail')) { <small class="field-error">{{ getFieldError('mail') }}</small> }
+        </div>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('password')">
+          <label class="form-label">CONTRASEÑA</label>
+          <input type="password" formControlName="password" class="form-control" placeholder="••••••••">
+          @if (getFieldError('password')) { <small class="field-error">{{ getFieldError('password') }}</small> }
+        </div>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('password2')">
+          <label class="form-label">CONFIRMAR CONTRASEÑA</label>
+          <input type="password" formControlName="password2" class="form-control" placeholder="••••••••">
+          @if (getFieldError('password2')) { <small class="field-error">{{ getFieldError('password2') }}</small> }
+        </div>
+
+        <button type="button" class="btn btn-pixel yellow" (click)="siguientePaso()">SIGUIENTE ►</button>
+      </div>
+    }
+
+    @if (pasoActual === 2) {
+      <div class="step-content">
+        <span class="step-subtitle">[ PASO 2: DATOS ADICIONALES ]</span>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('fecha_nacimiento')">
+          <label class="form-label">FECHA DE NACIMIENTO</label>
+          <input type="date" formControlName="fecha_nacimiento" class="form-control">
+          @if (getFieldError('fecha_nacimiento')) { <small class="field-error">{{ getFieldError('fecha_nacimiento') }}</small> }
+        </div>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('tipo_sangre')">
+          <label class="form-label">TIPO DE SANGRE</label>
+          <select formControlName="tipo_sangre" class="form-control">
+            <option value="" disabled selected>SELECCIONAR TIPO</option>
+            <option value="A+">A+</option><option value="A-">A-</option>
+            <option value="B+">B+</option><option value="B-">B-</option>
+            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+            <option value="O+">O+</option><option value="O-">O-</option>
+          </select>
+          @if (getFieldError('tipo_sangre')) { <small class="field-error">{{ getFieldError('tipo_sangre') }}</small> }
+        </div>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('color_ojos')">
+          <label class="form-label">COLOR DE OJOS</label>
+          <div class="color-options-grid">
+            <button type="button" class="color-btn blue" [class.selected]="formRegister.get('color_ojos')?.value === 'Azul/Celeste'" (click)="seleccionarColorOjos('Azul/Celeste')"><span class="color-dot"></span><span class="color-name">AZUL / CELESTE</span></button>
+            <button type="button" class="color-btn brown" [class.selected]="formRegister.get('color_ojos')?.value === 'Marrón'" (click)="seleccionarColorOjos('Marrón')"><span class="color-dot"></span><span class="color-name">MARRÓN</span></button>
+            <button type="button" class="color-btn green" [class.selected]="formRegister.get('color_ojos')?.value === 'Verde'" (click)="seleccionarColorOjos('Verde')"><span class="color-dot"></span><span class="color-name">VERDE</span></button>
+          </div>
+          @if (getFieldError('color_ojos')) { <small class="field-error">{{ getFieldError('color_ojos') }}</small> }
+        </div>
+
+        <div class="form-group" [class.has-error]="isFieldInvalid('cantidad_dias_vacaciones')">
+          <label class="form-label">DÍAS DE VACACIONES POR AÑO</label>
+          <input type="number" formControlName="cantidad_dias_vacaciones" class="form-control" placeholder="14" min="0">
+          @if (getFieldError('cantidad_dias_vacaciones')) { <small class="field-error">{{ getFieldError('cantidad_dias_vacaciones') }}</small> }
+        </div>
+
+        <div class="stage-actions">
+          <button type="button" class="btn-prev-stage" (click)="pasoAnterior()">◄ VOLVER</button>
+          <button class="btn btn-pixel cyan" type="submit" [disabled]="formRegister.invalid || mostrarLoader()">CREAR EMPLEADO</button>
+        </div>
+      </div>
+    }
+
+    <div class="form-login-footer-container">
+      <button type="button" class="btn-back-bottom" (click)="cancelar()">◄ VOLVER AL PANEL ADMIN</button>
+    </div>
+  </form>
+
+  @if (mostrarLoader()) { <app-loader message="CREANDO EMPLEADO..." /> }
+
+  <app-modal [isOpen]="mostrarModal()" title="EMPLEADO CREADO CON ÉXITO" subtitle="CUENTA REGISTRADA CON ROL DE EMPLEADO" variant="cyan" (close)="cerrarModal()">
+    <p>El empleado ya puede iniciar sesión con el email y la contraseña asignados.</p>
+    <div modal-actions><button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">VOLVER AL PANEL</button></div>
+  </app-modal>
+</div>

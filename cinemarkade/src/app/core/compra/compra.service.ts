@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { CompraRepository } from './compra.repository';
-import { Compra, CompraInput, ConfirmarCompraInput, EstadoCompra } from './compra.model';
+import { Compra, CompraInput, CompraValidadaQr, ConfirmarCompraInput, EstadoCompra } from './compra.model';
 
 @Injectable({ providedIn: 'root' })
 export class CompraService {
@@ -60,6 +60,16 @@ export class CompraService {
             throw new Error('Hay una butaca seleccionada que no es válida.');
         }
         return this.compraRepository.confirmarCompra(datos);
+    }
+
+    async validarQr(codigoQr: string): Promise<CompraValidadaQr | null> {
+        this.validarUuid(codigoQr, 'código QR');
+        return this.compraRepository.validarQr(codigoQr);
+    }
+
+    async cancelarCompra(compraId: string): Promise<number> {
+        this.validarUuid(compraId, 'compra');
+        return this.compraRepository.cancelarCompra(compraId);
     }
 
     async cambiarEstado(id: string, estado: EstadoCompra): Promise<void> {

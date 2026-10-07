@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="ticket-facts">
-        <div><small>FECHA</small><strong>{{ compra.proyeccion.fecha | date:'EEEE d MMMM yyyy':'':'es-AR' }}</strong>
+        <div><small>FECHA</small><strong>{{ formatearFecha(compra.proyeccion.fecha) }}</strong>
         </div>
         <div><small>HORARIO</small><strong>{{ compra.proyeccion.horario.slice(0, 5) }}</strong></div>
         <div><small>SALA</small><strong>{{ compra.proyeccion.salaId }}</strong></div>
@@ -111,8 +111,8 @@
     @if (compraAnonima()) {
       <button type="button" class="confirm-button modal-action" (click)="volverAlInicio()">VOLVER AL INICIO</button>
     } @else {
-      <button type="button" class="confirm-button modal-action" (click)="irAMisEntradas()">IR A MIS ENTRADAS</button>
       <button type="button" class="back-button modal-action" (click)="volverAlInicio()">VOLVER</button>
+      <button type="button" class="confirm-button modal-action" (click)="irAMisEntradas()">IR A MIS ENTRADAS</button>
     }
   </div>
 </app-modal>

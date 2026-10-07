@@ -55,7 +55,12 @@ export class Login {
 
   cerrarModal(): void {
     this.mostrarModal.set(false);
-    this.router.navigate([this.rolLogueado === 'admin' ? '/admin' : '/home']);
+    const destino = this.rolLogueado === 'admin'
+      ? '/admin'
+      : this.rolLogueado === 'empleado'
+        ? '/empleado'
+        : '/home';
+    this.router.navigate([destino]);
   }
 
   triggerError(msg: string): void {

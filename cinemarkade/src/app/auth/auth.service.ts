@@ -48,6 +48,16 @@ export class AuthService {
         return !!data.session;
     }
 
+    async obtenerIdUsuarioSesion(): Promise<string | null> {
+        const { data, error } = await this._supabaseClient.auth.getSession();
+        if (error) throw error;
+        return data.session?.user.id ?? null;
+    }
+
+    async refrescarUsuarioActual(): Promise<void> {
+        await this.cargarUsuarioDeSesion();
+    }
+
     private async cargarUsuarioDeSesion(): Promise<void> {
         try {
             const { data, error } = await this._supabaseClient.auth.getSession();

@@ -1,0 +1,86 @@
+<app-navbar></app-navbar>
+
+<main class="entries-page">
+  <header class="entries-heading">
+    <span class="eyebrow">CINEMARKADE · TU CUENTA</span>
+    <h1>MIS ENTRADAS</h1>
+    <p>Entradas confirmadas para funciones que todavía no comenzaron.</p>
+  </header>
+
+  @if (cargando()) {
+  <app-loader message="BUSCANDO TUS ENTRADAS..." />
+  } @else if (error()) {
+  <section class="entries-state error-state">
+    <p>{{ error() }}</p>
+  </section>
+  } @else if (entradas().length === 0) {
+  <section class="entries-state">
+    <span class="empty-icon">🎟️</span>
+    <h2>NO TENÉS ENTRADAS PENDIENTES</h2>
+    <p>Cuando compres una entrada para una función futura, aparecerá acá.</p>
+    <button type="button" class="action-button" (click)="volverAlPerfil()">VOLVER AL PERFIL</button>
+  </section>
+  } @else {
+  <section class="entries-list">
+    @for (entrada of entradas(); track entrada.compra.id) {
+    <article class="entry-card">
+      <div class="entry-info">
+        <span class="entry-label">ENTRADA PENDIENTE</span>
+        <h2>{{ entrada.pelicula }}</h2>
+        <p>{{ formatearFecha(entrada.fecha) }} · {{ entrada.horario.slice(0, 5) }}</p>
+        <p>SALA {{ entrada.salaId }} · {{ entrada.formato }} · {{ entrada.idioma }}</p>
+        <span class="entry-total">{{ entrada.compra.total | currency:'ARS':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="entry-actions">
+        <button type="button" class="action-button qr-button" (click)="mostrarQr(entrada)">▦ VER QR</button>
+        <button type="button" class="action-button ticket-button" [disabled]="cargandoPdfId() === entrada.compra.id"
+          (click)="descargarTicket(entrada)">
+          {{ cargandoPdfId() === entrada.compra.id ? 'PREPARANDO...' : 'TICKET PDF' }}
+        </button>
+        @if (puedeCancelar(entrada)) {
+        <button type="button" class="action-button cancel-purchase-button"
+          (click)="abrirCancelacion(entrada)">CANCELAR COMPRA</button>
+        }
+      </div>
+    </article>
+    }
+  </section>
+  }
+
+  @if (errorPdf()) { <p class="ticket-error">{{ errorPdf() }}</p> }
+</main>
+
+<app-modal [isOpen]="qrVisible()" title="CÓDIGO QR DE ENTRADA" subtitle="PRESENTALO AL EMPLEADO PARA VALIDAR TU COMPRA"
+  variant="cyan" (close)="cerrarQr()">
+  @if (qrImagen()) {
+  <div class="qr-panel"><img [src]="qrImagen()" alt="Código QR de la compra" /></div>
+  }
+  <div modal-actions>
+    <button type="button" class="action-button ticket-button" (click)="cerrarQr()">CERRAR</button>
+  </div>
+</app-modal>
+
+<app-modal [isOpen]="cancelacionSeleccionada() !== null"
+  [title]="puntosReintegrados() === null ? 'CONFIRMAR CANCELACIÓN' : 'COMPRA CANCELADA'"
+  [subtitle]="puntosReintegrados() === null ? 'ESTA ACCIÓN NO SE PUEDE DESHACER' : 'LAS BUTACAS FUERON LIBERADAS'"
+  variant="red" [closeOnBackdrop]="!cancelandoId()" (close)="cerrarCancelacion()">
+  @if (puntosReintegrados() === null) {
+  <p>¿Querés cancelar la compra de <strong>{{ cancelacionSeleccionada()?.pelicula }}</strong>?</p>
+  <p>Se liberarán las butacas y se reintegrarán los puntos correspondientes. La cancelación está permitida hasta dos horas antes de la función.</p>
+  } @else {
+  <p>La compra se canceló correctamente y sus butacas ya están disponibles.</p>
+  <p>Se reintegraron <strong>{{ puntosReintegrados() | number }} puntos</strong>.</p>
+  }
+  <div modal-actions>
+    @if (puntosReintegrados() === null) {
+    <button type="button" class="action-button qr-button" [disabled]="!!cancelandoId()"
+      (click)="cerrarCancelacion()">VOLVER</button>
+    <button type="button" class="action-button cancel-purchase-button" [disabled]="!!cancelandoId()"
+      (click)="confirmarCancelacion()">
+      {{ cancelandoId() ? 'CANCELANDO...' : 'CONFIRMAR CANCELACIÓN' }}
+    </button>
+    } @else {
+    <button type="button" class="action-button ticket-button" (click)="cerrarCancelacion()">CERRAR</button>
+    }
+  </div>
+</app-modal>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Compra, CompraInput, ConfirmarCompraInput, EstadoCompra } from './compra.model';
+import { Compra, CompraInput, CompraValidadaQr, ConfirmarCompraInput, EstadoCompra } from './compra.model';
 import { CompraRepository } from './compra.repository';
 import { SupabaseService } from '../services/supabase.service';
 
@@ -67,6 +67,26 @@ export class SupabaseCompraAdapter implements CompraRepository {
             throw new Error('Supabase no devolvió el identificador de la compra confirmada.');
         }
         return data;
+    }
+
+    async validarQr(codigoQr: string): Promise<CompraValidadaQr | null> {
+        const { data, error } = await this.supabaseService.supabaseClient
+            .rpc('validar_qr_compra', { p_codigo_qr: codigoQr });
+
+        if (error) throw new Error(`No se pudo validar la entrada: ${error.message}`);
+        return data as CompraValidadaQr | null;
+    }
+
+    async cancelarCompra(compraId: string): Promise<number> {
+        const { data, error } = await this.supabaseService.supabaseClient
+            .rpc('cancelar_compra', { p_compra_id: compraId });
+
+        if (error) throw new Error(`No se pudo cancelar la compra: ${error.message}`);
+        const puntosReintegrados = Number(data);
+        if (!Number.isInteger(puntosReintegrados) || puntosReintegrados < 0) {
+            throw new Error('Supabase no devolvió una cantidad válida de puntos reintegrados.');
+        }
+        return puntosReintegrados;
     }
 
     async cambiarEstado(id: string, estado: EstadoCompra): Promise<void> {

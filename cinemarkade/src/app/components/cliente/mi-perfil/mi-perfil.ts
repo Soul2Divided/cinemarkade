@@ -28,7 +28,7 @@ export class MiPerfil implements OnInit {
     this.router.navigate(['/historial-funciones']);
   }
 
-  irACanjearPuntos(): void {
-    this.router.navigate(['/canjear-puntos']);
+  irAMisEntradas(): void {
+    this.router.navigate(['/mis-entradas']);
   }
 }

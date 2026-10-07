@@ -33,8 +33,8 @@
                     </li>
 
                     <li>
-                        <a routerLink="/mis-puntos" (click)="cerrarMenu()" class="dropdown-item">
-                            <span class="item-icon">🪙</span> MIS PUNTOS
+                        <a routerLink="/mis-entradas" (click)="cerrarMenu()" class="dropdown-item">
+                            <span class="item-icon">🎟️</span> MIS ENTRADAS
                         </a>
                     </li>
                     }
@@ -43,6 +43,14 @@
                         <li>
                         <a routerLink="/admin" (click)="cerrarMenu()" class="dropdown-item">
                             <span class="item-icon">►</span> PANEL ADMIN
+                        </a>
+                    </li>
+                    }
+
+                    @if (usuario.rol === 'empleado') {
+                    <li>
+                        <a routerLink="/empleado" (click)="cerrarMenu()" class="dropdown-item">
+                            <span class="item-icon">▦</span> ESCANEAR ENTRADA
                         </a>
                     </li>
                     }

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './guards/admin-guard';
 import { authGuard } from './guards/auth-guard';
+import { employeeGuard } from './guards/employee-guard';
 import path from 'path';
 
 export const routes: Routes = [
@@ -120,6 +121,10 @@ export const routes: Routes = [
             {
                 path: 'editar-cupon/:id',
                 loadComponent: () => import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon)
+            },
+            {
+                path: 'nuevo-empleado',
+                loadComponent: () => import('./components/admin/add-empleado/add-empleado').then((m) => m.AddEmpleado)
             }
         ],
     },
@@ -127,6 +132,16 @@ export const routes: Routes = [
         path: 'perfil',
         canActivate: [authGuard],
         loadComponent: () => import('./components/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
+    },
+    {
+        path: 'mis-entradas',
+        canActivate: [authGuard],
+        loadComponent: () => import('./components/cliente/mis-entradas/mis-entradas').then((m) => m.MisEntradas),
+    },
+    {
+        path: 'empleado',
+        canActivate: [employeeGuard],
+        loadComponent: () => import('./components/empleado/escanear-entrada/escanear-entrada').then((m) => m.EscanearEntrada),
     },
     {
         path: '**',

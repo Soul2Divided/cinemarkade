@@ -1,0 +1,55 @@
+<app-navbar></app-navbar>
+
+<main class="employee-page">
+  <section class="employee-panel">
+    <span class="eyebrow">CONTROL DE ACCESO</span>
+    <h1>VALIDAR ENTRADA</h1>
+
+    @if (validando()) {
+    <app-loader message="VALIDANDO ENTRADA..." />
+    } @else if (entrada(); as ticket) {
+    <div class="validation-result valid">
+      <span class="result-icon">✓</span>
+      <h2>ENTRADA VALIDADA</h2>
+      <h3>{{ ticket.pelicula }}</h3>
+      <p>{{ formatearFecha(ticket.fecha) }} · {{ ticket.horario.slice(0, 5) }}</p>
+      <p>SALA {{ ticket.sala_id }} · {{ ticket.formato }} · {{ ticket.idioma }}</p>
+
+      <div class="verification-section">
+        <h4>BUTACAS</h4>
+        @for (butaca of ticket.butacas; track $index) {
+        <div class="verification-line"><span>{{ butaca.fila }}{{ butaca.columna }} · {{ butaca.tipo }}</span><strong>{{
+            butaca.precio_unitario | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+        }
+      </div>
+
+      <div class="verification-section">
+        <h4>CANDY BAR</h4>
+        @if (ticket.detalles.length) {
+        @for (detalle of ticket.detalles; track $index) {
+        <div class="verification-line"><span>{{ detalle.cantidad }} × {{ detalle.nombre_item }}</span><strong>{{
+            detalle.precio_unitario * detalle.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+        }
+        } @else {
+        <p>Sin productos ni combos.</p>
+        }
+      </div>
+
+      <div class="verification-total"><span>TOTAL</span><strong>{{ ticket.compra.total | currency:'ARS':'symbol':'1.0-0'
+          }}</strong></div>
+      <p class="consumed-note">Este QR ya fue utilizado y no puede volver a validarse.</p>
+      <button type="button" class="scan-button" (click)="nuevaLectura()">ESCANEAR OTRA ENTRADA</button>
+    </div>
+    } @else if (escaneando()) {
+    <div class="camera-panel">
+      <video #preview autoplay playsinline></video>
+      <p>Enfocá el código QR dentro del recuadro.</p>
+      <button type="button" class="cancel-button" (click)="nuevaLectura()">CANCELAR ESCANEO</button>
+    </div>
+    } @else {
+    <p class="instructions">Escaneá el QR del ticket para consultar la compra y validar el acceso.</p>
+    @if (error()) { <p class="scan-error">{{ error() }}</p> }
+    <button type="button" class="scan-button" (click)="iniciarEscaneo()"><span>▦</span> ESCANEAR ENTRADA</button>
+    }
+  </section>
+</main>

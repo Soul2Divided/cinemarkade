@@ -28,6 +28,8 @@ import { ButacaRepository } from './core/butaca/butaca.repository';
 import { SupabaseButacaAdapter } from './core/butaca/supabase-butaca.adapter';
 import { ButacaProyeccionRepository } from './core/butaca-proyeccion/butaca-proyeccion.repository';
 import { SupabaseButacaProyeccionAdapter } from './core/butaca-proyeccion/supabase-butaca-proyeccion.adapter';
+import { CompraButacaRepository } from './core/compra-butaca/compra-butaca.repository';
+import { SupabaseCompraButacaAdapter } from './core/compra-butaca/supabase-compra-butaca.adapter';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
@@ -51,6 +53,7 @@ export const appConfig: ApplicationConfig = {
     { provide: DetalleCompraRepository, useClass: SupabaseDetalleCompraAdapter},
     { provide: TarifaFormatoRepository, useClass: SupabaseTarifaFormatoAdapter},
     { provide: ButacaRepository, useClass: SupabaseButacaAdapter},
-    { provide: ButacaProyeccionRepository, useClass: SupabaseButacaProyeccionAdapter}
+    { provide: ButacaProyeccionRepository, useClass: SupabaseButacaProyeccionAdapter},
+    { provide: CompraButacaRepository, useClass: SupabaseCompraButacaAdapter}
   ]
 };

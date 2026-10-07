@@ -1,0 +1,214 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+@use '../../../../styles/mixins/pixel-art' as mixins;
+
+:host {
+  @extend %pixel-text-rendering;
+  display: block;
+  min-height: 100vh;
+  color: theme.$arcade-text-white;
+}
+
+.employee-page {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-height: calc(100vh - 70px);
+  padding: 2rem 1rem 4rem;
+}
+
+.employee-panel {
+  box-sizing: border-box;
+  width: min(100%, 700px);
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: #101014;
+  border: 1px solid #46464e;
+  border-top: 4px solid theme.$arcade-yellow;
+  box-shadow: 8px 8px 0 #000;
+  text-align: center;
+}
+
+.eyebrow {
+  color: theme.$arcade-cyan;
+  font: .75rem theme.$font-pixel;
+  letter-spacing: .12em;
+}
+
+h1 {
+  margin: 1rem 0;
+  color: theme.$arcade-yellow;
+  font: clamp(1.3rem, 4vw, 2rem) theme.$font-pixel;
+  line-height: 1.5;
+}
+
+.instructions {
+  max-width: 470px;
+  margin: 0 auto 2rem;
+  color: #aaa;
+  line-height: 1.7;
+}
+
+.scan-button,
+.cancel-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: .75rem;
+  min-height: 64px;
+  padding: 1rem 2rem;
+  color: #000;
+  background: theme.$arcade-yellow;
+  border: 2px solid theme.$arcade-yellow;
+  font: .85rem theme.$font-pixel;
+  cursor: pointer;
+}
+
+.scan-button:hover {
+  color: theme.$arcade-yellow;
+  background: transparent;
+}
+
+.scan-button span {
+  font-size: 1.4rem;
+}
+
+.cancel-button {
+  min-height: auto;
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  color: #bbb;
+  background: transparent;
+  border-color: #555;
+  font-size: .65rem;
+}
+
+.cancel-button:hover {
+  color: theme.$arcade-cyan;
+  border-color: theme.$arcade-cyan;
+}
+
+.scan-error {
+  margin: 0 auto 1.5rem;
+  padding: 1rem;
+  color: #ff8585;
+  border: 1px dashed #a33;
+  line-height: 1.6;
+}
+
+.camera-panel {
+  display: grid;
+  justify-items: center;
+  gap: .75rem;
+}
+
+.camera-panel video {
+  width: min(100%, 480px);
+  max-height: 60vh;
+  background: #000;
+  border: 2px solid theme.$arcade-cyan;
+  object-fit: cover;
+}
+
+.camera-panel p {
+  color: #aaa;
+}
+
+.validation-result {
+  text-align: left;
+}
+
+.result-icon {
+  display: block;
+  color: #36e38a;
+  font-size: 3rem;
+  text-align: center;
+}
+
+.validation-result h2 {
+  margin: .5rem 0 1.5rem;
+  color: #36e38a;
+  font: 1rem theme.$font-pixel;
+  text-align: center;
+}
+
+.validation-result h3 {
+  margin: 0 0 .75rem;
+  color: #fff;
+  font: 1.1rem theme.$font-pixel;
+  line-height: 1.5;
+}
+
+.validation-result>p {
+  color: #bbb;
+  line-height: 1.6;
+}
+
+.verification-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #444;
+}
+
+.verification-section h4 {
+  color: theme.$arcade-cyan;
+  font: .72rem theme.$font-pixel;
+}
+
+.verification-section p {
+  color: #999;
+}
+
+.verification-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .5rem 0;
+  color: #ddd;
+  line-height: 1.5;
+}
+
+.verification-line strong {
+  color: #fff;
+  white-space: nowrap;
+}
+
+.verification-total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  color: theme.$arcade-yellow;
+  border-top: 2px solid theme.$arcade-yellow;
+  font: .8rem theme.$font-pixel;
+}
+
+.verification-total strong {
+  font-size: 1.1rem;
+}
+
+.consumed-note {
+  color: #36e38a !important;
+  font-size: .9rem;
+  text-align: center;
+}
+
+.validation-result .scan-button {
+  display: flex;
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 520px) {
+  .employee-panel {
+    padding: 1.2rem;
+  }
+
+  .scan-button {
+    width: 100%;
+    padding-inline: .75rem;
+    font-size: .68rem;
+  }
+
+  .verification-line {
+    font-size: .85rem;
+  }
+}

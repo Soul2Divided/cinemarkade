@@ -138,6 +138,15 @@ export class ConfirmacionCompra implements OnInit {
     return borrador?.entradas?.[0]?.precio_unitario ?? 0;
   }
 
+  formatearFecha(fecha: string): string {
+    const [anio, mes, dia] = fecha.slice(0, 10).split('-').map(Number);
+    if (!anio || !mes || !dia) return fecha;
+
+    return new Date(anio, mes - 1, dia, 12).toLocaleDateString('es-AR', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    });
+  }
+
   async confirmarCompra(): Promise<void> {
     const borrador = this.borrador();
     if (!borrador || this.confirmando() || this.compraId()) return;
@@ -223,9 +232,7 @@ export class ConfirmacionCompra implements OnInit {
           compraId: id,
           qrDataUrl,
           pelicula: this.nombrePelicula(),
-          fecha: new Date(borrador.proyeccion.fecha).toLocaleDateString('es-AR', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-          }),
+          fecha: this.formatearFecha(borrador.proyeccion.fecha),
           horario: borrador.proyeccion.horario.slice(0, 5),
           sala: borrador.proyeccion.salaId,
           formato: borrador.proyeccion.formato,
@@ -280,7 +287,7 @@ export class ConfirmacionCompra implements OnInit {
 
   irAMisEntradas(): void {
     this.mostrarModalExito.set(false);
-    void this.router.navigate(['/perfil']);
+    void this.router.navigate(['/mis-entradas']);
   }
 
   volverAlInicio(): void {
