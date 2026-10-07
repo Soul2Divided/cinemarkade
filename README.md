@@ -31,7 +31,7 @@ Se diseñó un desacoplamiento en 4 capas para cada entidad del sistema:
 | **Service** | Capa de validación previa y reglas de negocio. | Evita mezclar la validación de dominio con la persistencia directa. |
 | **Adapter** | Implementación concreta del repositorio para Supabase. | Aísla la sintaxis y cliente de base de datos del resto del código. |
 
-* **Trade-off:** Aunque incrementa la cantidad de archivos iniciales (*boilerplate*), otorga alta mantenibilidad y capacidad de prueba (*testability*).
+* **Trade-off:** Aunque incrementa la cantidad de archivos iniciales, otorga alta mantenibilidad y capacidad de prueba.
 
 ---
 
