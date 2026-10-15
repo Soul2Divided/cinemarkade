@@ -15,10 +15,7 @@ export interface Compra {
     puntos_generados: number;
 }
 
-export type CompraInput = Omit<
-    Compra,
-    'id' | 'fecha_compra' | 'codigo_qr' | 'url_pdf'
-> & {
+export type CompraInput = Omit<Compra, 'id' | 'fecha_compra' | 'codigo_qr' | 'url_pdf'> & {
     id?: string;
     fecha_compra?: string | null;
     codigo_qr?: string | null;
@@ -26,11 +23,15 @@ export type CompraInput = Omit<
 };
 
 export interface ConfirmarCompraInput {
+    solicitud_id: string;
+    cupon_codigo: string | null;
+    recompensas: { recompensa_id: number; cantidad: number; costo_puntos: number; version?: number }[];
     proyeccion_id: number;
     total: number;
     creditos_usados: number;
     puntos_generados: number;
     butacas: {
+        recompensa_id?: number;
         butaca_proyeccion_id: number;
         medio_pago: MedioPagoCompra;
         precio_unitario: number;

@@ -51,6 +51,20 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
         children: [
             {
+                path: 'puntos',
+                loadComponent: () => import('./components/admin/recompensas/recompensas').then(m => m.Recompensas)
+            },
+            {
+                path: 'nueva-recompensa',
+                data: { formulario: true },
+                loadComponent: () => import('./components/admin/recompensas/recompensas').then(m => m.Recompensas)
+            },
+            {
+                path: 'editar-recompensa/:id',
+                data: { formulario: true },
+                loadComponent: () => import('./components/admin/recompensas/recompensas').then(m => m.Recompensas)
+            },
+            {
                 path: 'peliculas',
                 loadComponent: () => import('./components/admin/abm-pelicula/abm-pelicula').then((m) => m.AbmPelicula),
             },
@@ -137,6 +151,11 @@ export const routes: Routes = [
         path: 'mis-entradas',
         canActivate: [authGuard],
         loadComponent: () => import('./components/cliente/mis-entradas/mis-entradas').then((m) => m.MisEntradas),
+    },
+    {
+        path: 'historial-canjes',
+        canActivate: [authGuard],
+        loadComponent: () => import('./components/cliente/historial-canjes/historial-canjes').then(m => m.HistorialCanjes)
     },
     {
         path: 'empleado',

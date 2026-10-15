@@ -1,0 +1,39 @@
+:host {
+    color: #eee;
+}
+
+.history {
+    max-width: 900px;
+    margin: auto;
+    padding: 2rem;
+}
+
+h1,
+h2,
+a {
+    color: #fc0;
+}
+
+h1 {
+    font-size: 1.4rem;
+    line-height: 1.8;
+}
+
+h2 {
+    font-size: 1rem;
+}
+
+article {
+    border: 2px solid #fc0;
+    background: #111;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+p {
+    line-height: 1.7;
+}
+
+small {
+    overflow-wrap: anywhere;
+}

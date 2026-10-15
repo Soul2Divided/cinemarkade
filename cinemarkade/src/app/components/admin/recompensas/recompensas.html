@@ -1,0 +1,265 @@
+@if (formulario) {
+<div class="combo-page-container">
+
+    @if (cargando()) {
+    <div class="loading-state">
+        <span class="loading-text">CARGANDO RECOMPENSA...</span>
+    </div>
+    } @else {
+    <form #form="ngForm" class="combo-card-panel" (ngSubmit)="guardar()">
+
+        <aside class="floating-combo-panel">
+            <div class="image-panel">
+                <div class="preview-card">
+
+                    <span class="card-tag">RECOMPENSA POR PUNTOS</span>
+
+                    <div class="media-dropzone reward-preview">
+                        @if (imagen(datos); as imagenRecompensa) {
+                        <img [src]="imagenRecompensa" [alt]="datos.nombre || 'Vista previa de la recompensa'"
+                            class="media-img">
+                        } @else {
+                        <div class="dropzone-placeholder">
+                            <span class="icon">{{ datos.tipo === 'entrada' ? '🎟️' : '🍿' }}</span>
+                            <span class="label">{{ datos.nombre || 'NUEVA RECOMPENSA' }}</span>
+                            <span class="sub">{{ etiquetaTipo(datos) }}</span>
+                        </div>
+                        }
+
+                        <div class="corner top-l"></div>
+                        <div class="corner top-r"></div>
+                        <div class="corner bot-l"></div>
+                        <div class="corner bot-r"></div>
+                    </div>
+
+                    <div class="price-summary">
+                        <span>COSTO DE LA RECOMPENSA</span>
+                        <strong class="final-price">{{ datos.costo_puntos | number }} PTS</strong>
+                    </div>
+
+                </div>
+            </div>
+        </aside>
+
+        <section class="combo-details-panel">
+
+            <header class="panel-header">
+                <h2 class="panel-title">{{ id ? 'EDITAR RECOMPENSA' : 'NUEVA RECOMPENSA' }}</h2>
+                <span class="status-badge">CANJE POR PUNTOS</span>
+            </header>
+
+            <div class="form-grid">
+
+                <div class="form-group full-width">
+                    <label class="form-label" for="recompensa-nombre">NOMBRE DE LA RECOMPENSA</label>
+                    <input id="recompensa-nombre" name="nombre" class="form-control" type="text"
+                        [(ngModel)]="datos.nombre" required maxlength="100" placeholder="EJ: DOS ENTRADAS 3D">
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label" for="recompensa-tipo">TIPO DE RECOMPENSA</label>
+                    <select id="recompensa-tipo" name="tipo" class="form-control" [(ngModel)]="datos.tipo">
+                        <option value="entrada">ENTRADAS</option>
+                        <option value="producto">PRODUCTO CANDY</option>
+                        <option value="combo">COMBO CANDY</option>
+                    </select>
+                </div>
+
+                @if (datos.tipo === 'entrada') {
+                <div class="form-group full-width">
+                    <label class="form-label" for="recompensa-formato">FORMATO DE LAS ENTRADAS</label>
+                    <select id="recompensa-formato" name="formato" class="form-control"
+                        [(ngModel)]="datos.formato" required>
+                        @for (formato of formatos; track formato) {
+                        <option [ngValue]="formato">{{ formato }}</option>
+                        }
+                    </select>
+                    <small class="image-hint">
+                        El canje cubre la entrada general. Las butacas VIP conservan su recargo en dinero.
+                    </small>
+                </div>
+                } @else if (datos.tipo === 'producto') {
+                <div class="form-group full-width">
+                    <label class="form-label" for="recompensa-producto">PRODUCTO INCLUIDO</label>
+                    <select id="recompensa-producto" name="producto" class="form-control"
+                        [(ngModel)]="datos.producto_id" required>
+                        <option [ngValue]="null">SELECCIONÁ UN PRODUCTO</option>
+
+                        @for (producto of productos(); track producto.id) {
+                        <option [ngValue]="producto.id" [disabled]="!producto.activa">
+                            {{ producto.nombre | uppercase }}{{ !producto.activa ? ' (INACTIVO)' : '' }}
+                        </option>
+                        }
+                    </select>
+                </div>
+                } @else {
+                <div class="form-group full-width">
+                    <label class="form-label" for="recompensa-combo">COMBO INCLUIDO</label>
+                    <select id="recompensa-combo" name="combo" class="form-control"
+                        [(ngModel)]="datos.combo_id" required>
+                        <option [ngValue]="null">SELECCIONÁ UN COMBO</option>
+
+                        @for (combo of combos(); track combo.id) {
+                        <option [ngValue]="combo.id" [disabled]="!combo.activo">
+                            {{ combo.nombre | uppercase }}{{ !combo.activo ? ' (INACTIVO)' : '' }}
+                        </option>
+                        }
+                    </select>
+                </div>
+                }
+
+                <div class="form-group">
+                    <label class="form-label" for="recompensa-cantidad">CANTIDAD INCLUIDA</label>
+                    <input id="recompensa-cantidad" name="cantidad" class="form-control" type="number"
+                        [(ngModel)]="datos.cantidad" required min="1" [max]="datos.tipo === 'entrada' ? 8 : 10"
+                        step="1">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="recompensa-puntos">COSTO TOTAL EN PUNTOS</label>
+                    <input id="recompensa-puntos" name="puntos" class="form-control" type="number"
+                        [(ngModel)]="datos.costo_puntos" required min="1" step="1">
+                </div>
+
+                <label class="featured-control full-width" [class.is-featured]="datos.activa">
+                    <input name="activa" type="checkbox" [(ngModel)]="datos.activa">
+                    <span class="featured-copy">
+                        <strong>RECOMPENSA ACTIVA</strong>
+                        <small>Los clientes podrán seleccionarla durante la compra.</small>
+                    </span>
+                    <span class="featured-star">🪙</span>
+                </label>
+
+                <small class="image-hint full-width">
+                    Los cambios se aplican a nuevos canjes. El historial conserva el contenido y costo originales.
+                </small>
+
+            </div>
+
+            @if (error()) {
+            <div class="error-banner" role="alert">⚠️ {{ error() }}</div>
+            }
+
+            <div class="panel-actions">
+                <a class="btn-pixel-outline reward-link" routerLink="/admin/puntos">◄ CANCELAR</a>
+
+                <button type="submit" class="btn btn-pixel cyan" [disabled]="form.invalid || guardando()">
+                    {{ guardando() ? 'GUARDANDO...' : id ? 'GUARDAR CAMBIOS' : 'CREAR RECOMPENSA' }}
+                </button>
+            </div>
+
+        </section>
+
+    </form>
+    }
+
+</div>
+} @else {
+<div class="abm-combos-container">
+
+    <div class="abm-header">
+        <div class="header-title-group">
+            <h2 class="section-title">RECOMPENSAS POR PUNTOS</h2>
+            <span class="total-badge">TOTAL: {{ recompensas().length }}</span>
+        </div>
+
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input #busqueda type="text" class="form-control" placeholder="BUSCAR RECOMPENSA..."
+                (input)="filtro.set(busqueda.value)">
+        </div>
+    </div>
+
+    @if (error()) {
+    <div class="error-banner" role="alert">⚠️ {{ error() }}</div>
+    }
+
+    @if (!cargando()) {
+    <div class="combos-grid">
+        @for (recompensa of filtradas(); track recompensa.id) {
+        <article class="combo-card" [class.is-inactive]="!recompensa.activa">
+
+            <div class="combo-image-wrap">
+                @if (imagen(recompensa); as imagenRecompensa) {
+                <img [src]="imagenRecompensa" [alt]="recompensa.nombre" class="combo-image">
+                } @else {
+                <span class="image-placeholder">{{ recompensa.tipo === 'entrada' ? '🎟️' : '🍿' }}</span>
+                }
+            </div>
+
+            <div class="card-topline">
+                <span class="offer-badge">{{ etiquetaTipo(recompensa) }}</span>
+
+                @if (!recompensa.activa) {
+                <span class="inactive-badge">INACTIVA</span>
+                }
+            </div>
+
+            <div class="card-details">
+                <h3 class="combo-title">{{ recompensa.nombre | uppercase }}</h3>
+
+                <div class="included-products">
+                    <span class="list-label">INCLUYE</span>
+                    <div class="included-item">
+                        <span>{{ contenido(recompensa) }}</span>
+                    </div>
+                </div>
+
+                <div class="price-block">
+                    <div class="combo-price">
+                        <span>COSTO DEL CANJE</span>
+                        <strong>{{ recompensa.costo_puntos | number }} PTS</strong>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <a class="btn-action edit reward-link" [routerLink]="['/admin/editar-recompensa', recompensa.id]">
+                        ✏️ MODIFICAR
+                    </a>
+
+                    <button type="button" class="btn-action" [class.delete]="recompensa.activa"
+                        [class.activate]="!recompensa.activa" [disabled]="guardando()"
+                        (click)="pendiente.set(recompensa)">
+                        {{ recompensa.activa ? '✖ DAR DE BAJA' : '✔ DAR DE ALTA' }}
+                    </button>
+                </div>
+            </div>
+
+        </article>
+        } @empty {
+        <div class="empty-state">
+            <span class="empty-icon">🪙</span>
+            <p class="empty-text">[ NO SE ENCONTRARON RECOMPENSAS ]</p>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="loading-state">
+        <span class="loading-text">CARGANDO RECOMPENSAS...</span>
+    </div>
+    }
+
+    <a class="fab-add-combo reward-link" routerLink="/admin/nueva-recompensa" title="Crear recompensa nueva">
+        <span class="fab-icon">+</span>
+        <span class="fab-label">NUEVA RECOMPENSA</span>
+    </a>
+
+    <app-modal [isOpen]="!!pendiente()" title="CONFIRMAR CAMBIO DE ESTADO" variant="red"
+        (close)="!guardando() && pendiente.set(null)">
+
+        <p>¿Confirmás el cambio de estado?</p>
+
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" [disabled]="guardando()" (click)="pendiente.set(null)">
+                CANCELAR
+            </button>
+
+            <button type="button" class="btn btn-pixel red" [disabled]="guardando()" (click)="confirmarEstado()">
+                CONFIRMAR
+            </button>
+        </div>
+
+    </app-modal>
+
+</div>
+}

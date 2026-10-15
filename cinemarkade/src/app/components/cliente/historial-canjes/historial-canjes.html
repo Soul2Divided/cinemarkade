@@ -1,0 +1,36 @@
+<app-navbar></app-navbar>
+
+<main class="history">
+
+    <a routerLink="/perfil">← VOLVER AL PERFIL</a>
+    <h1>HISTORIAL DE CANJES</h1>
+
+    @if (cargando()) {
+    <p role="status">CARGANDO CANJES...</p>
+    }
+
+    @if (error()) {
+    <p role="alert">{{ error() }}</p>
+    }
+
+    @for (c of canjes(); track c.id) {
+    <article>
+
+        <h2>{{ c.nombre }}</h2>
+        <p>{{ c.unidades }} unidades · {{ c.puntos_utilizados | number }} PTS</p>
+
+        <p>
+            {{ c.fecha | date:'dd/MM/yyyy HH:mm':'-0300' }} ·
+            {{ c.reintegrado ? 'CANCELADO · PUNTOS DEVUELTOS' : 'CANJE CONFIRMADO' }}
+        </p>
+
+        <small>Compra: {{ c.compra_id }}</small>
+
+    </article>
+    }
+
+    @if (!cargando() && !error() && !canjes().length) {
+    <p>Todavía no realizaste canjes.</p>
+    }
+
+</main>

@@ -66,10 +66,10 @@
   variant="red" [closeOnBackdrop]="!cancelandoId()" (close)="cerrarCancelacion()">
   @if (puntosReintegrados() === null) {
   <p>¿Querés cancelar la compra de <strong>{{ cancelacionSeleccionada()?.pelicula }}</strong>?</p>
-  <p>Se liberarán las butacas y se reintegrarán los puntos correspondientes. La cancelación está permitida hasta dos horas antes de la función.</p>
+  <p>Se liberarán las butacas. El importe pagado se devolverá en puntos ($1 = 1 punto), se devolverán los puntos utilizados y se descontarán los puntos generados por esta compra. Podés cancelar hasta dos horas antes de la función.</p>
   } @else {
   <p>La compra se canceló correctamente y sus butacas ya están disponibles.</p>
-  <p>Se reintegraron <strong>{{ puntosReintegrados() | number }} puntos</strong>.</p>
+  <p>Se reintegraron <strong>{{ puntosReintegrados() | number }} puntos</strong> y se descontaron los puntos que había generado la compra. Podés consultar el saldo actualizado en tu perfil.</p>
   }
   <div modal-actions>
     @if (puntosReintegrados() === null) {

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Navbar } from '../../navbar/navbar';
 import { AuthService } from '../../../auth/auth.service';
 
 @Component({
-  imports: [Navbar],
+  imports: [Navbar, RouterLink],
   selector: 'app-mi-perfil',
   styleUrl: './mi-perfil.scss',
   templateUrl: './mi-perfil.html',

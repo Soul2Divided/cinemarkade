@@ -30,11 +30,14 @@ import { ButacaProyeccionRepository } from './core/butaca-proyeccion/butaca-proy
 import { SupabaseButacaProyeccionAdapter } from './core/butaca-proyeccion/supabase-butaca-proyeccion.adapter';
 import { CompraButacaRepository } from './core/compra-butaca/compra-butaca.repository';
 import { SupabaseCompraButacaAdapter } from './core/compra-butaca/supabase-compra-butaca.adapter';
+import { RecompensaRepository } from './core/recompensa/recompensa.repository';
+import { SupabaseRecompensaAdapter } from './core/recompensa/supabase-recompensa.adapter';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: RecompensaRepository, useClass: SupabaseRecompensaAdapter },
     { provide: LOCALE_ID, useValue: 'es-AR' },
     provideBrowserGlobalErrorListeners(),
     provideServiceWorker('ngsw-worker.js', {

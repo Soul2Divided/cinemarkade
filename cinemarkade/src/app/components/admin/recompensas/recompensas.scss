@@ -1,0 +1,34 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+.abm-combos-container .form-control {
+    padding: .85rem .8rem .85rem 2.8rem;
+}
+
+.reward-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+.reward-preview {
+    cursor: default;
+
+    &:hover {
+        background: #111;
+        border-color: #555;
+    }
+}
+
+.btn-action:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.reward-link:focus-visible,
+.btn-action:focus-visible {
+    outline: 3px solid theme.$arcade-cyan;
+    outline-offset: 3px;
+}
