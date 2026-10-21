@@ -36,10 +36,10 @@
 
 ## 6. Sistema de reseñas
 
-- [ ] Implementar el sistema de reseñas.
-    - [ ] Calificar con estrellas.
-    - [ ] Dejar un comentario corto.
-    - [ ] Mostrar la puntuación promedio.
+- [x] Implementar el sistema de reseñas.
+    - [x] Calificar con estrellas.
+    - [x] Dejar un comentario corto.
+    - [x] Mostrar la puntuación promedio.
 
 ## 7. Buscador
 
@@ -128,7 +128,7 @@ Estas condiciones acompañan a los requisitos numerados y a la definición de ro
 ### Películas y compras
 
 - [ ] Mostrar la cartelera de “Próximamente”.
-- [ ] Permitir consultar reseñas antes de comprar.
+- [x] Permitir consultar reseñas antes de comprar.
 - [ ] Mostrar primero las tres películas más vendidas y los combos destacados en la homepage.
 - [x] Impedir la compra a usuarios que no cumplen la edad mínima.
 - [x] Mostrar el aviso de acompañamiento de un adulto para películas +18 indicado en el enunciado.

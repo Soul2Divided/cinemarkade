@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Navbar } from '../navbar/navbar';
 import { Funcion, Proyeccion } from '../../core/funcion/funcion.model';
@@ -8,194 +9,466 @@ import { Pelicula } from '../../core/pelicula/pelicula.model';
 import { PeliculaService } from '../../core/pelicula/pelicula.service';
 import { AuthService } from '../../auth/auth.service';
 import { Modal } from '../modal/modal';
+import { Resena } from '../resena/resena';
+import { Estrellas } from '../estrellas/estrellas';
+import { ResenaService } from '../../core/resena/resena.service';
+import { GuardarResenaEvento, Resena as ResenaModel } from '../../core/resena/resena.model';
 
-interface OpcionFecha { fecha: string; etiqueta: string; }
-interface OpcionHorario { funcion: Funcion; proyeccion: Proyeccion; }
+interface OpcionFecha {
+    fecha: string;
+    etiqueta: string;
+}
+interface OpcionHorario {
+    funcion: Funcion;
+    proyeccion: Proyeccion;
+}
 
 @Component({
-  selector: 'app-seleccion-funcion',
-  standalone: true,
-  imports: [CommonModule, Navbar, Modal],
-  templateUrl: './seleccion-funcion.html',
-  styleUrl: './seleccion-funcion.scss',
+    selector: 'app-seleccion-funcion',
+    standalone: true,
+    imports: [CommonModule, Navbar, Modal, Resena, Estrellas],
+    templateUrl: './seleccion-funcion.html',
+    styleUrl: './seleccion-funcion.scss',
 })
 export class SeleccionFuncion implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private peliculaService = inject(PeliculaService);
-  private funcionService = inject(FuncionService);
-  private authService = inject(AuthService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
+    private peliculaService = inject(PeliculaService);
+    private funcionService = inject(FuncionService);
+    readonly authService = inject(AuthService);
+    private readonly resenaService = inject(ResenaService);
+    private readonly destroyRef = inject(DestroyRef);
+    private versionCarga = 0;
 
-  pelicula = signal<Pelicula | null>(null);
-  funciones = signal<Funcion[]>([]);
-  cargando = signal(true);
-  error = signal('');
-  fechaSeleccionada = signal('');
-  formatoSeleccionado = signal('');
-  idiomaSeleccionado = signal('');
-  horarioSeleccionado = signal<OpcionHorario | null>(null);
-  paginaFechas = signal(0);
-  mostrarModalEdad = signal(false);
-  mensajeEdad = signal('');
+    readonly resenas = signal<ResenaModel[]>([]);
+    readonly cargandoResenas = signal(true);
+    readonly guardandoResena = signal(false);
+    readonly errorResenas = signal('');
+    readonly mensajeResenas = signal('');
+    readonly promedio = computed(() => {
+        const resenas = this.resenas();
 
-  esPeliculaMas18 = computed(() => this.edadMinima(this.pelicula()?.restriccion_edad ?? '') >= 18);
+        return resenas.length
+            ? resenas.reduce((suma, resena) => suma + resena.estrellas, 0) / resenas.length
+            : 0;
+    });
 
-  fechas = computed<OpcionFecha[]>(() => {
-    const fechas = [...new Set(this.funciones()
-      .filter(f => f.activa && f.fecha >= this.hoy() && f.fecha <= this.ultimoDiaVisible() && f.proyecciones.some(p =>
-        p.activa && (f.fecha > this.hoy() || p.horario.slice(0, 5) > this.horaActual())
-      ))
-      .map(f => f.fecha))].sort();
-    return fechas.map(fecha => ({ fecha, etiqueta: this.etiquetaFecha(fecha) }));
-  });
+    pelicula = signal<Pelicula | null>(null);
+    funciones = signal<Funcion[]>([]);
+    cargando = signal(true);
+    error = signal('');
+    fechaSeleccionada = signal('');
+    formatoSeleccionado = signal('');
+    idiomaSeleccionado = signal('');
+    horarioSeleccionado = signal<OpcionHorario | null>(null);
+    paginaFechas = signal(0);
+    mostrarModalEdad = signal(false);
+    mensajeEdad = signal('');
 
-  fechasVisibles = computed(() => this.fechas().slice(this.paginaFechas() * 4, this.paginaFechas() * 4 + 4));
-  hayPaginaAnterior = computed(() => this.paginaFechas() > 0);
-  hayPaginaSiguiente = computed(() => (this.paginaFechas() + 1) * 4 < this.fechas().length);
+    esPeliculaMas18 = computed(
+        () => this.edadMinima(this.pelicula()?.restriccion_edad ?? '') >= 18,
+    );
 
-  formatos = computed(() => [...new Set(this.funciones()
-    .filter(f => f.fecha === this.fechaSeleccionada() && f.activa && f.proyecciones.some(p => p.activa))
-    .map(f => f.formato))].sort());
+    readonly compraBloqueadaPorEdad = computed(() => {
+        const usuario = this.authService.usuarioActual();
+        const edadMinima = this.edadMinima(this.pelicula()?.restriccion_edad ?? '');
 
-  idiomas = computed(() => [...new Set(this.funciones()
-    .filter(f => f.fecha === this.fechaSeleccionada() && f.activa &&
-      (!this.formatoSeleccionado() || f.formato === this.formatoSeleccionado()) && f.proyecciones.some(p => p.activa))
-    .map(f => f.idioma))].sort());
+        if (!usuario || edadMinima === 0) {
+            return false;
+        }
 
-  horarios = computed<OpcionHorario[]>(() => this.funciones()
-    .filter(f => f.activa && f.fecha === this.fechaSeleccionada() &&
-      (!this.formatoSeleccionado() || f.formato === this.formatoSeleccionado()) &&
-      (!this.idiomaSeleccionado() || f.idioma === this.idiomaSeleccionado()))
-    .flatMap(funcion => funcion.proyecciones
-      .filter(proyeccion => proyeccion.activa && (funcion.fecha !== this.hoy() || proyeccion.horario.slice(0, 5) > this.horaActual()))
-      .map(proyeccion => ({ funcion, proyeccion })))
-    .sort((a, b) => a.proyeccion.horario.localeCompare(b.proyeccion.horario)));
+        if (!usuario.fecha_nacimiento) {
+            return true;
+        }
 
-  async ngOnInit(): Promise<void> {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!Number.isInteger(id) || id < 1) {
-      this.error.set('La película solicitada no es válida.');
-      this.cargando.set(false);
-      return;
+        const edad = this.calcularEdad(usuario.fecha_nacimiento);
+
+        return !Number.isFinite(edad) || edad < edadMinima;
+    });
+
+    fechas = computed<OpcionFecha[]>(() => {
+        const fechas = [
+            ...new Set(
+                this.funciones()
+                    .filter(
+                        (f) =>
+                            f.activa &&
+                            f.fecha >= this.hoy() &&
+                            f.fecha <= this.ultimoDiaVisible() &&
+                            f.proyecciones.some(
+                                (p) =>
+                                    p.activa &&
+                                    (f.fecha > this.hoy() ||
+                                        p.horario.slice(0, 5) > this.horaActual()),
+                            ),
+                    )
+                    .map((f) => f.fecha),
+            ),
+        ].sort();
+        return fechas.map((fecha) => ({ fecha, etiqueta: this.etiquetaFecha(fecha) }));
+    });
+
+    fechasVisibles = computed(() =>
+        this.fechas().slice(this.paginaFechas() * 4, this.paginaFechas() * 4 + 4),
+    );
+    hayPaginaAnterior = computed(() => this.paginaFechas() > 0);
+    hayPaginaSiguiente = computed(() => (this.paginaFechas() + 1) * 4 < this.fechas().length);
+
+    formatos = computed(() =>
+        [
+            ...new Set(
+                this.funciones()
+                    .filter(
+                        (f) =>
+                            f.fecha === this.fechaSeleccionada() &&
+                            f.activa &&
+                            f.proyecciones.some((p) => p.activa),
+                    )
+                    .map((f) => f.formato),
+            ),
+        ].sort(),
+    );
+
+    idiomas = computed(() =>
+        [
+            ...new Set(
+                this.funciones()
+                    .filter(
+                        (f) =>
+                            f.fecha === this.fechaSeleccionada() &&
+                            f.activa &&
+                            (!this.formatoSeleccionado() ||
+                                f.formato === this.formatoSeleccionado()) &&
+                            f.proyecciones.some((p) => p.activa),
+                    )
+                    .map((f) => f.idioma),
+            ),
+        ].sort(),
+    );
+
+    horarios = computed<OpcionHorario[]>(() =>
+        this.funciones()
+            .filter(
+                (f) =>
+                    f.activa &&
+                    f.fecha === this.fechaSeleccionada() &&
+                    (!this.formatoSeleccionado() || f.formato === this.formatoSeleccionado()) &&
+                    (!this.idiomaSeleccionado() || f.idioma === this.idiomaSeleccionado()),
+            )
+            .flatMap((funcion) =>
+                funcion.proyecciones
+                    .filter(
+                        (proyeccion) =>
+                            proyeccion.activa &&
+                            (funcion.fecha !== this.hoy() ||
+                                proyeccion.horario.slice(0, 5) > this.horaActual()),
+                    )
+                    .map((proyeccion) => ({ funcion, proyeccion })),
+            )
+            .sort((a, b) => a.proyeccion.horario.localeCompare(b.proyeccion.horario)),
+    );
+
+    ngOnInit(): void {
+        this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((parametros) => {
+            void this.cargarPelicula(Number(parametros.get('id')));
+        });
     }
-    try {
-      const [pelicula, funciones] = await Promise.all([
-        this.peliculaService.obtenerPorId(id),
-        this.funcionService.listarFuncionesPorPelicula(id),
-      ]);
-      this.pelicula.set(pelicula);
-      this.funciones.set(funciones);
-      const primeraFecha = this.fechas()[0]?.fecha ?? '';
-      this.fechaSeleccionada.set(primeraFecha);
-      this.formatoSeleccionado.set('');
-      this.idiomaSeleccionado.set('');
-    } catch (e) {
-      console.error('No se pudo cargar la cartelera de la película:', e);
-      this.error.set('No se pudo cargar la información de la película y sus funciones.');
-    } finally {
-      this.cargando.set(false);
-    }
-  }
 
-  cambiarFecha(fecha: string): void {
-    this.fechaSeleccionada.set(fecha);
-    this.formatoSeleccionado.set('');
-    this.idiomaSeleccionado.set('');
-    this.horarioSeleccionado.set(null);
-  }
+    private async cargarPelicula(id: number): Promise<void> {
+        const version = ++this.versionCarga;
+        this.cargando.set(true);
+        this.error.set('');
+        this.resenas.set([]);
+        this.errorResenas.set('');
+        this.mensajeResenas.set('');
+        this.cargandoResenas.set(true);
+        this.guardandoResena.set(false);
+        this.horarioSeleccionado.set(null);
+        this.paginaFechas.set(0);
 
-  paginaAnterior(): void {
-    if (this.hayPaginaAnterior()) this.paginaFechas.update(pagina => pagina - 1);
-  }
+        if (!Number.isInteger(id) || id < 1) {
+            this.error.set('La película solicitada no es válida.');
+            this.cargando.set(false);
+            return;
+        }
+        try {
+            const [pelicula, funciones] = await Promise.all([
+                this.peliculaService.obtenerPorId(id),
+                this.funcionService.listarFuncionesPorPelicula(id),
+            ]);
 
-  paginaSiguiente(): void {
-    if (this.hayPaginaSiguiente()) this.paginaFechas.update(pagina => pagina + 1);
-  }
+            if (version !== this.versionCarga) {
+                return;
+            }
 
-  cambiarFormato(event: Event): void {
-    this.formatoSeleccionado.set((event.target as HTMLSelectElement).value);
-    this.idiomaSeleccionado.set('');
-    this.horarioSeleccionado.set(null);
-  }
+            this.pelicula.set(pelicula);
+            void this.cargarResenas();
+            this.funciones.set(funciones);
+            const primeraFecha = this.fechas()[0]?.fecha ?? '';
+            this.fechaSeleccionada.set(primeraFecha);
+            this.formatoSeleccionado.set('');
+            this.idiomaSeleccionado.set('');
+        } catch (e) {
+            if (version !== this.versionCarga) {
+                return;
+            }
 
-  cambiarIdioma(event: Event): void {
-    this.idiomaSeleccionado.set((event.target as HTMLSelectElement).value);
-    this.horarioSeleccionado.set(null);
-  }
-
-  seleccionarHorario(opcion: OpcionHorario): void { this.horarioSeleccionado.set(opcion); }
-
-  async continuarCompra(): Promise<void> {
-    const seleccion = this.horarioSeleccionado();
-    const pelicula = this.pelicula();
-    if (!seleccion || !pelicula) return;
-
-    const edadMinima = this.edadMinima(pelicula.restriccion_edad);
-    if (edadMinima > 0 && await this.authService.haySesionActiva()) {
-      await this.authService.refrescarUsuarioActual();
-      const fechaNacimiento = this.authService.usuarioActual()?.fecha_nacimiento;
-      if (fechaNacimiento && this.calcularEdad(fechaNacimiento) < edadMinima) {
-        this.mensajeEdad.set(`Tu perfil indica que todavía no tenés ${edadMinima} años. No podés comprar esta entrada.`);
-        this.mostrarModalEdad.set(true);
-        return;
-      }
+            console.error('No se pudo cargar la cartelera de la película:', e);
+            this.error.set('No se pudo cargar la información de la película y sus funciones.');
+        } finally {
+            if (version === this.versionCarga) {
+                this.cargando.set(false);
+            }
+        }
     }
 
-    sessionStorage.setItem('cinemarkade-proyeccion-seleccionada', JSON.stringify({
-      peliculaId: pelicula.id,
-      funcionId: seleccion.funcion.id,
-      proyeccionId: seleccion.proyeccion.id,
-      fecha: seleccion.funcion.fecha,
-      horario: seleccion.proyeccion.horario,
-      formato: seleccion.funcion.formato,
-      idioma: seleccion.funcion.idioma,
-      salaId: seleccion.funcion.sala_id,
-    }));
-    void this.router.navigate(['/compra']);
-  }
+    cambiarFecha(fecha: string): void {
+        this.fechaSeleccionada.set(fecha);
+        this.formatoSeleccionado.set('');
+        this.idiomaSeleccionado.set('');
+        this.horarioSeleccionado.set(null);
+    }
 
-  cerrarModalEdad(): void { this.mostrarModalEdad.set(false); }
+    async cargarResenas(): Promise<void> {
+        const pelicula = this.pelicula();
 
-  private edadMinima(restriccion: string): number {
-    const coincidencia = restriccion.match(/\+(\d+)/);
-    return coincidencia ? Number(coincidencia[1]) : 0;
-  }
+        if (!pelicula || this.guardandoResena()) {
+            return;
+        }
 
-  private calcularEdad(fechaNacimiento: string): number {
-    const nacimiento = new Date(`${fechaNacimiento.slice(0, 10)}T12:00:00Z`);
-    const hoy = new Date(`${this.hoy()}T12:00:00Z`);
-    let edad = hoy.getUTCFullYear() - nacimiento.getUTCFullYear();
-    const diferenciaMes = hoy.getUTCMonth() - nacimiento.getUTCMonth();
-    if (diferenciaMes < 0 || (diferenciaMes === 0 && hoy.getUTCDate() < nacimiento.getUTCDate())) edad--;
-    return edad;
-  }
+        this.cargandoResenas.set(true);
+        const version = this.versionCarga;
+        this.errorResenas.set('');
+        this.mensajeResenas.set('');
 
-  volver(): void { void this.router.navigate(['/']); }
-  formatoHora(horario: string): string { return horario.slice(0, 5); }
-  hoy(): string { return this.partesFechaHora().fecha; }
-  private horaActual(): string { return this.partesFechaHora().hora; }
+        try {
+            const resenas = await this.resenaService.listarPorPelicula(pelicula.id);
 
-  private ultimoDiaVisible(): string {
-    const ultimoDia = new Date(`${this.hoy()}T00:00:00Z`);
-    ultimoDia.setUTCDate(ultimoDia.getUTCDate() + 6);
-    return ultimoDia.toISOString().slice(0, 10);
-  }
+            if (version === this.versionCarga) {
+                this.resenas.set(resenas);
+            }
+        } catch (error) {
+            if (version === this.versionCarga) {
+                this.errorResenas.set(
+                    error instanceof Error ? error.message : 'No se pudieron cargar las reseñas.',
+                );
+            }
+        } finally {
+            if (version === this.versionCarga) {
+                this.cargandoResenas.set(false);
+            }
+        }
+    }
 
-  private partesFechaHora(): { fecha: string; hora: string } {
-    const parts = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'America/Argentina/Buenos_Aires', year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
-    }).formatToParts(new Date());
-    const get = (type: string) => parts.find(part => part.type === type)!.value;
-    return { fecha: `${get('year')}-${get('month')}-${get('day')}`, hora: `${get('hour')}:${get('minute')}` };
-  }
+    async guardarResena(datos: GuardarResenaEvento): Promise<void> {
+        const pelicula = this.pelicula();
+        const version = this.versionCarga;
 
-  private etiquetaFecha(fecha: string): string {
-    if (fecha === this.hoy()) return 'HOY';
-    const date = new Date(`${fecha}T12:00:00-03:00`);
-    const weekday = new Intl.DateTimeFormat('es-AR', { weekday: 'short', timeZone: 'America/Argentina/Buenos_Aires' })
-      .format(date).replace('.', '').toUpperCase();
-    const dayMonth = new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: '2-digit', timeZone: 'America/Argentina/Buenos_Aires' }).format(date);
-    return `${weekday} ${dayMonth}`;
-  }
+        if (!pelicula || this.guardandoResena()) {
+            return;
+        }
+
+        this.guardandoResena.set(true);
+        this.errorResenas.set('');
+        this.mensajeResenas.set('');
+
+        try {
+            const resena =
+                datos.id === null
+                    ? await this.resenaService.crear(pelicula.id, datos)
+                    : await this.resenaService.actualizar(datos.id, datos);
+
+            if (version !== this.versionCarga) {
+                return;
+            }
+
+            this.resenas.update((actuales) => [
+                resena,
+                ...actuales.filter((actual) => actual.id !== resena.id),
+            ]);
+            this.mensajeResenas.set('Tu reseña se guardó correctamente.');
+        } catch (error) {
+            if (version === this.versionCarga) {
+                this.errorResenas.set(
+                    error instanceof Error ? error.message : 'No se pudo guardar la reseña.',
+                );
+            }
+        } finally {
+            if (version === this.versionCarga) {
+                this.guardandoResena.set(false);
+            }
+        }
+    }
+
+    async eliminarResena(id: number): Promise<void> {
+        const version = this.versionCarga;
+
+        if (this.guardandoResena()) {
+            return;
+        }
+
+        this.guardandoResena.set(true);
+        this.errorResenas.set('');
+        this.mensajeResenas.set('');
+
+        try {
+            await this.resenaService.eliminar(id);
+
+            if (version !== this.versionCarga) {
+                return;
+            }
+
+            this.resenas.update((actuales) => actuales.filter((resena) => resena.id !== id));
+            this.mensajeResenas.set('Tu reseña se eliminó correctamente.');
+        } catch (error) {
+            if (version === this.versionCarga) {
+                this.errorResenas.set(
+                    error instanceof Error ? error.message : 'No se pudo eliminar la reseña.',
+                );
+            }
+        } finally {
+            if (version === this.versionCarga) {
+                this.guardandoResena.set(false);
+            }
+        }
+    }
+
+    paginaAnterior(): void {
+        if (this.hayPaginaAnterior()) this.paginaFechas.update((pagina) => pagina - 1);
+    }
+
+    paginaSiguiente(): void {
+        if (this.hayPaginaSiguiente()) this.paginaFechas.update((pagina) => pagina + 1);
+    }
+
+    cambiarFormato(event: Event): void {
+        this.formatoSeleccionado.set((event.target as HTMLSelectElement).value);
+        this.idiomaSeleccionado.set('');
+        this.horarioSeleccionado.set(null);
+    }
+
+    cambiarIdioma(event: Event): void {
+        this.idiomaSeleccionado.set((event.target as HTMLSelectElement).value);
+        this.horarioSeleccionado.set(null);
+    }
+
+    seleccionarHorario(opcion: OpcionHorario): void {
+        this.horarioSeleccionado.set(opcion);
+    }
+
+    async continuarCompra(): Promise<void> {
+        const seleccion = this.horarioSeleccionado();
+        const pelicula = this.pelicula();
+        if (
+            !seleccion ||
+            !pelicula ||
+            this.compraBloqueadaPorEdad() ||
+            this.authService.cargandoUsuario()
+        ) {
+            return;
+        }
+
+        const edadMinima = this.edadMinima(pelicula.restriccion_edad);
+        if (edadMinima > 0 && (await this.authService.haySesionActiva())) {
+            await this.authService.refrescarUsuarioActual();
+            if (this.compraBloqueadaPorEdad()) {
+                this.mensajeEdad.set(
+                    `Tu perfil indica que todavía no tenés ${edadMinima} años. No podés comprar esta entrada.`,
+                );
+                this.mostrarModalEdad.set(true);
+                return;
+            }
+        }
+
+        sessionStorage.setItem(
+            'cinemarkade-proyeccion-seleccionada',
+            JSON.stringify({
+                peliculaId: pelicula.id,
+                funcionId: seleccion.funcion.id,
+                proyeccionId: seleccion.proyeccion.id,
+                fecha: seleccion.funcion.fecha,
+                horario: seleccion.proyeccion.horario,
+                formato: seleccion.funcion.formato,
+                idioma: seleccion.funcion.idioma,
+                salaId: seleccion.funcion.sala_id,
+            }),
+        );
+        void this.router.navigate(['/compra']);
+    }
+
+    cerrarModalEdad(): void {
+        this.mostrarModalEdad.set(false);
+    }
+
+    private edadMinima(restriccion: string): number {
+        const coincidencia = restriccion.match(/\+(\d+)/);
+        return coincidencia ? Number(coincidencia[1]) : 0;
+    }
+
+    private calcularEdad(fechaNacimiento: string): number {
+        const nacimiento = new Date(`${fechaNacimiento.slice(0, 10)}T12:00:00Z`);
+        const hoy = new Date(`${this.hoy()}T12:00:00Z`);
+        let edad = hoy.getUTCFullYear() - nacimiento.getUTCFullYear();
+        const diferenciaMes = hoy.getUTCMonth() - nacimiento.getUTCMonth();
+        if (
+            diferenciaMes < 0 ||
+            (diferenciaMes === 0 && hoy.getUTCDate() < nacimiento.getUTCDate())
+        )
+            edad--;
+        return edad;
+    }
+
+    volver(): void {
+        void this.router.navigate(['/']);
+    }
+    formatoHora(horario: string): string {
+        return horario.slice(0, 5);
+    }
+    hoy(): string {
+        return this.partesFechaHora().fecha;
+    }
+    private horaActual(): string {
+        return this.partesFechaHora().hora;
+    }
+
+    private ultimoDiaVisible(): string {
+        const ultimoDia = new Date(`${this.hoy()}T00:00:00Z`);
+        ultimoDia.setUTCDate(ultimoDia.getUTCDate() + 6);
+        return ultimoDia.toISOString().slice(0, 10);
+    }
+
+    private partesFechaHora(): { fecha: string; hora: string } {
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'America/Argentina/Buenos_Aires',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23',
+        }).formatToParts(new Date());
+        const get = (type: string) => parts.find((part) => part.type === type)!.value;
+        return {
+            fecha: `${get('year')}-${get('month')}-${get('day')}`,
+            hora: `${get('hour')}:${get('minute')}`,
+        };
+    }
+
+    private etiquetaFecha(fecha: string): string {
+        if (fecha === this.hoy()) return 'HOY';
+        const date = new Date(`${fecha}T12:00:00-03:00`);
+        const weekday = new Intl.DateTimeFormat('es-AR', {
+            weekday: 'short',
+            timeZone: 'America/Argentina/Buenos_Aires',
+        })
+            .format(date)
+            .replace('.', '')
+            .toUpperCase();
+        const dayMonth = new Intl.DateTimeFormat('es-AR', {
+            day: '2-digit',
+            month: '2-digit',
+            timeZone: 'America/Argentina/Buenos_Aires',
+        }).format(date);
+        return `${weekday} ${dayMonth}`;
+    }
 }

@@ -354,16 +354,24 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+            box-sizing: border-box;
+            width: 100%;
             background-color: #141418;
             border: 2px solid theme.$arcade-text-white;
+            color: theme.$arcade-text-white;
             padding: 1rem;
             cursor: pointer;
             text-align: left;
+            text-decoration: none;
             transition: all 0.15s ease;
             box-shadow: 3px 3px 0px #000;
 
             .btn-icon {
+                flex: 0 0 2rem;
+                font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
                 font-size: 1.5rem;
+                line-height: 1;
+                text-align: center;
             }
 
             .btn-content {

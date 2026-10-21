@@ -1,106 +1,212 @@
 <app-navbar></app-navbar>
 
 <main class="schedule-page">
-  <button class="back-link" type="button" (click)="volver()">← VOLVER A CARTELERA</button>
+    <button class="back-link" type="button" (click)="volver()">← VOLVER A CARTELERA</button>
 
-  @if (cargando()) {
-  <div class="state-message">CARGANDO FUNCIONES...</div>
-  } @else if (error()) {
-  <div class="state-message error">{{ error() }}</div>
-  } @else if (pelicula(); as peli) {
-  <div class="schedule-layout">
-    <section class="movie-panel">
-      <img class="poster" [src]="peli.imagen" [alt]="peli.nombre" />
-      <div class="movie-copy">
-        <span class="eyebrow">CARTELERA CINEMARKADE</span>
-        <h1>{{ peli.nombre }}</h1>
-        @if (esPeliculaMas18()) {
-        <div class="age-warning" role="alert">
-          <strong>PELÍCULA +18</strong>
-          <span>SOLO MAYORES DE 18 AÑOS. LOS MENORES DEBEN ASISTIR ACOMPAÑADOS POR UN ADULTO.</span>
+    @if (cargando()) {
+        <div class="state-message">CARGANDO FUNCIONES...</div>
+    } @else if (error()) {
+        <div class="state-message error">{{ error() }}</div>
+    } @else if (pelicula(); as peli) {
+        <div class="schedule-layout">
+            <section class="movie-panel">
+                <header class="movie-header">
+                    <h1>{{ peli.nombre }}</h1>
+                    <p class="movie-meta">
+                        {{ peli.genero }} · {{ peli.duracion }} MIN · {{ peli.restriccion_edad }}
+                    </p>
+                </header>
+
+                <div class="movie-poster-rating">
+                    <img class="poster" [src]="peli.imagen" [alt]="peli.nombre" />
+
+                    <div class="movie-rating" aria-live="polite">
+                        <app-estrellas [valor]="promedio()"></app-estrellas>
+                        @if (cargandoResenas()) {
+                            <span>CARGANDO CALIFICACIÓN...</span>
+                        } @else if (errorResenas() && !resenas().length) {
+                            <span>CALIFICACIÓN NO DISPONIBLE</span>
+                        } @else if (resenas().length) {
+                            <strong>{{ promedio() | number: '1.1-1' }} / 5</strong>
+                            <span>
+                                {{ resenas().length }}
+                                {{ resenas().length === 1 ? 'RESEÑA' : 'RESEÑAS' }}
+                            </span>
+                        } @else {
+                            <span>SIN CALIFICACIONES</span>
+                        }
+                    </div>
+                </div>
+                <p class="synopsis">{{ peli.sinopsis }}</p>
+            </section>
+
+            <section class="showtimes-panel">
+                <h2>HORARIOS</h2>
+                @if (fechas().length > 0) {
+                    <div class="date-pagination" aria-label="Fechas disponibles, hasta siete días">
+                        @if (fechas().length > 4) {
+                            <button
+                                type="button"
+                                class="date-arrow"
+                                aria-label="Ver fechas anteriores"
+                                [disabled]="!hayPaginaAnterior()"
+                                (click)="paginaAnterior()"
+                            >
+                                ‹
+                            </button>
+                        }
+                        <div class="date-list" aria-label="Seleccionar fecha">
+                            @for (opcion of fechasVisibles(); track opcion.fecha) {
+                                <button
+                                    type="button"
+                                    [class.selected]="fechaSeleccionada() === opcion.fecha"
+                                    (click)="cambiarFecha(opcion.fecha)"
+                                >
+                                    <span>{{ opcion.etiqueta }}</span>
+                                    @if (opcion.etiqueta === 'HOY') {
+                                        <small>
+                                            {{ opcion.fecha | date: 'dd/MM' : '' : 'es-AR' }}
+                                        </small>
+                                    }
+                                </button>
+                            }
+                        </div>
+                        @if (fechas().length > 4) {
+                            <button
+                                type="button"
+                                class="date-arrow"
+                                aria-label="Ver fechas siguientes"
+                                [disabled]="!hayPaginaSiguiente()"
+                                (click)="paginaSiguiente()"
+                            >
+                                ›
+                            </button>
+                        }
+                    </div>
+
+                    <div class="filters">
+                        <label>
+                            FORMATO
+                            <select
+                                [value]="formatoSeleccionado()"
+                                (change)="cambiarFormato($event)"
+                            >
+                                <option value="">Todos</option>
+                                @for (formato of formatos(); track formato) {
+                                    <option [value]="formato">{{ formato }}</option>
+                                }
+                            </select>
+                        </label>
+                        <label>
+                            IDIOMA
+                            <select [value]="idiomaSeleccionado()" (change)="cambiarIdioma($event)">
+                                <option value="">Todos</option>
+                                @for (idioma of idiomas(); track idioma) {
+                                    <option [value]="idioma">{{ idioma }}</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+
+                    @if (horarios().length) {
+                        <div class="showtime-groups">
+                            @for (opcion of horarios(); track opcion.proyeccion.id) {
+                                <button
+                                    type="button"
+                                    class="showtime-card"
+                                    [class.selected]="
+                                        horarioSeleccionado()?.proyeccion?.id ===
+                                        opcion.proyeccion.id
+                                    "
+                                    (click)="seleccionarHorario(opcion)"
+                                >
+                                    <strong>{{ formatoHora(opcion.proyeccion.horario) }}</strong>
+                                    <span>
+                                        {{ opcion.funcion.formato }} · {{ opcion.funcion.idioma }}
+                                    </span>
+                                    @if (opcion.funcion.es_preventa) {
+                                        <small>PREVENTA</small>
+                                    }
+                                </button>
+                            }
+                        </div>
+                    } @else {
+                        <p class="empty-message">No hay horarios disponibles con esos filtros.</p>
+                    }
+                } @else {
+                    <p class="empty-message">
+                        Esta película todavía no tiene funciones futuras disponibles.
+                    </p>
+                }
+            </section>
+            <aside class="movie-reviews">
+                <app-resena
+                    [resenas]="resenas()"
+                    [usuarioId]="authService.usuarioActual()?.id ?? null"
+                    [cargando]="cargandoResenas()"
+                    [guardando]="guardandoResena()"
+                    [error]="errorResenas()"
+                    [mensaje]="mensajeResenas()"
+                    (guardar)="guardarResena($event)"
+                    (eliminar)="eliminarResena($event)"
+                    (reintentar)="cargarResenas()"
+                ></app-resena>
+
+                @if (esPeliculaMas18()) {
+                    <div class="age-warning" role="note">
+                        <strong>PELÍCULA +18</strong>
+                        <span>
+                            SOLO MAYORES DE 18 AÑOS. LOS MENORES DEBEN ASISTIR ACOMPAÑADOS POR UN
+                            ADULTO.
+                        </span>
+                    </div>
+                }
+            </aside>
         </div>
-        }
-        <p class="movie-meta">{{ peli.genero }} · {{ peli.duracion }} MIN · {{ peli.restriccion_edad }}</p>
-        <p class="synopsis">{{ peli.sinopsis }}</p>
-      </div>
-    </section>
 
-    <section class="showtimes-panel">
-      <h2>HORARIOS</h2>
-      @if (fechas().length > 0) {
-      <div class="date-pagination" aria-label="Fechas disponibles, hasta siete días">
-        @if (fechas().length > 4) {
-        <button type="button" class="date-arrow" aria-label="Ver fechas anteriores" [disabled]="!hayPaginaAnterior()"
-          (click)="paginaAnterior()">‹</button>
-        }
-        <div class="date-list" aria-label="Seleccionar fecha">
-          @for (opcion of fechasVisibles(); track opcion.fecha) {
-          <button type="button" [class.selected]="fechaSeleccionada() === opcion.fecha"
-            (click)="cambiarFecha(opcion.fecha)">
-            <span>{{ opcion.etiqueta }}</span>
-            @if (opcion.etiqueta === 'HOY') { <small>{{ opcion.fecha | date:'dd/MM':'':'es-AR' }}</small> }
-          </button>
-          }
-        </div>
-        @if (fechas().length > 4) {
-        <button type="button" class="date-arrow" aria-label="Ver fechas siguientes" [disabled]="!hayPaginaSiguiente()"
-          (click)="paginaSiguiente()">›</button>
-        }
-      </div>
-
-      <div class="filters">
-        <label>FORMATO
-          <select [value]="formatoSeleccionado()" (change)="cambiarFormato($event)">
-            <option value="">Todos</option>
-            @for (formato of formatos(); track formato) { <option [value]="formato">{{ formato }}</option> }
-          </select>
-        </label>
-        <label>IDIOMA
-          <select [value]="idiomaSeleccionado()" (change)="cambiarIdioma($event)">
-            <option value="">Todos</option>
-            @for (idioma of idiomas(); track idioma) { <option [value]="idioma">{{ idioma }}</option> }
-          </select>
-        </label>
-      </div>
-
-      @if (horarios().length) {
-      <div class="showtime-groups">
-        @for (opcion of horarios(); track opcion.proyeccion.id) {
-        <button type="button" class="showtime-card"
-          [class.selected]="horarioSeleccionado()?.proyeccion?.id === opcion.proyeccion.id"
-          (click)="seleccionarHorario(opcion)">
-          <strong>{{ formatoHora(opcion.proyeccion.horario) }}</strong>
-          <span>{{ opcion.funcion.formato }} · {{ opcion.funcion.idioma }}</span>
-          @if (opcion.funcion.es_preventa) { <small>PREVENTA</small> }
-        </button>
-        }
-      </div>
-      } @else {
-      <p class="empty-message">No hay horarios disponibles con esos filtros.</p>
-      }
-      } @else {
-      <p class="empty-message">Esta película todavía no tiene funciones futuras disponibles.</p>
-      }
-    </section>
-  </div>
-
-  <footer class="selection-footer">
-    <div>
-      @if (horarioSeleccionado(); as seleccion) {
-      <span>{{ seleccion.funcion.fecha | date:'dd/MM/yyyy':'':'es-AR' }} · {{ seleccion.funcion.formato }} · {{
-        seleccion.funcion.idioma }} · {{ formatoHora(seleccion.proyeccion.horario) }}</span>
-      } @else { <span>SELECCIONÁ UN HORARIO PARA CONTINUAR</span> }
-    </div>
-    <button type="button" [disabled]="!horarioSeleccionado()" (click)="continuarCompra()">COMPRAR ENTRADAS →</button>
-  </footer>
-  }
+        <footer class="selection-footer">
+            <div>
+                @if (compraBloqueadaPorEdad()) {
+                    <span id="restriccion-compra">
+                        NO CUMPLÍS LA EDAD MÍNIMA PARA ESTA PELÍCULA
+                    </span>
+                } @else if (horarioSeleccionado(); as seleccion) {
+                    <span>
+                        {{ seleccion.funcion.fecha | date: 'dd/MM/yyyy' : '' : 'es-AR' }} ·
+                        {{ seleccion.funcion.formato }} · {{ seleccion.funcion.idioma }} ·
+                        {{ formatoHora(seleccion.proyeccion.horario) }}
+                    </span>
+                } @else {
+                    <span>SELECCIONÁ UN HORARIO PARA CONTINUAR</span>
+                }
+            </div>
+            <button
+                type="button"
+                [disabled]="
+                    !horarioSeleccionado() ||
+                    compraBloqueadaPorEdad() ||
+                    authService.cargandoUsuario()
+                "
+                [attr.aria-describedby]="compraBloqueadaPorEdad() ? 'restriccion-compra' : null"
+                (click)="continuarCompra()"
+            >
+                COMPRAR ENTRADAS →
+            </button>
+        </footer>
+    }
 </main>
 
-<app-modal [isOpen]="mostrarModalEdad()" title="COMPRA NO PERMITIDA"
-  subtitle="RESTRICCIÓN DE EDAD" variant="red" (close)="cerrarModalEdad()">
-  <p>{{ mensajeEdad() }}</p>
-  <div modal-actions>
-    <button type="button" class="age-modal-button" (click)="cerrarModalEdad()">ENTENDIDO</button>
-  </div>
+<app-modal
+    [isOpen]="mostrarModalEdad()"
+    title="COMPRA NO PERMITIDA"
+    subtitle="RESTRICCIÓN DE EDAD"
+    variant="red"
+    (close)="cerrarModalEdad()"
+>
+    <p>{{ mensajeEdad() }}</p>
+    <div modal-actions>
+        <button type="button" class="age-modal-button" (click)="cerrarModalEdad()">
+            ENTENDIDO
+        </button>
+    </div>
 </app-modal>
-

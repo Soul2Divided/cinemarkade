@@ -15,23 +15,28 @@ export const routes: Routes = [
     },
     {
         path: 'invitado',
-        loadComponent: () => import('./components/guest-screen/guest-screen').then((m) => m.GuestScreen),
+        loadComponent: () =>
+            import('./components/guest-screen/guest-screen').then((m) => m.GuestScreen),
     },
     {
         path: 'select-login',
-        loadComponent: () => import('./components/select-login/select-login').then((m) => m.SelectLogin),
+        loadComponent: () =>
+            import('./components/select-login/select-login').then((m) => m.SelectLogin),
     },
     {
         path: 'login',
-        loadComponent: () => import('./components/login/login').then((m) => m.Login)
+        loadComponent: () => import('./components/login/login').then((m) => m.Login),
     },
     {
         path: 'register',
-        loadComponent: () => import('./components/register/register').then((m) => m.Register)
+        loadComponent: () => import('./components/register/register').then((m) => m.Register),
     },
     {
         path: 'funciones/:id',
-        loadComponent: () => import('./components/seleccion-funcion/seleccion-funcion').then((m) => m.SeleccionFuncion),
+        loadComponent: () =>
+            import('./components/seleccion-funcion/seleccion-funcion').then(
+                (m) => m.SeleccionFuncion,
+            ),
     },
     {
         path: 'compra',
@@ -39,131 +44,196 @@ export const routes: Routes = [
     },
     {
         path: 'butacas',
-        loadComponent: () => import('./components/seleccion-butacas/seleccion-butacas').then((m) => m.SeleccionButacas),
+        loadComponent: () =>
+            import('./components/seleccion-butacas/seleccion-butacas').then(
+                (m) => m.SeleccionButacas,
+            ),
     },
     {
         path: 'confirmacion-compra',
-        loadComponent: () => import('./components/confirmacion-compra/confirmacion-compra').then((m) => m.ConfirmacionCompra),
+        loadComponent: () =>
+            import('./components/confirmacion-compra/confirmacion-compra').then(
+                (m) => m.ConfirmacionCompra,
+            ),
     },
     {
         path: 'admin',
         canActivate: [adminGuard],
-        loadComponent: () => import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
+        loadComponent: () =>
+            import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
         children: [
             {
                 path: 'puntos',
-                loadComponent: () => import('./components/admin/recompensas/recompensas').then(m => m.Recompensas)
+                loadComponent: () =>
+                    import('./components/admin/recompensas/recompensas').then((m) => m.Recompensas),
             },
             {
                 path: 'nueva-recompensa',
                 data: { formulario: true },
-                loadComponent: () => import('./components/admin/recompensas/recompensas').then(m => m.Recompensas)
+                loadComponent: () =>
+                    import('./components/admin/recompensas/recompensas').then((m) => m.Recompensas),
             },
             {
                 path: 'editar-recompensa/:id',
                 data: { formulario: true },
-                loadComponent: () => import('./components/admin/recompensas/recompensas').then(m => m.Recompensas)
+                loadComponent: () =>
+                    import('./components/admin/recompensas/recompensas').then((m) => m.Recompensas),
             },
             {
                 path: 'peliculas',
-                loadComponent: () => import('./components/admin/abm-pelicula/abm-pelicula').then((m) => m.AbmPelicula),
+                loadComponent: () =>
+                    import('./components/admin/abm-pelicula/abm-pelicula').then(
+                        (m) => m.AbmPelicula,
+                    ),
             },
             {
                 path: 'nueva-pelicula',
-                loadComponent: () => import('./components/admin/add-pelicula/add-pelicula').then((m) => m.AddPelicula)
+                loadComponent: () =>
+                    import('./components/admin/add-pelicula/add-pelicula').then(
+                        (m) => m.AddPelicula,
+                    ),
             },
             {
                 path: 'editar-pelicula/:id',
-                loadComponent: () => import('./components/admin/add-pelicula/add-pelicula').then((m) => m.AddPelicula)
+                loadComponent: () =>
+                    import('./components/admin/add-pelicula/add-pelicula').then(
+                        (m) => m.AddPelicula,
+                    ),
             },
             {
                 path: 'salas',
-                loadComponent: () => import('./components/admin/abm-sala/abm-sala').then((m) => m.AbmSala)
+                loadComponent: () =>
+                    import('./components/admin/abm-sala/abm-sala').then((m) => m.AbmSala),
             },
             {
                 path: 'nueva-sala',
-                loadComponent: () => import('./components/admin/add-sala/add-sala').then((m) => m.AddSala)
+                loadComponent: () =>
+                    import('./components/admin/add-sala/add-sala').then((m) => m.AddSala),
             },
             {
                 path: 'editar-sala/:id',
-                loadComponent: () => import('./components/admin/add-sala/add-sala').then((m) => m.AddSala)
+                loadComponent: () =>
+                    import('./components/admin/add-sala/add-sala').then((m) => m.AddSala),
             },
             {
                 path: 'productos',
-                loadComponent: () => import('./components/admin/abm-producto/abm-producto').then((m) => m.AbmProducto)
+                loadComponent: () =>
+                    import('./components/admin/abm-producto/abm-producto').then(
+                        (m) => m.AbmProducto,
+                    ),
             },
             {
                 path: 'nuevo-producto',
-                loadComponent: () => import('./components/admin/add-producto/add-producto').then((m) => m.AddProducto)
+                loadComponent: () =>
+                    import('./components/admin/add-producto/add-producto').then(
+                        (m) => m.AddProducto,
+                    ),
             },
             {
                 path: 'editar-producto/:id',
-                loadComponent: () => import('./components/admin/add-producto/add-producto').then((m) => m.AddProducto)
+                loadComponent: () =>
+                    import('./components/admin/add-producto/add-producto').then(
+                        (m) => m.AddProducto,
+                    ),
             },
             {
                 path: 'combos',
-                loadComponent: () => import('./components/admin/abm-combo/abm-combo').then((m) => m.AbmCombo)
+                loadComponent: () =>
+                    import('./components/admin/abm-combo/abm-combo').then((m) => m.AbmCombo),
             },
             {
                 path: 'nuevo-combo',
-                loadComponent: () => import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo)
+                loadComponent: () =>
+                    import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo),
             },
             {
                 path: 'editar-combo/:id',
-                loadComponent: () => import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo)
+                loadComponent: () =>
+                    import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo),
             },
             {
                 path: 'funciones',
-                loadComponent: () => import('./components/admin/abm-funcion/abm-funcion').then((m) => m.AbmFuncion)
+                loadComponent: () =>
+                    import('./components/admin/abm-funcion/abm-funcion').then((m) => m.AbmFuncion),
             },
             {
                 path: 'nueva-funcion',
-                loadComponent: () => import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion)
+                loadComponent: () =>
+                    import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion),
             },
             {
                 path: 'editar-funcion/:id',
-                loadComponent: () => import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion)
+                loadComponent: () =>
+                    import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion),
             },
             {
                 path: 'cupones',
-                loadComponent: () => import('./components/admin/abm-cupon/abm-cupon').then((m) => m.AbmCupon)
+                loadComponent: () =>
+                    import('./components/admin/abm-cupon/abm-cupon').then((m) => m.AbmCupon),
             },
             {
                 path: 'nuevo-cupon',
-                loadComponent: () => import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon)
+                loadComponent: () =>
+                    import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon),
             },
             {
                 path: 'editar-cupon/:id',
-                loadComponent: () => import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon)
+                loadComponent: () =>
+                    import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon),
             },
             {
                 path: 'nuevo-empleado',
-                loadComponent: () => import('./components/admin/add-empleado/add-empleado').then((m) => m.AddEmpleado)
-            }
+                loadComponent: () =>
+                    import('./components/admin/add-empleado/add-empleado').then(
+                        (m) => m.AddEmpleado,
+                    ),
+            },
         ],
     },
     {
         path: 'perfil',
         canActivate: [authGuard],
-        loadComponent: () => import('./components/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
+        loadComponent: () =>
+            import('./components/cliente/mi-perfil/mi-perfil').then((m) => m.MiPerfil),
     },
     {
         path: 'mis-entradas',
         canActivate: [authGuard],
-        loadComponent: () => import('./components/cliente/mis-entradas/mis-entradas').then((m) => m.MisEntradas),
+        loadComponent: () =>
+            import('./components/cliente/mis-entradas/mis-entradas').then((m) => m.MisEntradas),
+    },
+    {
+        path: 'historial-compras',
+        canActivate: [authGuard],
+        loadComponent: () =>
+            import('./components/cliente/historial-compras/historial-compras').then(
+                (m) => m.HistorialCompras,
+            ),
+    },
+    {
+        path: 'mis-resenas',
+        canActivate: [authGuard],
+        loadComponent: () =>
+            import('./components/cliente/mis-resenas/mis-resenas').then((m) => m.MisResenas),
     },
     {
         path: 'historial-canjes',
         canActivate: [authGuard],
-        loadComponent: () => import('./components/cliente/historial-canjes/historial-canjes').then(m => m.HistorialCanjes)
+        loadComponent: () =>
+            import('./components/cliente/historial-canjes/historial-canjes').then(
+                (m) => m.HistorialCanjes,
+            ),
     },
     {
         path: 'empleado',
         canActivate: [employeeGuard],
-        loadComponent: () => import('./components/empleado/escanear-entrada/escanear-entrada').then((m) => m.EscanearEntrada),
+        loadComponent: () =>
+            import('./components/empleado/escanear-entrada/escanear-entrada').then(
+                (m) => m.EscanearEntrada,
+            ),
     },
     {
         path: '**',
-        loadComponent: () => import('./components/home-page/home-page').then((m) => m.HomePage)
-    }
+        loadComponent: () => import('./components/home-page/home-page').then((m) => m.HomePage),
+    },
 ];

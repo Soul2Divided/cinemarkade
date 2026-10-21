@@ -170,10 +170,8 @@
                 </form>
             }
 
-            <!-- SECCIÓN DE PUNTOS (SCORE / COINS) -->
             <div class="score-card">
                 <div class="coin-icon-wrapper">
-                    <!-- Moneda de 8 bits creada en CSS/Pixel Art -->
                     <div class="pixel-coin">
                         <div class="coin-inner">$</div>
                     </div>
@@ -190,14 +188,23 @@
                 <h3 class="menu-title">► SELECCIONAR OPCIÓN</h3>
 
                 <div class="menu-buttons">
-                    <a class="menu-card-btn highlight-yellow" routerLink="/historial-canjes">
-                        <div class="btn-icon">🪙</div>
+                    <button type="button" class="menu-card-btn" (click)="irAMisResenas()">
+                        <div class="btn-icon" aria-hidden="true">⭐</div>
+                        <div class="btn-content">
+                            <span class="btn-title">MIS RESEÑAS</span>
+                            <span class="btn-sub">VER, EDITAR Y ELIMINAR MIS OPINIONES</span>
+                        </div>
+                        <span class="arrow-indicator">►</span>
+                    </button>
+
+                    <button type="button" class="menu-card-btn" (click)="irAHistorialCanjes()">
+                        <div class="btn-icon" aria-hidden="true">🎁</div>
                         <div class="btn-content">
                             <span class="btn-title">HISTORIAL DE CANJES</span>
                             <span class="btn-sub">RECOMPENSAS Y PUNTOS UTILIZADOS</span>
                         </div>
                         <span class="arrow-indicator">►</span>
-                    </a>
+                    </button>
                     <button type="button" class="menu-card-btn" (click)="irAHistorialCompras()">
                         <div class="btn-icon">🧾</div>
                         <div class="btn-content">

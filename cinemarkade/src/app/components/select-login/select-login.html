@@ -2,17 +2,73 @@
 
 <div class="select-container">
     <div class="arcade-card">
+        @if (pruebasHabilitadas) {
+            <div
+                class="test-users"
+                (focusout)="cerrarAlSalir($event)"
+                (keydown.escape)="menuPruebasAbierto.set(false)"
+            >
+                <button
+                    type="button"
+                    class="question-block"
+                    aria-label="Elegir un perfil de prueba"
+                    aria-controls="perfiles-prueba"
+                    [attr.aria-expanded]="menuPruebasAbierto()"
+                    (click)="alternarPerfiles()"
+                    title="Perfiles de prueba"
+                >
+                    <span aria-hidden="true">?</span>
+                </button>
+
+                @if (menuPruebasAbierto()) {
+                    <div id="perfiles-prueba" class="test-users-dropdown">
+                        <h3>PERFILES DE PRUEBA</h3>
+
+                        @if (cargandoPerfiles()) {
+                            <p role="status">CARGANDO PERFILES...</p>
+                        } @else if (errorPerfiles()) {
+                            <p role="alert">{{ errorPerfiles() }}</p>
+                            <button type="button" class="retry-profiles" (click)="cargarPerfiles()">
+                                REINTENTAR
+                            </button>
+                        } @else {
+                            <ul>
+                                @for (perfil of perfiles(); track perfil.id) {
+                                    <li>
+                                        <button
+                                            type="button"
+                                            class="test-user-option"
+                                            (click)="elegirPerfil(perfil.id)"
+                                        >
+                                            <strong>{{ perfil.etiqueta }}</strong>
+                                            <span>{{ perfil.mail }}</span>
+                                        </button>
+                                    </li>
+                                } @empty {
+                                    <li class="empty-profiles">
+                                        Todavía no hay perfiles de prueba disponibles.
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
         <div class="arcade-menu">
             <span class="badge-header">INSERT COIN TO PLAY</span>
             <h2 class="arcade-title">CINEMARKADE</h2>
 
             <div class="menu-options">
                 <button type="button" class="btn-menu yellow" (click)="irALogin()">
-                    <span class="selector">►</span> [ 1 PLAYER ] INICIAR SESIÓN
+                    <span class="selector">►</span>
+                    [ 1 PLAYER ] INICIAR SESIÓN
                 </button>
 
                 <button type="button" class="btn-menu cyan" (click)="irARegistro()">
-                    <span class="selector">►</span> [ NEW GAME ] REGISTRARSE
+                    <span class="selector">►</span>
+                    [ NEW GAME ] REGISTRARSE
                 </button>
             </div>
 

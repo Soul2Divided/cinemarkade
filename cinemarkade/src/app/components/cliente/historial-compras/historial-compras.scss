@@ -1,0 +1,177 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+    min-height: 100vh;
+    color: #eee;
+    background: #100f0d;
+}
+
+.purchase-history {
+    display: grid;
+    gap: 28px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    box-sizing: border-box;
+}
+
+.back-button,
+.retry-button {
+    justify-self: start;
+    padding: 12px;
+    border: 1px solid theme.$arcade-cyan;
+    background: #111;
+    color: theme.$arcade-cyan;
+    font: 0.6rem/1.8 theme.$font-pixel;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+        border-color: theme.$arcade-yellow;
+        color: theme.$arcade-yellow;
+        outline-color: theme.$arcade-yellow;
+    }
+}
+
+.history-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 24px;
+    border-bottom: 2px dashed #444;
+
+    h1 {
+        margin: 0;
+        color: theme.$arcade-yellow;
+        font: 1.1rem/1.8 theme.$font-pixel;
+    }
+}
+
+.history-count {
+    color: theme.$arcade-cyan;
+    font: 0.6rem/1.8 theme.$font-pixel;
+}
+
+.purchases-list {
+    display: grid;
+    gap: 24px;
+}
+
+.purchase-card {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 24px;
+    padding: 24px;
+    border: 2px solid theme.$arcade-yellow;
+    background: #141418;
+    box-shadow: 5px 5px 0 #000;
+}
+
+.purchase-poster {
+    display: grid;
+    place-items: center;
+    align-self: start;
+    aspect-ratio: 2 / 3;
+    background: #222;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    span {
+        font-size: 2rem;
+    }
+}
+
+.purchase-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    h2 {
+        margin: 0;
+        color: theme.$arcade-yellow;
+        font: 0.85rem/1.8 theme.$font-pixel;
+        overflow-wrap: anywhere;
+    }
+}
+
+.purchase-status {
+    padding: 8px;
+    border: 1px solid theme.$arcade-cyan;
+    color: theme.$arcade-cyan;
+    font: 0.5rem/1.6 theme.$font-pixel;
+
+    &.cancelled {
+        border-color: #ff8ca7;
+        color: #ff8ca7;
+    }
+}
+
+.purchase-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin: 24px 0 0;
+
+    dt {
+        margin-bottom: 8px;
+        color: #aaa;
+        font: 0.5rem/1.8 theme.$font-pixel;
+    }
+
+    dd {
+        margin: 0;
+        color: #eee;
+        font:
+            16px/1.6 Arial,
+            sans-serif;
+        overflow-wrap: anywhere;
+    }
+
+    .purchase-total {
+        color: theme.$arcade-yellow;
+        font-weight: bold;
+    }
+}
+
+.state-message {
+    margin: 0;
+    padding: 24px;
+    border: 1px dashed #777;
+    font: 16px/1.8 monospace;
+
+    p {
+        margin: 0 0 16px;
+    }
+}
+
+.error-message {
+    color: #ff8ca7;
+}
+
+@media (max-width: 600px) {
+    .purchase-card {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 20px;
+    }
+
+    .purchase-poster {
+        width: 100px;
+    }
+
+    .purchase-details {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .history-header h1 {
+        font-size: 0.85rem;
+    }
+}

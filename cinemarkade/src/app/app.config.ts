@@ -1,4 +1,9 @@
-import { ApplicationConfig, LOCALE_ID, provideBrowserGlobalErrorListeners, isDevMode } from '@angular/core';
+import {
+    ApplicationConfig,
+    LOCALE_ID,
+    provideBrowserGlobalErrorListeners,
+    isDevMode,
+} from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { provideRouter } from '@angular/router';
@@ -32,31 +37,37 @@ import { CompraButacaRepository } from './core/compra-butaca/compra-butaca.repos
 import { SupabaseCompraButacaAdapter } from './core/compra-butaca/supabase-compra-butaca.adapter';
 import { RecompensaRepository } from './core/recompensa/recompensa.repository';
 import { SupabaseRecompensaAdapter } from './core/recompensa/supabase-recompensa.adapter';
+import { ResenaRepository } from './core/resena/resena.repository';
+import { SupabaseResenaAdapter } from './core/resena/supabase-resena.adapter';
+import { UsuarioPruebaRepository } from './core/usuario-prueba/usuario-prueba.repository';
+import { SupabaseUsuarioPruebaAdapter } from './core/usuario-prueba/supabase-usuario-prueba.adapter';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    { provide: RecompensaRepository, useClass: SupabaseRecompensaAdapter },
-    { provide: LOCALE_ID, useValue: 'es-AR' },
-    provideBrowserGlobalErrorListeners(),
-    provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000'
-    }),
-    provideRouter(routes),
-    { provide: UserRepository, useClass: SupabaseUserAdapter },
-    { provide: PeliculaRepository, useClass: SupabasePeliculaAdapter },
-    { provide: SalaRepository, useClass: SupabaseSalaAdapter },
-    { provide: ProductoRepository, useClass: SupabaseProductoAdapter },
-    { provide: FuncionRepository, useClass: SupabaseFuncionAdapter},
-    { provide: CuponRepository, useClass: SupabaseCuponAdapter},
-    { provide: ComboRepository, useClass: SupabaseComboAdapter},
-    { provide: CompraRepository, useClass: SupabaseCompraAdapter},
-    { provide: DetalleCompraRepository, useClass: SupabaseDetalleCompraAdapter},
-    { provide: TarifaFormatoRepository, useClass: SupabaseTarifaFormatoAdapter},
-    { provide: ButacaRepository, useClass: SupabaseButacaAdapter},
-    { provide: ButacaProyeccionRepository, useClass: SupabaseButacaProyeccionAdapter},
-    { provide: CompraButacaRepository, useClass: SupabaseCompraButacaAdapter}
-  ]
+    providers: [
+        { provide: UsuarioPruebaRepository, useClass: SupabaseUsuarioPruebaAdapter },
+        { provide: ResenaRepository, useClass: SupabaseResenaAdapter },
+        { provide: RecompensaRepository, useClass: SupabaseRecompensaAdapter },
+        { provide: LOCALE_ID, useValue: 'es-AR' },
+        provideBrowserGlobalErrorListeners(),
+        provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000',
+        }),
+        provideRouter(routes),
+        { provide: UserRepository, useClass: SupabaseUserAdapter },
+        { provide: PeliculaRepository, useClass: SupabasePeliculaAdapter },
+        { provide: SalaRepository, useClass: SupabaseSalaAdapter },
+        { provide: ProductoRepository, useClass: SupabaseProductoAdapter },
+        { provide: FuncionRepository, useClass: SupabaseFuncionAdapter },
+        { provide: CuponRepository, useClass: SupabaseCuponAdapter },
+        { provide: ComboRepository, useClass: SupabaseComboAdapter },
+        { provide: CompraRepository, useClass: SupabaseCompraAdapter },
+        { provide: DetalleCompraRepository, useClass: SupabaseDetalleCompraAdapter },
+        { provide: TarifaFormatoRepository, useClass: SupabaseTarifaFormatoAdapter },
+        { provide: ButacaRepository, useClass: SupabaseButacaAdapter },
+        { provide: ButacaProyeccionRepository, useClass: SupabaseButacaProyeccionAdapter },
+        { provide: CompraButacaRepository, useClass: SupabaseCompraButacaAdapter },
+    ],
 };

@@ -1,0 +1,178 @@
+<section
+    class="reviews-panel"
+    [attr.aria-label]="propias() ? 'Mis reseñas' : 'Reseñas de la película'"
+>
+    <header class="reviews-header">
+        <h2>{{ propias() ? 'MIS RESEÑAS' : 'RESEÑAS' }}</h2>
+        @if (!cargando() && (!error() || resenas().length)) {
+            <span>{{ resenas().length }} {{ propias() ? 'PUBLICADAS' : 'OPINIONES' }}</span>
+        }
+    </header>
+
+    @if (error()) {
+        <div class="review-error" role="alert">
+            <p>{{ error() }}</p>
+            <button
+                type="button"
+                (click)="reintentar.emit()"
+                [disabled]="guardando() || cargando()"
+            >
+                RECARGAR LISTA
+            </button>
+        </div>
+    }
+
+    @if (mensaje()) {
+        <p class="review-success" role="status">{{ mensaje() }}</p>
+    }
+
+    @if (cargando()) {
+        <p class="review-state" role="status">CARGANDO RESEÑAS...</p>
+    } @else {
+        <div class="reviews-scroll" tabindex="0" aria-label="Lista de reseñas, desplazable">
+            @for (resena of resenas(); track resena.id) {
+                <article class="review-card">
+                    @if (propias()) {
+                        <a class="review-movie" [routerLink]="['/funciones', resena.pelicula_id]">
+                            <img [src]="resena.pelicula_imagen" alt="" />
+                            <strong>{{ resena.pelicula_nombre }}</strong>
+                        </a>
+                    } @else {
+                        <strong class="review-author">{{ resena.autor_nombre }}</strong>
+                    }
+
+                    <app-estrellas [valor]="resena.estrellas"></app-estrellas>
+                    <time [attr.datetime]="resena.fecha">
+                        {{ resena.fecha | date: 'dd/MM/yyyy' : '-0300' }}
+                    </time>
+                    <p class="review-comment">{{ resena.comentario }}</p>
+
+                    @if (resena.usuario_id === usuarioId()) {
+                        <div class="review-actions">
+                            <button type="button" (click)="editar(resena)" [disabled]="guardando()">
+                                EDITAR
+                            </button>
+                            <button
+                                type="button"
+                                class="danger"
+                                (click)="eliminandoId.set(resena.id)"
+                                [disabled]="guardando()"
+                            >
+                                ELIMINAR
+                            </button>
+                        </div>
+
+                        @if (eliminandoId() === resena.id) {
+                            <div class="delete-confirmation">
+                                <p>¿Eliminar esta reseña?</p>
+                                <div class="review-actions">
+                                    <button
+                                        type="button"
+                                        (click)="eliminandoId.set(null)"
+                                        [disabled]="guardando()"
+                                    >
+                                        CANCELAR
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="danger"
+                                        (click)="confirmarEliminacion(resena.id)"
+                                        [disabled]="guardando()"
+                                    >
+                                        {{ guardando() ? 'ELIMINANDO...' : 'CONFIRMAR' }}
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                </article>
+            } @empty {
+                @if (!error()) {
+                    <p class="review-state">
+                        {{
+                            propias()
+                                ? 'Todavía no publicaste reseñas.'
+                                : 'Todavía no hay reseñas. ¡Compartí tu opinión!'
+                        }}
+                    </p>
+                }
+            }
+        </div>
+
+        @if (!usuarioId() && !propias()) {
+            <p class="review-state">
+                <a routerLink="/login">Iniciá sesión</a>
+                para calificar y escribir una reseña.
+            </p>
+        }
+    }
+
+    @if (mostrarFormulario()) {
+        <form class="review-form" [formGroup]="formulario" (ngSubmit)="enviar()">
+            <h3>{{ editandoId() ? 'EDITAR MI RESEÑA' : 'TU OPINIÓN' }}</h3>
+
+            <fieldset [disabled]="guardando()">
+                <legend>PUNTUACIÓN</legend>
+                <div class="rating-options">
+                    @for (estrella of estrellas; track estrella) {
+                        <label class="rating-option">
+                            <input
+                                type="radio"
+                                formControlName="estrellas"
+                                [value]="estrella"
+                                [attr.aria-label]="estrella + ' de 5 estrellas'"
+                            />
+                            <span class="rating-icon" aria-hidden="true">
+                                <app-estrellas
+                                    [cantidad]="1"
+                                    [valor]="
+                                        formulario.controls.estrellas.value >= estrella ? 1 : 0
+                                    "
+                                ></app-estrellas>
+                            </span>
+                        </label>
+                    }
+                </div>
+
+                @if (
+                    formulario.controls.estrellas.touched && formulario.controls.estrellas.invalid
+                ) {
+                    <small class="review-error">Seleccioná entre 1 y 5 estrellas.</small>
+                }
+
+                <label for="comentario-resena">COMENTARIO</label>
+                <textarea
+                    id="comentario-resena"
+                    formControlName="comentario"
+                    rows="3"
+                    maxlength="300"
+                    placeholder="¿Qué te pareció la película?"
+                    [attr.aria-invalid]="
+                        formulario.controls.comentario.touched &&
+                        formulario.controls.comentario.invalid
+                    "
+                ></textarea>
+                <small class="character-count">
+                    {{ formulario.controls.comentario.value.length }}/300
+                </small>
+
+                @if (
+                    formulario.controls.comentario.touched && formulario.controls.comentario.invalid
+                ) {
+                    <small class="review-error">
+                        Escribí un comentario de entre 1 y 300 caracteres.
+                    </small>
+                }
+
+                <div class="review-actions">
+                    @if (editandoId()) {
+                        <button type="button" (click)="cancelarEdicion()">CANCELAR</button>
+                    }
+                    <button type="submit" class="primary">
+                        {{ guardando() ? 'GUARDANDO...' : 'GUARDAR RESEÑA' }}
+                    </button>
+                </div>
+            </fieldset>
+        </form>
+    }
+</section>

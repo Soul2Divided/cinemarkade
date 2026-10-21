@@ -1,11 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Navbar } from '../../navbar/navbar';
 import { AuthService } from '../../../auth/auth.service';
 
 @Component({
-    imports: [Navbar, RouterLink, ReactiveFormsModule],
+    imports: [Navbar, ReactiveFormsModule],
     selector: 'app-mi-perfil',
     styleUrl: './mi-perfil.scss',
     templateUrl: './mi-perfil.html',
@@ -118,6 +118,14 @@ export class MiPerfil {
 
     irAHistorialCompras(): void {
         this.router.navigate(['/historial-compras']);
+    }
+
+    irAMisResenas(): void {
+        this.router.navigate(['/mis-resenas']);
+    }
+
+    irAHistorialCanjes(): void {
+        this.router.navigate(['/historial-canjes']);
     }
 
     irAHistorialFunciones(): void {

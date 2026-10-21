@@ -1,0 +1,7 @@
+<span class="stars" role="img" [attr.aria-label]="valor() + ' de 5 estrellas'">
+    @for (posicion of posiciones(); track posicion) {
+        <span class="pixel-star" aria-hidden="true">
+            <span class="star-fill" [style.width.%]="porcentaje(posicion)"></span>
+        </span>
+    }
+</span>

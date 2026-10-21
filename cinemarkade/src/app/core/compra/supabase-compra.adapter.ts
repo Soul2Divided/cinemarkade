@@ -26,7 +26,8 @@ export class SupabaseCompraAdapter implements CompraRepository {
             .from('compra')
             .select('*')
             .eq('usuario_id', usuarioId)
-            .order('fecha_compra', { ascending: false });
+            .order('fecha_compra', { ascending: false, nullsFirst: false })
+            .order('id', { ascending: false });
 
         if (error) {
             throw new Error(`Error al listar las compras del usuario: ${error.message}`);

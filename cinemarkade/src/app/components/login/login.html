@@ -1,28 +1,57 @@
 <app-navbar></app-navbar>
 
 <div class="login-container">
-    <form class="form-login" [formGroup]="formLogin" (ngSubmit)="onSubmit()" [class.error-shake]="errorMessage">
+    <form
+        class="form-login"
+        [formGroup]="formLogin"
+        (ngSubmit)="onSubmit()"
+        [class.error-shake]="errorMessage"
+    >
         <h2 class="form-login-heading">INICIAR SESIÓN</h2>
 
         @if (errorMessage) {
-        <div class="error-message">
-            <span class="error-icon">⚠️</span> {{ errorMessage }}
-        </div>
+            <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                {{ errorMessage }}
+            </div>
         }
 
-        <div class="form-group" [class.has-error]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched">
+        <div
+            class="form-group"
+            [class.has-error]="formLogin.get('email')?.invalid && formLogin.get('email')?.touched"
+        >
             <label class="form-label">EMAIL</label>
-            <input type="email" formControlName="email" class="form-control" placeholder="ALGUIEN@CINEMARKADE.COM"
-                required autofocus>
+            <input
+                type="email"
+                formControlName="email"
+                class="form-control"
+                placeholder="ALGUIEN@CINEMARKADE.COM"
+                required
+                autofocus
+            />
         </div>
 
-        <div class="form-group"
-            [class.has-error]="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
+        <div
+            class="form-group"
+            [class.has-error]="
+                formLogin.get('password')?.invalid && formLogin.get('password')?.touched
+            "
+        >
             <label class="form-label">CONTRASEÑA</label>
-            <input type="password" formControlName="password" class="form-control" placeholder="••••••••" required>
+            <input
+                type="password"
+                formControlName="password"
+                class="form-control"
+                placeholder="••••••••"
+                required
+            />
         </div>
 
-        <button class="btn btn-pixel yellow" type="submit" [disabled]="formLogin.invalid">
+        <button
+            class="btn btn-pixel yellow"
+            type="submit"
+            [disabled]="formLogin.invalid || mostrarLoader() || mostrarModal()"
+        >
             PRESS START
         </button>
 
@@ -39,9 +68,13 @@
         <app-loader message="INICIANDO SESIÓN..."></app-loader>
     }
 
-    <app-modal [isOpen]="mostrarModal()" title="SESIÓN INICIADA CON EXITO" subtitle="DISFRUTA DE TUS PELICULAS FAVORITAS"
-        variant="cyan" (close)="cerrarModal()">
-
+    <app-modal
+        [isOpen]="mostrarModal()"
+        title="SESIÓN INICIADA CON EXITO"
+        subtitle="DISFRUTA DE TUS PELICULAS FAVORITAS"
+        variant="cyan"
+        (close)="cerrarModal()"
+    >
         <p>¡Recordá que con tu cuenta tenés beneficios exclusivos!</p>
         <p>Acumulá puntos y canjealos por lo que más te guste</p>
 

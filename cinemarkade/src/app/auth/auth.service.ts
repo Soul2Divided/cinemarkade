@@ -1,17 +1,18 @@
-import { inject, Injectable, signal } from "@angular/core";
-import { SupabaseService } from "../core/services/supabase.service";
-import { SignInWithPasswordCredentials } from "@supabase/supabase-js";
-import { UserService } from "../core/user/user.service";
-import { ActualizarPerfilInput, User } from "../core/user/user.model";
+import { inject, Injectable, signal } from '@angular/core';
+import { SupabaseService } from '../core/services/supabase.service';
+import { SignInWithPasswordCredentials } from '@supabase/supabase-js';
+import { UserService } from '../core/user/user.service';
+import { ActualizarPerfilInput, User } from '../core/user/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
     private _supabaseClient = inject(SupabaseService).supabaseClient;
     private userService = inject(UserService);
     private _usuarioActual = signal<User | null>(null);
+    private readonly _cargandoUsuario = signal(true);
 
     usuarioActual = this._usuarioActual.asReadonly();
+    readonly cargandoUsuario = this._cargandoUsuario.asReadonly();
 
     constructor() {
         this.escucharCambiosDeSesion();
@@ -64,6 +65,8 @@ export class AuthService {
     }
 
     private async cargarUsuarioDeSesion(): Promise<void> {
+        this._cargandoUsuario.set(true);
+
         try {
             const { data, error } = await this._supabaseClient.auth.getSession();
             if (error) throw error;
@@ -79,6 +82,8 @@ export class AuthService {
         } catch (error) {
             console.error('No se pudo recuperar el perfil de la sesión:', error);
             this._usuarioActual.set(null);
+        } finally {
+            this._cargandoUsuario.set(false);
         }
     }
 }

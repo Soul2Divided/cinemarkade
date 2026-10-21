@@ -1,0 +1,18 @@
+<app-navbar></app-navbar>
+
+<main class="my-reviews-page">
+    <a class="back-link" routerLink="/perfil">← VOLVER A MI PERFIL</a>
+
+    <app-resena
+        [resenas]="resenas()"
+        [usuarioId]="authService.usuarioActual()?.id ?? null"
+        [cargando]="cargando()"
+        [guardando]="guardando()"
+        [error]="error()"
+        [mensaje]="mensaje()"
+        [propias]="true"
+        (guardar)="guardarResena($event)"
+        (eliminar)="eliminarResena($event)"
+        (reintentar)="cargarResenas()"
+    ></app-resena>
+</main>
