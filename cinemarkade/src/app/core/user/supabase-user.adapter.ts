@@ -1,16 +1,48 @@
 import { Injectable } from '@angular/core';
 import { UserRepository } from './user.repository';
-import { CrearUserData, User } from './user.model';
+import { ActualizarPerfilInput, CrearUserData, User } from './user.model';
 import { SupabaseService } from '../services/supabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseUserAdapter implements UserRepository {
-    constructor(private supabaseService: SupabaseService) { }
+    constructor(private supabaseService: SupabaseService) {}
+
+    async actualizarPerfil(datos: ActualizarPerfilInput): Promise<User> {
+        const supabase = this.supabaseService.supabaseClient;
+        const { data: autenticacion, error: errorSesion } = await supabase.auth.getUser();
+
+        if (errorSesion || !autenticacion.user) {
+            throw new Error('Iniciá sesión para editar tu perfil.');
+        }
+
+        const { data, error } = await supabase
+            .from('usuario')
+            .update({
+                nombre: datos.nombre,
+                apellido: datos.apellido,
+                fecha_nacimiento: datos.fecha_nacimiento,
+                tipo_sangre: datos.tipo_sangre,
+                color_ojos: datos.color_ojos,
+                cantidad_dias_vacaciones: datos.cantidad_dias_vacaciones,
+            })
+            .eq('id', autenticacion.user.id)
+            .select('*')
+            .single();
+
+        if (error) {
+            throw new Error(`No se pudo guardar el perfil: ${error.message}`);
+        }
+
+        return this.mapToModel(data);
+    }
 
     async createEmployee(user: CrearUserData): Promise<User> {
         const supabase = this.supabaseService.supabaseClient;
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) throw new Error(`No se pudo recuperar la sesión del administrador: ${sessionError.message}`);
+        if (sessionError)
+            throw new Error(
+                `No se pudo recuperar la sesión del administrador: ${sessionError.message}`,
+            );
         const sesionAdmin = sessionData.session;
         let sesionRestaurada = false;
 
@@ -27,7 +59,10 @@ export class SupabaseUserAdapter implements UserRepository {
                     access_token: sesionAdmin.access_token,
                     refresh_token: sesionAdmin.refresh_token,
                 });
-                if (error) throw new Error(`No se pudo restaurar la sesión del administrador: ${error.message}`);
+                if (error)
+                    throw new Error(
+                        `No se pudo restaurar la sesión del administrador: ${error.message}`,
+                    );
                 sesionRestaurada = true;
             }
 
@@ -38,7 +73,8 @@ export class SupabaseUserAdapter implements UserRepository {
                     access_token: sesionAdmin.access_token,
                     refresh_token: sesionAdmin.refresh_token,
                 });
-                if (error) console.error('No se pudo restaurar la sesión del administrador:', error);
+                if (error)
+                    console.error('No se pudo restaurar la sesión del administrador:', error);
             }
         }
     }

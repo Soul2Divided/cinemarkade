@@ -3,89 +3,187 @@
         <span class="logo-text">CINEMARKADE</span>
     </div>
 
-    <div class="nav-search">
+    <form
+        class="nav-search"
+        role="search"
+        (submit)="$event.preventDefault()"
+        (focusout)="salirDelBuscador($event)"
+        (keydown.escape)="cerrarBuscador()"
+    >
         <span class="search-icon">🔍</span>
-        <input type="text" class="search-input" placeholder="BUSCAR PELÍCULA..." (input)="onSearch($event)" />
-    </div>
+        <input
+            #busquedaInput
+            type="search"
+            class="search-input"
+            placeholder="BUSCAR PELÍCULA..."
+            aria-label="Buscar película por título"
+            [value]="busqueda()"
+            autocomplete="off"
+            aria-controls="resultados-busqueda"
+            [attr.aria-expanded]="buscadorAbierto() && !!busqueda().trim()"
+            (focus)="abrirBuscador()"
+            (input)="onSearch($event)"
+        />
+
+        @if (buscadorAbierto() && busqueda().trim()) {
+            <div id="resultados-busqueda" class="search-dropdown">
+                @if (cargandoPeliculas()) {
+                    <p class="search-message" role="status">BUSCANDO PELÍCULAS...</p>
+                } @else if (errorBusqueda()) {
+                    <p class="search-message" role="alert">{{ errorBusqueda() }}</p>
+
+                    <button type="button" class="search-retry" (click)="abrirBuscador()">
+                        REINTENTAR
+                    </button>
+                } @else {
+                    <p class="search-message search-count" role="status">
+                        {{ resultados().length }} RESULTADOS
+                    </p>
+
+                    <ul class="search-results" aria-label="Películas encontradas">
+                        @for (pelicula of resultados(); track pelicula.id) {
+                            <li>
+                                <a
+                                    class="search-result"
+                                    [routerLink]="['/funciones', pelicula.id]"
+                                    (click)="seleccionarResultado()"
+                                >
+                                    <img [src]="pelicula.imagen" alt="" class="search-poster" />
+
+                                    <span class="search-movie-info">
+                                        <strong>{{ pelicula.nombre }}</strong>
+                                        <span>
+                                            {{ pelicula.genero }} · {{ pelicula.duracion }} MIN ·
+                                            {{ pelicula.restriccion_edad }}
+                                        </span>
+                                    </span>
+                                </a>
+                            </li>
+                        } @empty {
+                            <li class="search-message">NO ENCONTRAMOS PELÍCULAS CON ESE TÍTULO.</li>
+                        }
+                    </ul>
+                }
+            </div>
+        }
+    </form>
 
     <div class="nav-actions">
-
         @if (authService.usuarioActual(); as usuario) {
-        <div class="menu-perfil-container">
-            <button type="button" class="nav-btn profile-btn" (click)="toggleMenu()" aria-label="Menú de usuario">
-                <span class="icon">👤</span>
-                <span class="profile-text">{{ usuario.nombre | uppercase }}</span>
-                <span class="arrow-icon" [class.rotated]="menuAbierto()">▾</span>
-            </button>
+            <div class="menu-perfil-container">
+                <button
+                    type="button"
+                    class="nav-btn profile-btn"
+                    (click)="toggleMenu()"
+                    aria-label="Menú de usuario"
+                >
+                    <span class="icon">👤</span>
+                    <span class="profile-text">{{ usuario.nombre | uppercase }}</span>
+                    <span class="arrow-icon" [class.rotated]="menuAbierto()">▾</span>
+                </button>
 
-            @if (menuAbierto()) {
-            <div class="arcade-dropdown-menu" (click)="$event.stopPropagation()">
-                <div class="dropdown-header">
-                    <span class="user-role-badge">{{ usuario.rol | uppercase }}</span>
-                </div>
+                @if (menuAbierto()) {
+                    <div class="arcade-dropdown-menu" (click)="$event.stopPropagation()">
+                        <div class="dropdown-header">
+                            <span class="user-role-badge">{{ usuario.rol | uppercase }}</span>
+                        </div>
 
-                <ul class="dropdown-list">
-                    @if (usuario.rol === 'cliente') {
-                    <li>
-                        <a routerLink="/perfil" (click)="cerrarMenu()" class="dropdown-item">
-                            <span class="item-icon">►</span> MI PERFIL
-                        </a>
-                    </li>
+                        <ul class="dropdown-list">
+                            @if (usuario.rol === 'cliente') {
+                                <li>
+                                    <a
+                                        routerLink="/perfil"
+                                        (click)="cerrarMenu()"
+                                        class="dropdown-item"
+                                    >
+                                        <span class="item-icon">►</span>
+                                        MI PERFIL
+                                    </a>
+                                </li>
 
-                    <li>
-                        <a routerLink="/mis-entradas" (click)="cerrarMenu()" class="dropdown-item">
-                            <span class="item-icon">🎟️</span> MIS ENTRADAS
-                        </a>
-                    </li>
-                    }
+                                <li>
+                                    <a
+                                        routerLink="/mis-entradas"
+                                        (click)="cerrarMenu()"
+                                        class="dropdown-item"
+                                    >
+                                        <span class="item-icon">🎟️</span>
+                                        MIS ENTRADAS
+                                    </a>
+                                </li>
+                            }
 
-                    @if (usuario.rol === 'admin') {
-                        <li>
-                        <a routerLink="/admin" (click)="cerrarMenu()" class="dropdown-item">
-                            <span class="item-icon">►</span> PANEL ADMIN
-                        </a>
-                    </li>
-                    }
+                            @if (usuario.rol === 'admin') {
+                                <li>
+                                    <a
+                                        routerLink="/admin"
+                                        (click)="cerrarMenu()"
+                                        class="dropdown-item"
+                                    >
+                                        <span class="item-icon">►</span>
+                                        PANEL ADMIN
+                                    </a>
+                                </li>
+                            }
 
-                    @if (usuario.rol === 'empleado') {
-                    <li>
-                        <a routerLink="/empleado" (click)="cerrarMenu()" class="dropdown-item">
-                            <span class="item-icon">▦</span> ESCANEAR ENTRADA
-                        </a>
-                    </li>
-                    }
+                            @if (usuario.rol === 'empleado') {
+                                <li>
+                                    <a
+                                        routerLink="/empleado"
+                                        (click)="cerrarMenu()"
+                                        class="dropdown-item"
+                                    >
+                                        <span class="item-icon">▦</span>
+                                        ESCANEAR ENTRADA
+                                    </a>
+                                </li>
+                            }
 
-                    <li class="divider"></li>
+                            <li class="divider"></li>
 
-                    <li>
-                        <button type="button" (click)="cerrarSesion()" class="dropdown-item logout-btn">
-                            <span class="item-icon">✖</span> CERRAR SESIÓN
-                        </button>
-                    </li>
-                </ul>
+                            <li>
+                                <button
+                                    type="button"
+                                    (click)="cerrarSesion()"
+                                    class="dropdown-item logout-btn"
+                                >
+                                    <span class="item-icon">✖</span>
+                                    CERRAR SESIÓN
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                }
             </div>
-            }
-        </div>
         } @else {
-        <button type="button" class="nav-btn profile-btn" routerLink="/select-login" aria-label="Perfil">
-            <span class="icon">👤</span>
-            <span class="profile-text">INGRESAR</span>
-        </button>
+            <button
+                type="button"
+                class="nav-btn profile-btn"
+                routerLink="/select-login"
+                aria-label="Perfil"
+            >
+                <span class="icon">👤</span>
+                <span class="profile-text">INGRESAR</span>
+            </button>
         }
     </div>
 </header>
 
 @if (mostrarLoader()) {
-<app-loader message="CERRANDO SESIÓN..."></app-loader>
+    <app-loader message="CERRANDO SESIÓN..."></app-loader>
 }
 
-<app-modal [isOpen]="mostrarModal()" title="SESIÓN CERRADA" subtitle="" variant="cyan" (close)="cerrarModal()">
+<app-modal
+    [isOpen]="mostrarModal()"
+    title="SESIÓN CERRADA"
+    subtitle=""
+    variant="cyan"
+    (close)="cerrarModal()"
+>
     <p>Cerraste sesión correctamente.</p>
     <p>¡Esperamos verte pronto!</p>
 
     <div modal-actions>
-        <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">
-            ACEPTAR
-        </button>
+        <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">ACEPTAR</button>
     </div>
 </app-modal>

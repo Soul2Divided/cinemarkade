@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from "@angular/core";
 import { SupabaseService } from "../core/services/supabase.service";
 import { SignInWithPasswordCredentials } from "@supabase/supabase-js";
 import { UserService } from "../core/user/user.service";
-import { User } from "../core/user/user.model";
+import { ActualizarPerfilInput, User } from "../core/user/user.model";
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -56,6 +56,11 @@ export class AuthService {
 
     async refrescarUsuarioActual(): Promise<void> {
         await this.cargarUsuarioDeSesion();
+    }
+
+    async actualizarPerfil(datos: ActualizarPerfilInput): Promise<void> {
+        const usuario = await this.userService.actualizarPerfil(datos);
+        this._usuarioActual.set(usuario);
     }
 
     private async cargarUsuarioDeSesion(): Promise<void> {

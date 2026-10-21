@@ -7,6 +7,119 @@
     min-height: 100vh;
 }
 
+.profile-edit-form {
+    display: grid;
+    gap: 1.2rem;
+    padding: 1.2rem;
+    border: 2px solid theme.$arcade-cyan;
+    background: #141418;
+
+    h3 {
+        margin: 0;
+        color: theme.$arcade-cyan;
+        font: 0.8rem theme.$font-pixel;
+    }
+
+    fieldset {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.2rem;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        min-width: 0;
+
+        @media (max-width: 600px) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    .profile-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        min-width: 0;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        color: theme.$arcade-text-white;
+        font: 0.55rem/1.7 theme.$font-pixel;
+    }
+
+    input,
+    select {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        padding: 0.75rem;
+        border: 2px solid #888;
+        border-radius: 0;
+        background: #090909;
+        color: #fff;
+        font: 1rem sans-serif;
+        color-scheme: dark;
+
+        &:focus-visible {
+            outline: 2px solid theme.$arcade-cyan;
+            outline-offset: 2px;
+        }
+
+        &[readonly] {
+            color: #aaa;
+            border-color: #444;
+        }
+
+        &[aria-invalid='true'] {
+            border-color: #ff547a;
+        }
+    }
+
+    small {
+        color: #bbb;
+        font: 0.85rem/1.5 sans-serif;
+    }
+
+    .field-error {
+        color: #ff8ca7;
+    }
+}
+
+.profile-edit-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    button {
+        padding: 0.8rem;
+        border: 2px solid #fff;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+        font: 0.6rem/1.6 theme.$font-pixel;
+
+        &.save-profile {
+            border-color: theme.$arcade-yellow;
+            color: theme.$arcade-yellow;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+    }
+}
+
+.profile-success {
+    margin: 0;
+    color: #00ff66;
+    font: 1rem/1.5 sans-serif;
+}
+
 .profile-page-container {
     @extend %pixel-text-rendering;
     display: flex;

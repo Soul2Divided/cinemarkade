@@ -1,17 +1,50 @@
-import { Injectable, Inject } from '@angular/core';
+import { Injectable, Inject, signal } from '@angular/core';
 
 import { PeliculaRepository } from './pelicula.repository';
 import { Pelicula, PeliculaInput, RESTRICCIONES_EDAD } from './pelicula.model';
 
 @Injectable({ providedIn: 'root' })
 export class PeliculaService {
+    private readonly catalogo = signal<Pelicula[]>([]);
+    private readonly cargado = signal(false);
+    private cargaPendiente: Promise<Pelicula[]> | null = null;
+    private versionCatalogo = 0;
 
-    constructor(
-        @Inject(PeliculaRepository) private peliculaRepository: PeliculaRepository
-    ) { }
+    readonly peliculas = this.catalogo.asReadonly();
+    readonly catalogoCargado = this.cargado.asReadonly();
+
+    constructor(@Inject(PeliculaRepository) private peliculaRepository: PeliculaRepository) {}
 
     async listarPeliculas(): Promise<Pelicula[]> {
-        return this.peliculaRepository.listar();
+        if (this.cargado()) {
+            return this.catalogo();
+        }
+
+        if (this.cargaPendiente) {
+            return this.cargaPendiente;
+        }
+
+        const version = this.versionCatalogo;
+        const consulta = this.peliculaRepository.listar().then((peliculas) => {
+            if (version !== this.versionCatalogo) {
+                return this.listarPeliculas();
+            }
+
+            this.catalogo.set(peliculas);
+            this.cargado.set(true);
+
+            return peliculas;
+        });
+
+        this.cargaPendiente = consulta;
+
+        try {
+            return await consulta;
+        } finally {
+            if (this.cargaPendiente === consulta) {
+                this.cargaPendiente = null;
+            }
+        }
     }
 
     async obtenerPorId(id: number): Promise<Pelicula> {
@@ -20,16 +53,42 @@ export class PeliculaService {
 
     async crearPelicula(datos: PeliculaInput): Promise<Pelicula> {
         this.validarDatosBasicos(datos);
-        return this.peliculaRepository.crear(datos);
+        const pelicula = await this.peliculaRepository.crear(datos);
+        this.actualizarCatalogo(pelicula);
+
+        return pelicula;
     }
 
     async actualizarPelicula(id: number, datos: PeliculaInput): Promise<Pelicula> {
         this.validarDatosBasicos(datos);
-        return this.peliculaRepository.actualizar(id, datos);
+        const pelicula = await this.peliculaRepository.actualizar(id, datos);
+        this.actualizarCatalogo(pelicula);
+
+        return pelicula;
     }
 
     async cambiarActiva(id: number, activa: boolean): Promise<void> {
-        return this.peliculaRepository.cambiarActiva(id, activa);
+        await this.peliculaRepository.cambiarActiva(id, activa);
+        this.versionCatalogo++;
+        this.cargaPendiente = null;
+        this.catalogo.update((peliculas) =>
+            peliculas.map((pelicula) => (pelicula.id === id ? { ...pelicula, activa } : pelicula)),
+        );
+    }
+
+    private actualizarCatalogo(pelicula: Pelicula): void {
+        this.versionCatalogo++;
+        this.cargaPendiente = null;
+
+        if (!this.cargado()) {
+            return;
+        }
+
+        this.catalogo.update((peliculas) =>
+            [...peliculas.filter((actual) => actual.id !== pelicula.id), pelicula].sort((a, b) =>
+                a.nombre.localeCompare(b.nombre, 'es'),
+            ),
+        );
     }
 
     private validarDatosBasicos(datos: PeliculaInput): void {
