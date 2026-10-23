@@ -1,5 +1,7 @@
 @use './styles/mixins/pixel-art.scss' as mixins;
 @use './styles/components/ui-components';
+@use './styles/components/section-header';
+@use './styles/components/posters-grid';
 
 html,
 body {

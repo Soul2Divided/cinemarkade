@@ -1,0 +1,7 @@
+<article class="poster-card" (click)="seleccionarPelicula.emit(pelicula())">
+    <div class="card-media">
+        <img [src]="pelicula().imagen" [alt]="pelicula().nombre" />
+    </div>
+
+    <h4 class="card-title">{{ pelicula().nombre }}</h4>
+</article>

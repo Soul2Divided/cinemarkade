@@ -60,7 +60,7 @@
                 }
             </div>
 
-            <button type="button" class="btn btn-pixel yellow" (click)="siguientePaso()">
+            <button type="button" class="btn btn-pixel yellow" (click)="siguientePaso()" appEnfoque>
                 NEXT STAGE ►
             </button>
         </div>
@@ -139,7 +139,7 @@
                     ◄ PREV STAGE
                 </button>
 
-                <button class="btn btn-pixel cyan" type="submit" [disabled]="formRegister.invalid">
+                <button class="btn btn-pixel cyan" type="submit" [disabled]="formRegister.invalid" appEnfoque>
                     CREAR USUARIO
                 </button>
             </div>

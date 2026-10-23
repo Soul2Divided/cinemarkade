@@ -1,0 +1,28 @@
+@use '../themes/arcade-theme' as theme;
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    border-bottom: 2px dashed #222;
+    padding-bottom: 0.6rem;
+
+    .section-title {
+        font-family: theme.$font-pixel;
+        font-size: 1rem;
+        color: theme.$arcade-text-white;
+        letter-spacing: 1px;
+
+        &::before {
+            content: '▌';
+            color: theme.$arcade-yellow;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            font-size: 0.8rem;
+        }
+    }
+
+}

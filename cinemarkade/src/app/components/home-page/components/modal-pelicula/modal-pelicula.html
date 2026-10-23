@@ -1,0 +1,42 @@
+<div class="movie-modal-overlay" (click)="cerrar.emit()">
+    <div class="movie-modal-card" (click)="$event.stopPropagation()">
+        <button type="button" class="btn-close-modal" (click)="cerrar.emit()" appEnfoque>
+            ✖
+        </button>
+
+        <div class="modal-media">
+            <img [src]="pelicula().imagen" [alt]="pelicula().nombre" class="modal-poster" />
+            <span class="badge-rating" [class.age-restricted]="pelicula().restriccion_edad === '+18'">
+                {{ pelicula().restriccion_edad }}
+            </span>
+        </div>
+
+
+        <div class="modal-info">
+            <h2 class="modal-title">{{ pelicula().nombre | uppercase }}</h2>
+
+            <div class="modal-meta">
+                <span class="meta-item">🎭 {{ pelicula().genero | uppercase }}</span>
+                <span class="meta-item">⏱️ {{ pelicula().duracion | formatoDuracion }} </span>
+            </div>
+
+            <p class="modal-synopsis">{{ pelicula().sinopsis }}</p>
+
+            @if (pelicula().restriccion_edad === '+18') {
+            <div class="age-warning-inline" role="alert">
+                <strong>PELÍCULA +18</strong>
+                <span>
+                    Solo mayores de 18 años. Los menores deben asistir acompañados
+                    por un adulto.
+                </span>
+            </div>
+            }
+
+            <div class="modal-actions">
+                <button type="button" class="btn-pixel yellow" (click)="verFunciones.emit(pelicula().id)">
+                    🎟️ VER FUNCIONES
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+@if (elementos().length > 0) {
+<section class="hero-section">
+    <div class="hero-backdrop">
+        <img [src]="elementos()[indiceHeroActual].banner" [alt]="elementos()[indiceHeroActual].nombre"
+            class="hero-img" />
+        <div class="hero-overlay"></div>
+    </div>
+
+    <div class="hero-info">
+        <span class="badge-featured" [class.badge-combo]="elementos()[indiceHeroActual].esCombo">
+            {{
+            elementos()[indiceHeroActual].esCombo
+            ? 'COMBO DESTACADO'
+            : 'DESTACADO'
+            }}
+        </span>
+
+        <h1 class="hero-title">
+            {{ elementos()[indiceHeroActual].nombre | uppercase }}
+        </h1>
+
+        <p class="hero-meta">
+            @if (elementos()[indiceHeroActual].esCombo) {
+            OFERTA CANDY BAR |
+            {{
+            elementos()[indiceHeroActual].precio
+            | currency: 'ARS' : 'symbol-narrow' : '1.0-0'
+            }}
+            } @else {
+            {{ elementos()[indiceHeroActual].genero | uppercase }} |
+            {{ elementos()[indiceHeroActual].duracion | formatoDuracion }} |
+            {{ elementos()[indiceHeroActual].restriccion_edad }}
+            }
+        </p>
+
+        <p class="hero-synopsis">
+            {{ elementos()[indiceHeroActual].sinopsis }}
+        </p>
+
+        @if (!elementos()[indiceHeroActual].esCombo) {
+        <div class="hero-actions">
+            <button type="button" class="btn-pixel yellow" (click)="seleccionarDestacado.emit(elementos()[indiceHeroActual])">
+                🎟️ VER DETALLES
+            </button>
+        </div>
+        }
+    </div>
+
+    <div class="hero-indicators">
+        @for (item of elementos(); track item.id; let i = $index) {
+        <button type="button" class="indicator-btn" [class.active]="indiceHeroActual === i"
+            (click)="seleccionarHero(i)"></button>
+        }
+    </div>
+</section>
+}

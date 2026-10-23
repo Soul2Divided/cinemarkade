@@ -1,0 +1,47 @@
+<section class="catalog-section">
+            <div class="section-header">
+                <h2 class="section-title">EXPLORAR POR GÉNEROS</h2>
+            </div>
+            <div class="genres-grid">
+                @for (genero of generos(); track genero) {
+                <button type="button" class="genre-card" [class.active]="generoSeleccionado() === genero"
+                    (click)="seleccionarGenero(genero)">
+                    <span class="genre-icon">{{ iconoGenero(genero) }}</span>
+                    <span class="genre-name">{{ genero }}</span>
+                    <span class="genre-count">
+                        {{ contarPeliculasDelGenero(genero) }} PELÍCULAS
+                    </span>
+                </button>
+                } @empty {
+                <div class="genre-empty">NO HAY GÉNEROS CARGADOS EN LA CARTELERA</div>
+                }
+            </div>
+
+            <div class="genre-results" id="cartelera">
+                <div class="section-header genre-results-header">
+                    <h3 class="section-title">
+                        {{
+                        generoSeleccionado()
+                        ? 'PELÍCULAS DE ' + (generoSeleccionado() | uppercase)
+                        : 'PELÍCULAS EN CARTELERA'
+                        }}
+                    </h3>
+                    @if (generoSeleccionado()) {
+                    <button type="button" class="clear-genre" (click)="limpiarGeneroSeleccionado()">
+                        ✕ VER TODAS
+                    </button>
+                    }
+                </div>
+
+                <div class="posters-grid">
+                    @for (pelicula of peliculasVisibles(); track pelicula.id) {
+                        <app-card-pelicula 
+                            [pelicula]="pelicula"
+                            (seleccionarPelicula)="seleccionarPelicula.emit($event)"
+                        ></app-card-pelicula>
+                    } @empty {
+                    <p class="genre-empty">NO HAY PELÍCULAS PARA MOSTRAR</p>
+                    }
+                </div>
+            </div>
+        </section>

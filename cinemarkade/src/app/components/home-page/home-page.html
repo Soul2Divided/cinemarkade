@@ -2,76 +2,8 @@
 
 <div class="crt-screen">
     <main class="arcade-content">
-        @if (elementosHero().length > 0) {
-            <section class="hero-section">
-                <div class="hero-backdrop">
-                    <img
-                        [src]="elementosHero()[indiceHeroActual].banner"
-                        [alt]="elementosHero()[indiceHeroActual].nombre"
-                        class="hero-img"
-                    />
-                    <div class="hero-overlay"></div>
-                </div>
 
-                <div class="hero-info">
-                    <span
-                        class="badge-featured"
-                        [class.badge-combo]="elementosHero()[indiceHeroActual].esCombo"
-                    >
-                        {{
-                            elementosHero()[indiceHeroActual].esCombo
-                                ? 'COMBO DESTACADO'
-                                : 'DESTACADO'
-                        }}
-                    </span>
-
-                    <h1 class="hero-title">
-                        {{ elementosHero()[indiceHeroActual].nombre | uppercase }}
-                    </h1>
-
-                    <p class="hero-meta">
-                        @if (elementosHero()[indiceHeroActual].esCombo) {
-                            OFERTA CANDY BAR |
-                            {{
-                                elementosHero()[indiceHeroActual].precio
-                                    | currency: 'ARS' : 'symbol-narrow' : '1.0-0'
-                            }}
-                        } @else {
-                            {{ elementosHero()[indiceHeroActual].genero | uppercase }} |
-                            {{ elementosHero()[indiceHeroActual].duracion }} MIN |
-                            {{ elementosHero()[indiceHeroActual].restriccion_edad }}
-                        }
-                    </p>
-
-                    <p class="hero-synopsis">
-                        {{ elementosHero()[indiceHeroActual].sinopsis }}
-                    </p>
-
-                    @if (!elementosHero()[indiceHeroActual].esCombo) {
-                        <div class="hero-actions">
-                            <button
-                                type="button"
-                                class="btn-pixel yellow"
-                                (click)="ejecutarAccionHero(elementosHero()[indiceHeroActual])"
-                            >
-                                🎟️ VER DETALLES
-                            </button>
-                        </div>
-                    }
-                </div>
-
-                <div class="hero-indicators">
-                    @for (item of elementosHero(); track item.id; let i = $index) {
-                        <button
-                            type="button"
-                            class="indicator-btn"
-                            [class.active]="indiceHeroActual === i"
-                            (click)="seleccionarHero(i)"
-                        ></button>
-                    }
-                </div>
-            </section>
-        }
+        <app-hero [elementos]="elementosHero()" (seleccionarDestacado)="ejecutarAccionHero($event)"></app-hero>
 
         <section class="catalog-section">
             <div class="section-header">
@@ -89,73 +21,14 @@
             </div>
             <div class="posters-grid">
                 @for (pelicula of peliculasEstrenos(); track pelicula.id) {
-                    <article class="poster-card" (click)="seleccionarPelicula(pelicula)">
-                        <div class="card-media">
-                            <img [src]="pelicula.imagen" [alt]="pelicula.nombre" />
-                        </div>
-                        <h4 class="card-title">{{ pelicula.nombre }}</h4>
-                    </article>
+                <app-card-pelicula 
+                    [pelicula]="pelicula"
+                    (seleccionarPelicula)="seleccionarPelicula($event)"
+                ></app-card-pelicula>
                 }
             </div>
         </section>
 
-        <section class="catalog-section">
-            <div class="section-header">
-                <h2 class="section-title">EXPLORAR POR GÉNEROS</h2>
-            </div>
-            <div class="genres-grid">
-                @for (genero of generos(); track genero) {
-                    <button
-                        type="button"
-                        class="genre-card"
-                        [class.active]="generoSeleccionado() === genero"
-                        (click)="seleccionarGenero(genero)"
-                    >
-                        <span class="genre-icon">{{ iconoGenero(genero) }}</span>
-                        <span class="genre-name">{{ genero }}</span>
-                        <span class="genre-count">
-                            {{ contarPeliculasDelGenero(genero) }} PELÍCULAS
-                        </span>
-                    </button>
-                } @empty {
-                    <div class="genre-empty">NO HAY GÉNEROS CARGADOS EN LA CARTELERA</div>
-                }
-            </div>
-
-            <div class="genre-results" id="cartelera">
-                <div class="section-header genre-results-header">
-                    <h3 class="section-title">
-                        {{
-                            generoSeleccionado()
-                                ? 'PELÍCULAS DE ' + (generoSeleccionado() | uppercase)
-                                : 'PELÍCULAS EN CARTELERA'
-                        }}
-                    </h3>
-                    @if (generoSeleccionado()) {
-                        <button
-                            type="button"
-                            class="clear-genre"
-                            (click)="limpiarGeneroSeleccionado()"
-                        >
-                            ✕ VER TODAS
-                        </button>
-                    }
-                </div>
-
-                <div class="posters-grid">
-                    @for (pelicula of peliculasVisibles(); track pelicula.id) {
-                        <article class="poster-card" (click)="seleccionarPelicula(pelicula)">
-                            <div class="card-media">
-                                <img [src]="pelicula.imagen" [alt]="pelicula.nombre" />
-                            </div>
-                            <h4 class="card-title">{{ pelicula.nombre }}</h4>
-                        </article>
-                    } @empty {
-                        <p class="genre-empty">NO HAY PELÍCULAS PARA MOSTRAR</p>
-                    }
-                </div>
-            </div>
-        </section>
 
         <section class="catalog-section">
             <div class="section-header">
@@ -163,11 +36,23 @@
             </div>
             <div class="empty-recommendations">
                 <p>
-                    LAS RECOMENDACIONES SE BASARÁN EN LOS GÉNEROS DE TUS DOS ÚLTIMAS PELÍCULAS
-                    VISTAS.
+                    NO HAY RECOMENDACIONES DISPONIBLES POR EL MOMENTO. TE SUGERIMOS EXPLORAR NUESTRAS PELÍCULAS EN
+                    CARTELERA.
                 </p>
             </div>
         </section>
+
+        <section class="catalog-section">
+            <app-genero [peliculas]="peliculas()" (seleccionarPelicula)="seleccionarPelicula($event)"></app-genero>
+        </section>
+
+        @if (peliculaSeleccionada(); as peli) {
+        <app-modal-pelicula
+                [pelicula]="peli"
+                (cerrar)="cerrarDetalle()"
+                (verFunciones)="irAFunciones($event)"
+            ></app-modal-pelicula>
+        }
 
         <section class="catalog-section upcoming-section">
             <div class="section-header">
@@ -180,63 +65,9 @@
                 </p>
             </div>
         </section>
-
-        @if (peliculaSeleccionada(); as peli) {
-            <div class="movie-modal-overlay" (click)="cerrarDetalle()">
-                <div class="movie-modal-card" (click)="$event.stopPropagation()">
-                    <!-- BOTÓN DE CIERRE -->
-                    <button type="button" class="btn-close-modal" (click)="cerrarDetalle()">
-                        ✖
-                    </button>
-
-                    <!-- COLUMNA IZQUIERDA: POSTER -->
-                    <div class="modal-media">
-                        <img [src]="peli.imagen" [alt]="peli.nombre" class="modal-poster" />
-                        <span
-                            class="badge-rating"
-                            [class.age-restricted]="peli.restriccion_edad === '+18'"
-                        >
-                            {{ peli.restriccion_edad }}
-                        </span>
-                    </div>
-
-                    <!-- COLUMNA DERECHA: INFORMACIÓN -->
-                    <div class="modal-info">
-                        <h2 class="modal-title">{{ peli.nombre | uppercase }}</h2>
-
-                        <div class="modal-meta">
-                            <span class="meta-item">🎭 {{ peli.genero | uppercase }}</span>
-                            <span class="meta-item">⏱️ {{ peli.duracion }} MIN</span>
-                        </div>
-
-                        <p class="modal-synopsis">{{ peli.sinopsis }}</p>
-
-                        @if (peli.restriccion_edad === '+18') {
-                            <div class="age-warning-inline" role="alert">
-                                <strong>PELÍCULA +18</strong>
-                                <span>
-                                    Solo mayores de 18 años. Los menores deben asistir acompañados
-                                    por un adulto.
-                                </span>
-                            </div>
-                        }
-
-                        <div class="modal-actions">
-                            <button
-                                type="button"
-                                class="btn-pixel yellow"
-                                (click)="irAFunciones(peli.id)"
-                            >
-                                🎟️ VER FUNCIONES
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
     </main>
 </div>
 
 @if (mostrarLoader()) {
-    <app-loader message="CARGANDO FUNCIONES..."></app-loader>
+<app-loader message="CARGANDO FUNCIONES..."></app-loader>
 }

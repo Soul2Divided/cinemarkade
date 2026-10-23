@@ -7,9 +7,10 @@ import { Loader } from '../loader/loader';
 import { passwordCheck } from '../../validators/user.validators';
 import { UserService } from '../../core/user/user.service';
 import { CrearUserCommand } from '../../core/user/user.model';
+import { EnfoqueDirective } from '../../shared/enfoque.directive';
 
 @Component({
-  imports: [ReactiveFormsModule, Navbar, Modal, Loader],
+  imports: [ReactiveFormsModule, Navbar, Modal, Loader, EnfoqueDirective],
   selector: 'app-register',
   styleUrl: './register.scss',
   templateUrl: './register.html',

@@ -1,0 +1,95 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+.genres-grid {
+    display: flex;
+    gap: 1.5rem;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+
+    .genre-card {
+        width: 100%;
+        color: inherit;
+        background-color: #0e0e11;
+        border: 2px solid theme.$arcade-text-white;
+        box-shadow: 4px 4px 0px #000;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+        cursor: pointer;
+        text-align: center;
+        font-family: inherit;
+        transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        box-sizing: border-box;
+        min-width: 0;
+
+        .genre-icon {
+            font-size: 1.5rem;
+        }
+
+        .genre-name {
+            font-family: theme.$font-pixel;
+            font-size: 0.7rem;
+            color: theme.$arcade-yellow;
+        }
+
+        .genre-count {
+            color: #888;
+            font: .55rem theme.$font-pixel;
+        }
+
+        &:hover {
+            border-color: theme.$arcade-cyan;
+            box-shadow: 4px 4px 0px theme.$arcade-cyan;
+            transform: translateY(-2px);
+        }
+
+        &.active {
+            border-color: theme.$arcade-yellow;
+            box-shadow: 4px 4px 0px theme.$arcade-yellow;
+        }
+    }
+}
+
+.genre-results {
+    margin-top: 2rem;
+}
+
+.genre-results-header {
+    gap: 1rem;
+}
+
+.genre-results-header .section-title {
+    font-size: .8rem;
+}
+
+.clear-genre {
+    color: theme.$arcade-cyan;
+    background: transparent;
+    border: 1px solid theme.$arcade-cyan;
+    padding: .45rem .6rem;
+    cursor: pointer;
+    font: .55rem theme.$font-pixel;
+}
+
+.clear-genre:hover {
+    color: #000;
+    background: theme.$arcade-cyan;
+}
+
+.genre-empty {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 2rem 1rem;
+    color: #888;
+    border: 1px dashed #444;
+    text-align: center;
+    font: .65rem theme.$font-pixel;
+}

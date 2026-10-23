@@ -1,0 +1,129 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+.hero-section {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    border: 3px solid theme.$arcade-yellow;
+    box-shadow: 6px 6px 0px #000, 0 0 15px rgba(255, 204, 0, 0.2);
+    display: flex;
+    align-items: flex-end;
+    padding: 2.5rem;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+        height: auto;
+        min-height: 380px;
+        padding: 1.5rem;
+    }
+
+    .hero-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.95) 35%, rgba(0, 0, 0, 0.4) 100%);
+
+            @media (max-width: 768px) {
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 50%, rgba(0, 0, 0, 0.5) 100%);
+            }
+        }
+    }
+
+    .hero-info {
+        position: relative;
+        z-index: 2;
+        max-width: 550px;
+
+        .badge-featured {
+            background-color: theme.$arcade-red;
+            color: #fff;
+            font-family: theme.$font-pixel;
+            font-size: 0.6rem;
+            padding: 0.3rem 0.6rem;
+
+        }
+
+        .badge-featured.badge-combo {
+            background-color: theme.$arcade-cyan;
+            color: #000;
+        }
+
+        .hero-title {
+            font-family: theme.$font-pixel;
+            font-size: 1.8rem;
+            color: theme.$arcade-yellow;
+            margin: 1rem 0 0.5rem 0;
+            text-shadow: 3px 3px 0px theme.$arcade-blue-shadow;
+
+            @media (max-width: 768px) {
+                font-size: 1.2rem;
+            }
+        }
+
+        .hero-meta {
+            font-family: theme.$font-pixel;
+            font-size: 0.65rem;
+            color: #aaa;
+            margin-bottom: 1rem;
+        }
+
+        .hero-synopsis {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: theme.$arcade-text-white;
+            margin-bottom: 1.5rem;
+
+            @media (max-width: 768px) {
+                font-size: 0.75rem;
+            }
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+        }
+    }
+
+    .hero-indicators {
+        position: absolute;
+        bottom: 1rem;
+        right: 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+        z-index: 3;
+
+        @media (max-width: 768px) {
+            top: 1rem;
+            bottom: auto;
+        }
+
+        .indicator-btn {
+            width: 12px;
+            height: 12px;
+            background-color: #333;
+            border: 1px solid theme.$arcade-text-white;
+            cursor: pointer;
+
+            &.active {
+                background-color: theme.$arcade-yellow;
+                border-color: theme.$arcade-yellow;
+            }
+        }
+    }
+}
