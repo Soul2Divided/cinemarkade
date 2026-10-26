@@ -1,0 +1,165 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+.order-summary {
+    padding: 1.5rem;
+    background: #121215;
+    border: 1px solid #46464e;
+    border-top: 4px solid theme.$arcade-yellow;
+    box-shadow: 6px 6px 0 #000;
+}
+
+.eyebrow {
+    color: #a4a4af;
+    font: 0.5rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+h2 {
+    margin: 1rem 0 1.5rem;
+    color: theme.$arcade-yellow;
+    font: 1rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+.empty-order {
+    padding: 1.5rem 0.5rem;
+    border-top: 1px dashed #41414b;
+    border-bottom: 1px dashed #41414b;
+    text-align: center;
+}
+
+.bag-icon {
+    font-size: 2.75rem;
+}
+
+h3 {
+    margin: 1rem 0;
+    color: #ddd;
+    font: 0.6rem theme.$font-pixel;
+    line-height: 1.9;
+}
+
+p {
+    color: #a4a4af;
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+dl {
+    margin: 1.5rem 0;
+}
+
+dl > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin: 1rem 0;
+    color: #b8b8c2;
+    font-size: 0.9rem;
+}
+
+dd {
+    margin: 0;
+    color: #fff;
+    white-space: nowrap;
+}
+
+dl > .total-line {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    color: theme.$arcade-yellow;
+    border-top: 2px solid theme.$arcade-yellow;
+    font: 0.75rem theme.$font-pixel;
+}
+
+.total-line dd {
+    color: theme.$arcade-yellow;
+}
+
+button {
+    width: 100%;
+    padding: 1rem 0.5rem;
+    color: #a6a39a;
+    background: #302e1c;
+    border: 1px solid #696234;
+    font: 0.6rem theme.$font-pixel;
+    line-height: 1.8;
+    cursor: not-allowed;
+}
+
+.pickup-note {
+    margin: 1rem 0 0;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.order-item {
+    padding: 1rem 0;
+    border-top: 1px dashed #41414b;
+}
+
+.order-item strong {
+    color: theme.$arcade-yellow;
+}
+
+.item-actions {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.item-actions label {
+    display: grid;
+    gap: 0.5rem;
+    color: #bbb;
+    font-size: 0.8rem;
+}
+
+.item-actions input {
+    box-sizing: border-box;
+    width: 80px;
+    padding: 0.6rem;
+    color: #fff;
+    background: #08080b;
+    border: 1px solid #555;
+    font-size: 1rem;
+}
+
+button.remove-item,
+button.clear-order {
+    width: auto;
+    padding: 0.7rem;
+    color: theme.$arcade-cyan;
+    background: transparent;
+    border-color: #37616a;
+    cursor: pointer;
+}
+
+button.clear-order {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.remove-item:hover,
+.clear-order:hover {
+    background: #172b30;
+}
+
+.order-warning {
+    color: #ffb2a8;
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid theme.$arcade-cyan;
+    outline-offset: 3px;
+}
+
+.order-summary > button:not(:disabled) {
+    color: #000;
+    background: theme.$arcade-yellow;
+    cursor: pointer;
+}

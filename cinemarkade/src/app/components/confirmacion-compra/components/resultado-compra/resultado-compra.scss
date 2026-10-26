@@ -1,0 +1,83 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+}
+
+.confirmation-code {
+    padding: 1.2rem;
+    text-align: center;
+    border-top: 1px dashed #55555e;
+}
+
+.confirmation-code strong {
+    display: block;
+    margin-top: 0.55rem;
+    color: theme.$arcade-cyan;
+    font-size: 1.5rem;
+    overflow-wrap: anywhere;
+}
+
+.confirm-button,
+.back-button,
+.secondary-button {
+    width: min(100%, 760px);
+    margin-top: 1rem;
+    padding: 1.3rem;
+    font: 1rem theme.$font-pixel;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.confirm-button {
+    color: #000;
+    background: theme.$arcade-yellow;
+    border: 2px solid theme.$arcade-yellow;
+}
+
+.confirm-button:hover:not(:disabled) {
+    color: theme.$arcade-yellow;
+    background: transparent;
+}
+
+.confirm-button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.back-button,
+.secondary-button {
+    color: #aaa;
+    background: transparent;
+    border: 1px solid #55555e;
+}
+
+.modal-action {
+    width: 100%;
+    margin: 0;
+    padding: 0.9rem 1rem;
+    font-size: 1rem;
+}
+
+.result-actions {
+    display: grid;
+    gap: 0.85rem;
+    width: 100%;
+}
+
+p {
+    font: 1.25rem/1.7 Arial, sans-serif;
+}
+
+.action-error {
+    color: #ff7777;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.confirmation-code small {
+    display: block;
+    color: #92929a;
+    font: 1rem/1.7 theme.$font-pixel;
+    letter-spacing: 0.06em;
+}

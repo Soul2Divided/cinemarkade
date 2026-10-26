@@ -1,0 +1,38 @@
+<app-modal
+    [isOpen]="imagen() !== null"
+    [title]="esCandy() ? 'QR DE RETIRO' : 'QR DE ENTRADA'"
+    [subtitle]="esCandy() ? 'PRESENTALO EN EL MOSTRADOR' : 'PRESENTALO AL INGRESAR AL CINE'"
+    variant="cyan"
+    (close)="cerrar.emit()"
+>
+    @if (imagen(); as qr) {
+        <div class="purchase-qr">
+            <img
+                [src]="qr"
+                [alt]="
+                    esCandy()
+                        ? 'Código QR para retirar el pedido de candy'
+                        : 'Código QR de entrada al cine'
+                "
+            />
+            <p>
+                {{
+                    esCandy()
+                        ? 'Mostrá este QR al empleado para retirar tu compra.'
+                        : 'Mostrá este QR al empleado para validar tus entradas.'
+                }}
+            </p>
+
+            @if (codigoManual(); as codigo) {
+                <div class="manual-code">
+                    <span>Código manual</span>
+                    <strong>{{ codigo.slice(0, 5) }}-{{ codigo.slice(5) }}</strong>
+                </div>
+            }
+        </div>
+    }
+
+    <div modal-actions class="qr-actions">
+        <button type="button" (click)="cerrar.emit()">CERRAR</button>
+    </div>
+</app-modal>

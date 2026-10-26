@@ -1,0 +1,24 @@
+<div class="ticket-adjustments">
+    @if (datos().cupon?.codigo) {
+        <div class="ticket-coupon">
+            CUPÓN APLICADO · {{ datos().cupon?.codigo }} ({{ datos().cupon?.porcentaje_descuento }}%
+            OFF)
+        </div>
+    }
+    @if (datos().recargoVip) {
+        <div class="ticket-line vip-line">
+            <span>Recargo por butacas VIP</span>
+            <strong>
+                {{ datos().recargoVip | currency: 'ARS' : 'symbol' : '1.0-0' }}
+            </strong>
+        </div>
+    }
+</div>
+<div class="ticket-total">
+    <span>TOTAL</span>
+    <strong>{{ datos().total | currency: 'ARS' : 'symbol' : '1.0-0' }}</strong>
+</div>
+<div class="ticket-points">
+    {{ confirmada() ? 'PUNTOS ACREDITADOS' : 'PUNTOS QUE VAS A SUMAR' }} ·
+    <strong>{{ datos().puntos | number }}</strong>
+</div>

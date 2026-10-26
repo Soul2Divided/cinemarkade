@@ -1,85 +1,51 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CarritoCandyService } from '../../core/candy/carrito-candy.service';
 import { Navbar } from '../navbar/navbar';
 import { Loader } from '../loader/loader';
-import { CompraService } from '../../core/compra/compra.service';
-import { ConfirmarCompraInput } from '../../core/compra/compra.model';
-import { ButacaProyeccionService } from '../../core/butaca-proyeccion/butaca-proyeccion.service';
-import { ButacaProyeccionVista } from '../../core/butaca-proyeccion/butaca-proyeccion.model';
-import { Pelicula } from '../../core/pelicula/pelicula.model';
-import { PeliculaService } from '../../core/pelicula/pelicula.service';
-import { Producto } from '../../core/producto/producto.model';
-import { ProductoService } from '../../core/producto/producto.service';
-import { Combo } from '../../core/combo/combo.model';
-import { ComboService } from '../../core/combo/combo.service';
 import { Modal } from '../modal/modal';
+import { CompraService } from '../../core/compra/compra.service';
+import { BorradorCompra } from '../../core/compra/borrador-compra.model';
+import {
+    CatalogosConfirmacionCompra,
+    PreparacionCompraService,
+} from '../../core/compra/preparacion-compra.service';
 import { TicketPdfService } from '../../core/compra/ticket-pdf.service';
-import QRCode from 'qrcode';
 import { AuthService } from '../../auth/auth.service';
-import { SeleccionRecompensa } from '../../core/recompensa/recompensa.model';
-
-interface ItemBorrador {
-    id: number;
-    cantidad: number;
-}
-
-interface BorradorCompra {
-    solicitudId?: string;
-    recompensas?: SeleccionRecompensa[];
-    puntosUsados?: number;
-    proyeccion: {
-        peliculaId: number;
-        proyeccionId: number;
-        fecha: string;
-        horario: string;
-        formato: string;
-        idioma: string;
-        salaId: number;
-    };
-    cantidadEntradas: number;
-    entradas?: {
-        precio_unitario: number;
-        medio_pago: 'dinero' | 'puntos';
-        puntos_usados: number;
-        recompensa_id?: number;
-    }[];
-    productos: ItemBorrador[];
-    combos: ItemBorrador[];
-    cupon?: { codigo?: string; porcentaje_descuento?: number } | null;
-    subtotal: number;
-    total: number;
-    puntosEstimados: number;
-    butacaProyeccionIds?: number[];
-    butacasSeleccionadas?: string[];
-    recargoButacasVip?: number;
-}
+import { DatosEntrada } from './components/datos-entrada/datos-entrada';
+import { DetalleCompra } from './components/detalle-compra/detalle-compra';
+import { TotalesCompra } from './components/totales-compra/totales-compra';
+import { ResultadoCompra } from './components/resultado-compra/resultado-compra';
+import QRCode from 'qrcode';
 
 @Component({
-    imports: [CommonModule, Navbar, Loader, Modal],
+    imports: [Navbar, Loader, Modal, DatosEntrada, DetalleCompra, TotalesCompra, ResultadoCompra],
     selector: 'app-confirmacion-compra',
     styleUrl: './confirmacion-compra.scss',
-    templateUrl: './confirmacion-compra.html'
+    templateUrl: './confirmacion-compra.html',
 })
 export class ConfirmacionCompra implements OnInit {
     private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
+    private readonly carrito = inject(CarritoCandyService);
+    readonly esCandy = this.route.snapshot.queryParamMap.get('tipo') === 'candy';
     private readonly compraService = inject(CompraService);
-    private readonly butacaProyeccionService = inject(ButacaProyeccionService);
-    private readonly peliculaService = inject(PeliculaService);
-    private readonly productoService = inject(ProductoService);
-    private readonly comboService = inject(ComboService);
+    private readonly preparacionCompra = inject(PreparacionCompraService);
     private readonly ticketPdfService = inject(TicketPdfService);
     private readonly authService = inject(AuthService);
-    readonly recargoPorButacaVip = 5000;
+    private readonly catalogos = signal<CatalogosConfirmacionCompra>({
+        peliculas: [],
+        productos: [],
+        combos: [],
+        butacas: [],
+    });
 
     borrador = signal<BorradorCompra | null>(null);
-    peliculas = signal<Pelicula[]>([]);
-    productos = signal<Producto[]>([]);
-    combos = signal<Combo[]>([]);
-    butacas = signal<ButacaProyeccionVista[]>([]);
     cargando = signal(true);
     confirmando = signal(false);
     compraId = signal('');
+    codigoManual = signal('');
+    preparandoTicket = signal(false);
     qrGenerado = signal<string | null>(null);
     ticketPdf = signal<Blob | null>(null);
     compraAnonima = signal(false);
@@ -87,96 +53,27 @@ export class ConfirmacionCompra implements OnInit {
     mostrarModalExito = signal(false);
     error = signal('');
 
+    readonly resumen = computed(() => {
+        const borrador = this.borrador();
+
+        return borrador ? this.preparacionCompra.crearResumen(borrador, this.catalogos()) : null;
+    });
+
     async ngOnInit(): Promise<void> {
         try {
-            const guardado = sessionStorage.getItem('cinemarkade-compra-borrador');
-
-            if (!guardado) {
-                this.error.set('No encontramos una compra para confirmar. Volvé a iniciar la compra.');
-
-                return;
-            }
-
-            const borrador = JSON.parse(guardado) as BorradorCompra;
-
-            if (!borrador.solicitudId) {
-                borrador.solicitudId = crypto.randomUUID();
-                sessionStorage.setItem('cinemarkade-compra-borrador', JSON.stringify(borrador));
-            }
-
-            if (
-                !borrador.proyeccion?.proyeccionId ||
-                !borrador.butacaProyeccionIds?.length ||
-                borrador.butacaProyeccionIds.length !== borrador.cantidadEntradas
-            ) {
-                this.error.set('Faltan datos de la función o no se seleccionó una butaca por cada entrada.');
-
-                return;
-            }
-
+            const borrador = this.preparacionCompra.recuperarBorrador(this.esCandy);
             this.borrador.set(borrador);
-
-            const [peliculas, productos, combos, butacas] = await Promise.all([
-                this.peliculaService.listarPeliculas(),
-                this.productoService.listarProductos(),
-                this.comboService.listarCombos(),
-                this.butacaProyeccionService.listarPorProyeccion(borrador.proyeccion.proyeccionId)
-            ]);
-            this.peliculas.set(peliculas ?? []);
-            this.productos.set(productos ?? []);
-            this.combos.set(combos ?? []);
-            this.butacas.set(butacas ?? []);
+            this.catalogos.set(await this.preparacionCompra.cargarCatalogos(borrador));
         } catch (error) {
             console.error('No se pudo preparar el ticket:', error);
             this.error.set(
-                'No se pudo cargar el resumen de la compra. Volvé a la selección de butacas e intentá nuevamente.'
+                error instanceof Error
+                    ? error.message
+                    : 'No se pudo cargar el resumen de la compra.',
             );
         } finally {
             this.cargando.set(false);
         }
-    }
-
-    nombrePelicula(): string {
-        const id = this.borrador()?.proyeccion.peliculaId;
-
-        return this.peliculas().find(pelicula => pelicula.id === id)?.nombre ?? 'Película';
-    }
-
-    cantidadProducto(id: number): number {
-        return this.productos().find(item => item.id === id)?.precio ?? 0;
-    }
-
-    nombreProducto(id: number): string {
-        return this.productos().find(item => item.id === id)?.nombre ?? 'Producto';
-    }
-
-    nombreCombo(id: number): string {
-        return this.combos().find(item => item.id === id)?.nombre ?? 'Combo';
-    }
-
-    precioCombo(id: number): number {
-        return this.combos().find(item => item.id === id)?.precio ?? 0;
-    }
-
-    precioTicketBase(): number {
-        const borrador = this.borrador();
-
-        return borrador?.entradas?.[0]?.precio_unitario ?? 0;
-    }
-
-    formatearFecha(fecha: string): string {
-        const [anio, mes, dia] = fecha.slice(0, 10).split('-').map(Number);
-
-        if (!anio || !mes || !dia) {
-            return fecha;
-        }
-
-        return new Date(anio, mes - 1, dia, 12).toLocaleDateString('es-AR', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
     }
 
     async confirmarCompra(): Promise<void> {
@@ -186,19 +83,14 @@ export class ConfirmacionCompra implements OnInit {
             return;
         }
 
-        const butacasSeleccionadas = borrador.butacaProyeccionIds
-            ?.map(id => this.butacas().find(butaca => butaca.id === id))
-            .filter((butaca): butaca is ButacaProyeccionVista => !!butaca);
+        const catalogos = this.catalogos();
 
-        if (!butacasSeleccionadas || butacasSeleccionadas.length !== borrador.cantidadEntradas) {
-            this.error.set('No encontramos todas las butacas seleccionadas. Volvé a elegirlas.');
-
-            return;
-        }
-
-        if (butacasSeleccionadas.some(butaca => butaca.estado !== 'libre')) {
-            this.error.set('Alguna butaca ya no está disponible. Volvé a la grilla y elegí otras.');
-
+        try {
+            this.preparacionCompra.validarButacas(borrador, catalogos.butacas);
+        } catch (error) {
+            this.error.set(
+                error instanceof Error ? error.message : 'No se pudieron validar las butacas.',
+            );
             return;
         }
 
@@ -209,74 +101,29 @@ export class ConfirmacionCompra implements OnInit {
         try {
             const tieneSesion = await this.authService.haySesionActiva();
             this.compraAnonima.set(!tieneSesion);
-            const detalles: ConfirmarCompraInput['detalles'] = [
-                ...borrador.productos.map(item => {
-                    const producto = this.productos().find(actual => actual.id === item.id);
 
-                    if (!producto) {
-                        throw new Error('Uno de los productos ya no está disponible.');
-                    }
+            if (this.esCandy) {
+                const usuarioId = await this.authService.obtenerIdUsuarioSesion();
 
-                    return {
-                        producto_id: producto.id,
-                        combo_id: null,
-                        tipo_item: 'producto' as const,
-                        nombre_item: producto.nombre,
-                        cantidad: item.cantidad,
-                        precio_unitario: producto.precio,
-                        medio_pago: 'dinero' as const,
-                        puntos_usados: 0,
-                        puntos_generados: Math.floor(producto.precio * item.cantidad)
-                    };
-                }),
-                ...borrador.combos.map(item => {
-                    const combo = this.combos().find(actual => actual.id === item.id);
+                if (usuarioId !== borrador.usuarioId) {
+                    throw new Error(
+                        'La sesión cambió. Volvé a la tienda para revisar el carrito de tu usuario.',
+                    );
+                }
+            }
 
-                    if (!combo) {
-                        throw new Error('Uno de los combos ya no está disponible.');
-                    }
-
-                    return {
-                        producto_id: null,
-                        combo_id: combo.id,
-                        tipo_item: 'combo' as const,
-                        nombre_item: combo.nombre,
-                        cantidad: item.cantidad,
-                        precio_unitario: combo.precio,
-                        medio_pago: 'dinero' as const,
-                        puntos_usados: 0,
-                        puntos_generados: Math.floor(combo.precio * item.cantidad)
-                    };
-                })
-            ];
-            const butacas = butacasSeleccionadas.map((butaca, index) => ({
-                butaca_proyeccion_id: butaca.id,
-                medio_pago: borrador.entradas?.[index]?.medio_pago ?? 'dinero',
-                recompensa_id: borrador.entradas?.[index]?.recompensa_id,
-                precio_unitario:
-                    (borrador.entradas?.[index]?.precio_unitario ?? this.precioTicketBase()) +
-                    (butaca.butaca.tipo === 'vip' ? this.recargoPorButacaVip : 0),
-                puntos_usados: 0
-            }));
-            const datos: ConfirmarCompraInput = {
-                solicitud_id: borrador.solicitudId!,
-                cupon_codigo: borrador.cupon?.codigo ?? null,
-                recompensas: (borrador.recompensas ?? []).map(i => ({
-                    recompensa_id: i.recompensa.id,
-                    cantidad: i.cantidad,
-                    costo_puntos: i.recompensa.costo_puntos,
-                    version: i.recompensa.version
-                })),
-                proyeccion_id: borrador.proyeccion.proyeccionId,
-                total: borrador.total,
-                creditos_usados: 0,
-                puntos_generados: tieneSesion ? Math.floor(borrador.total) : 0,
-                butacas,
-                detalles
-            };
+            const datos = this.preparacionCompra.prepararSolicitud(
+                borrador,
+                catalogos,
+                tieneSesion,
+            );
 
             const id = await this.compraService.confirmarCompra(datos);
             this.compraId.set(id);
+
+            if (this.esCandy) {
+                this.carrito.vaciar();
+            }
 
             if (tieneSesion) {
                 try {
@@ -289,66 +136,25 @@ export class ConfirmacionCompra implements OnInit {
             sessionStorage.removeItem('cinemarkade-compra-borrador');
 
             try {
-                this.qrGenerado.set(await QRCode.toDataURL(id, { width: 320, margin: 2 }));
-            } catch (error) {
-                console.error('La compra se confirmó, pero no se pudo generar la imagen QR:', error);
-            }
-
-            try {
-                const qrDataUrl = this.qrGenerado();
-
-                if (!qrDataUrl) {
-                    throw new Error('No se generó el QR de la compra.');
-                }
-
-                this.ticketPdf.set(
-                    this.ticketPdfService.generar({
-                        compraId: id,
-                        qrDataUrl,
-                        pelicula: this.nombrePelicula(),
-                        fecha: this.formatearFecha(borrador.proyeccion.fecha),
-                        horario: borrador.proyeccion.horario.slice(0, 5),
-                        sala: borrador.proyeccion.salaId,
-                        formato: borrador.proyeccion.formato,
-                        idioma: borrador.proyeccion.idioma,
-                        butacas: butacasSeleccionadas.map(butaca => `${butaca.butaca.fila}${butaca.butaca.columna}`),
-                        detalles: [
-                            ...(borrador.recompensas ?? []).map(i => ({
-                                nombre: `${i.recompensa.nombre} (${i.recompensa.costo_puntos * i.cantidad} PTS)`,
-                                cantidad: i.cantidad,
-                                total: 0
-                            })),
-                            ...borrador.combos.map(item => ({
-                                nombre: this.nombreCombo(item.id),
-                                cantidad: item.cantidad,
-                                total: this.precioCombo(item.id) * item.cantidad
-                            })),
-                            ...borrador.productos.map(item => ({
-                                nombre: this.nombreProducto(item.id),
-                                cantidad: item.cantidad,
-                                total: this.cantidadProducto(item.id) * item.cantidad
-                            }))
-                        ],
-                        cupon: borrador.cupon?.codigo ?? null,
-                        recargoVip: borrador.recargoButacasVip ?? 0,
-                        total: borrador.total,
-                        puntos: borrador.puntosEstimados,
-                        puntosUsados: borrador.puntosUsados ?? 0
-                    })
-                );
+                await this.prepararTicket();
             } catch (error) {
                 console.error('La compra se confirmó, pero no se pudo preparar el PDF:', error);
+                this.error.set(
+                    'La compra quedó confirmada, pero no se pudo generar el ticket. Usá Reintentar descarga.',
+                );
             }
 
             if (!tieneSesion && this.ticketPdf()) {
-                this.descargarTicket();
+                await this.descargarTicket();
             }
 
             this.mostrarModalExito.set(true);
         } catch (error) {
             console.error('No se pudo confirmar la compra:', error);
             this.error.set(
-                error instanceof Error ? error.message : 'No se pudo confirmar la compra. Intentá nuevamente.'
+                error instanceof Error
+                    ? error.message
+                    : 'No se pudo confirmar la compra. Intentá nuevamente.',
             );
         } finally {
             this.confirmando.set(false);
@@ -357,7 +163,7 @@ export class ConfirmacionCompra implements OnInit {
 
     cancelar(): void {
         sessionStorage.removeItem('cinemarkade-compra-borrador');
-        void this.router.navigate(['/']);
+        void this.router.navigate([this.esCandy ? '/tienda' : '/']);
     }
 
     abrirModalConfirmacion(): void {
@@ -374,7 +180,7 @@ export class ConfirmacionCompra implements OnInit {
 
     irAMisEntradas(): void {
         this.mostrarModalExito.set(false);
-        void this.router.navigate(['/mis-entradas']);
+        void this.router.navigate([this.esCandy ? '/historial-compras' : '/mis-entradas']);
     }
 
     volverAlInicio(): void {
@@ -382,12 +188,59 @@ export class ConfirmacionCompra implements OnInit {
         void this.router.navigate(['/']);
     }
 
-    descargarTicket(): void {
-        const pdf = this.ticketPdf();
-        const id = this.compraId();
-
-        if (pdf && id) {
-            this.ticketPdfService.descargar(pdf, id);
+    async descargarTicket(): Promise<void> {
+        if (this.preparandoTicket() || !this.compraId()) {
+            return;
         }
+
+        this.preparandoTicket.set(true);
+        this.error.set('');
+
+        try {
+            if (!this.ticketPdf()) {
+                await this.prepararTicket();
+            }
+
+            this.ticketPdfService.descargar(this.ticketPdf()!, this.compraId());
+        } catch (error) {
+            this.error.set(
+                error instanceof Error ? error.message : 'No se pudo descargar el ticket.',
+            );
+        } finally {
+            this.preparandoTicket.set(false);
+        }
+    }
+
+    private async prepararTicket(): Promise<void> {
+        const borrador = this.borrador();
+
+        if (!borrador?.solicitudId || !this.compraId()) {
+            throw new Error('No se encontró la solicitud de la compra confirmada.');
+        }
+
+        const ticket = await this.compraService.obtenerTicketConfirmado(borrador.solicitudId);
+
+        if (ticket.compra.id !== this.compraId() || !ticket.compra.codigo_qr) {
+            throw new Error('El ticket recuperado no corresponde a una compra disponible.');
+        }
+
+        const qrDataUrl = await QRCode.toDataURL(ticket.compra.codigo_qr, {
+            width: 320,
+            margin: 2,
+        });
+        this.qrGenerado.set(qrDataUrl);
+        this.codigoManual.set(ticket.compra.codigo_manual ?? '');
+        this.borrador.set({
+            ...borrador,
+            total: Number(ticket.compra.total),
+            puntosEstimados: Number(ticket.compra.puntos_generados),
+        });
+        this.ticketPdf.set(
+            this.ticketPdfService.generarDesdeCompra(
+                ticket,
+                qrDataUrl,
+                borrador.cupon?.codigo ?? null,
+            ),
+        );
     }
 }

@@ -1,0 +1,65 @@
+<section id="productos-candy" aria-labelledby="titulo-productos">
+    <div class="section-heading">
+        <span class="section-number" aria-hidden="true">01</span>
+        <div>
+            <h2 id="titulo-productos">ELEGÍ TUS FAVORITOS</h2>
+            <p>Algo salado, algo dulce y una bebida para acompañar.</p>
+        </div>
+    </div>
+
+    <div class="product-grid">
+        @for (producto of catalogo.productos(); track producto.id) {
+            <app-tarjeta-candy
+                [nombre]="producto.nombre"
+                [imagen]="producto.imagen"
+                [cantidad]="carrito.cantidad('producto', producto.id)"
+                [bloqueada]="carrito.sesionCargando() || catalogo.cargando()"
+                (agregar)="carrito.agregar('producto', producto.id)"
+                (cambiarCantidad)="carrito.cambiarCantidad('producto', producto.id, $event)"
+            >
+                <span candy-icono>🍿</span>
+                <span candy-categoria>{{ producto.categoria }}</span>
+                <span candy-nombre>{{ producto.nombre }}</span>
+                <span candy-descripcion>{{ producto.descripcion }}</span>
+                <span candy-precio>{{ producto.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+            </app-tarjeta-candy>
+        } @empty {
+            @if (!catalogo.cargando() && !catalogo.error()) {
+                <p>No hay productos disponibles en este momento.</p>
+            }
+        }
+    </div>
+</section>
+
+<section id="combos-candy" aria-labelledby="titulo-combos">
+    <div class="section-heading">
+        <span class="section-number" aria-hidden="true">02</span>
+        <div>
+            <h2 id="titulo-combos">MEJOR EN COMBO</h2>
+            <p>Tus favoritos juntos, listos para compartir.</p>
+        </div>
+    </div>
+
+    <div class="combo-grid">
+        @for (combo of catalogo.combos(); track combo.id) {
+            <app-tarjeta-candy
+                [nombre]="combo.nombre"
+                [imagen]="combo.imagen"
+                [cantidad]="carrito.cantidad('combo', combo.id)"
+                [bloqueada]="carrito.sesionCargando() || catalogo.cargando()"
+                (agregar)="carrito.agregar('combo', combo.id)"
+                (cambiarCantidad)="carrito.cambiarCantidad('combo', combo.id, $event)"
+            >
+                <span candy-icono>🍿 🥤</span>
+                <span candy-categoria>{{ 'COMBO' }}</span>
+                <span candy-nombre>{{ combo.nombre }}</span>
+                <span candy-descripcion>{{ combo.descripcion }}</span>
+                <span candy-precio>{{ combo.precio | currency:'ARS':'symbol':'1.0-0' }}</span>
+            </app-tarjeta-candy>
+        } @empty {
+            @if (!catalogo.cargando() && !catalogo.error()) {
+                <p>No hay combos disponibles en este momento.</p>
+            }
+        }
+    </div>
+</section>

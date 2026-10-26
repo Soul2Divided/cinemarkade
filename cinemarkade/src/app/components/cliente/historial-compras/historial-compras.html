@@ -1,118 +1,138 @@
-<app-navbar></app-navbar>
+<app-navbar />
 
 <main class="purchase-history">
-    <button type="button" class="back-button" (click)="volverAlPerfil()">
-        ◄ VOLVER A MI PERFIL
-    </button>
+    <button type="button" class="back-button" (click)="volverAlPerfil()">◄ VOLVER A MI PERFIL</button>
 
     <header class="history-header">
-        <h1>HISTORIAL DE COMPRAS</h1>
+        <div>
+            <h1>HISTORIAL DE COMPRAS</h1>
+            <p>Tus entradas y pedidos de candy, en un solo lugar.</p>
+        </div>
 
         @if (!cargando() && !error()) {
-            <span class="history-count">{{ historial().length }} COMPRAS</span>
+        <span class="history-count">{{ historial().length }} compras</span>
         }
     </header>
 
     @if (cargando()) {
-        <p class="state-message" role="status">CARGANDO TUS COMPRAS...</p>
+    <p class="state-message" role="status">Cargando tus compras...</p>
     } @else if (error()) {
-        <div class="state-message error-message" role="alert">
-            <p>{{ error() }}</p>
-            <button type="button" class="retry-button" (click)="cargarHistorial()">
-                REINTENTAR
-            </button>
-        </div>
+    <div class="state-message error-message" role="alert">
+        <p>{{ error() }}</p>
+        <button type="button" class="retry-button" (click)="cargarHistorial()">REINTENTAR</button>
+    </div>
     } @else {
-        @if (aviso()) {
-            <div class="state-message" role="status">
-                <p>{{ aviso() }}</p>
-                <button type="button" class="retry-button" (click)="cargarHistorial()">
-                    RECARGAR DATOS
-                </button>
-            </div>
-        }
+    @if (aviso()) {
+    <div class="state-message" role="status">
+        <p>{{ aviso() }}</p>
+        <button type="button" class="retry-button" (click)="cargarHistorial()">RECARGAR DATOS</button>
+    </div>
+    }
 
-        <div class="purchases-list">
-            @for (item of historial(); track item.compra.id) {
-                <article class="purchase-card">
-                    <div class="purchase-poster">
-                        @if (item.imagen) {
-                            <img [src]="item.imagen" [alt]="item.pelicula" />
+    @if (errorTicket()) {
+    <p class="state-message error-message" role="alert">{{ errorTicket() }}</p>
+    }
+
+    <div class="purchases-list">
+        @for (item of historial(); track item.compra.id) {
+        <article class="purchase-card" [class.candy-purchase]="item.compra.proyeccion_id === null">
+            <header class="purchase-heading">
+                @if (item.imagen) {
+                <img class="purchase-poster" [src]="item.imagen" [alt]="item.pelicula" loading="lazy" />
+                } @else {
+                <span class="purchase-icon" aria-hidden="true">{{ item.compra.proyeccion_id === null ? '🍿' : '🎬'
+                    }}</span>
+                }
+
+                <div class="purchase-title">
+                    <span class="purchase-category">{{ item.compra.proyeccion_id === null ? 'CANDY BAR' : 'ENTRADAS DE
+                        CINE' }}</span>
+                    <h2>{{ item.pelicula }}</h2>
+
+                    @if (item.compra.estado?.toLowerCase() !== 'confirmada') {
+                    <p class="purchase-state" [class.cancelled]="esCancelada(item.compra)">
+                        {{ estadoCompra(item.compra) }}
+                    </p>
+                    }
+                </div>
+            </header>
+
+            <dl class="purchase-details">
+                <div>
+                    <dt>Fecha de compra</dt>
+                    <dd>{{ item.compra.fecha_compra ? (item.compra.fecha_compra | date:'dd/MM/yyyy · HH:mm':'-0300') :
+                        'No disponible' }}</dd>
+                </div>
+
+                @if (item.compra.proyeccion_id !== null) {
+                <div>
+                    <dt>Función</dt>
+                    <dd>
+                        @if (item.fechaFuncion && item.horario) {
+                        {{ item.fechaFuncion | date:'dd/MM/yyyy':'UTC' }} · {{ item.horario }}
                         } @else {
-                            <span aria-label="Póster no disponible">🎬</span>
+                        Datos no disponibles
                         }
-                    </div>
+                    </dd>
+                </div>
+                }
 
-                    <div class="purchase-content">
-                        <div class="purchase-heading">
-                            <h2>{{ item.pelicula }}</h2>
-                            <span
-                                class="purchase-status"
-                                [class.cancelled]="esCancelada(item.compra)"
-                            >
-                                {{ estadoCompra(item.compra) }}
-                            </span>
-                        </div>
+                @if (item.sala !== null) {
+                <div>
+                    <dt>Sala y formato</dt>
+                    <dd>Sala {{ item.sala }} · {{ item.formato }} · {{ item.idioma }}</dd>
+                </div>
+                }
 
-                        <dl class="purchase-details">
-                            <div>
-                                <dt>FECHA DE COMPRA</dt>
-                                <dd>
-                                    @if (item.compra.fecha_compra) {
-                                        {{
-                                            item.compra.fecha_compra
-                                                | date: 'dd/MM/yyyy HH:mm' : '-0300'
-                                        }}
-                                    } @else {
-                                        No disponible
-                                    }
-                                </dd>
-                            </div>
+                @if (item.compra.puntos_generados > 0) {
+                <div>
+                    <dt>Puntos sumados</dt>
+                    <dd>{{ item.compra.puntos_generados | number:'1.0-0' }} PTS</dd>
+                </div>
+                }
 
-                            <div>
-                                <dt>FUNCIÓN</dt>
-                                <dd>
-                                    @if (item.fechaFuncion && item.horario) {
-                                        {{ item.fechaFuncion | date: 'dd/MM/yyyy' : 'UTC' }} ·
-                                        {{ item.horario }}
-                                    } @else {
-                                        Datos de la función no disponibles
-                                    }
-                                </dd>
-                            </div>
+                @if (item.compra.proyeccion_id === null && item.compra.estado === 'confirmada' && item.compra.codigo_qr
+                && item.compra.codigo_manual) {
+                <div>
+                    <dt>Código de retiro</dt>
+                    <dd class="pickup-code">{{ item.compra.codigo_manual.slice(0, 5) }}-{{
+                        item.compra.codigo_manual.slice(5) }}</dd>
+                </div>
+                }
+            </dl>
 
-                            @if (item.sala !== null) {
-                                <div>
-                                    <dt>SALA Y FORMATO</dt>
-                                    <dd>
-                                        Sala {{ item.sala }} · {{ item.formato }} ·
-                                        {{ item.idioma }}
-                                    </dd>
-                                </div>
-                            }
+            <footer class="purchase-footer">
+                <div class="purchase-total">
+                    <span>Total pagado</span>
+                    <strong>{{ item.compra.total | currency:'ARS':'symbol-narrow':'1.2-2' }}</strong>
+                </div>
 
-                            <div>
-                                <dt>TOTAL PAGADO</dt>
-                                <dd class="purchase-total">
-                                    {{
-                                        item.compra.total
-                                            | currency: 'ARS' : 'symbol-narrow' : '1.2-2'
-                                    }}
-                                </dd>
-                            </div>
+                @if (item.compra.proyeccion_id === null && item.compra.estado === 'confirmada' && item.compra.codigo_qr)
+                {
+                <div class="purchase-actions">
+                    <button type="button" class="qr-button" [disabled]="!!cargandoQrId()"
+                        (click)="mostrarQr(item.compra)">
+                        {{ cargandoQrId() === item.compra.id ? 'PREPARANDO QR...' : 'VER QR' }}
+                    </button>
 
-                            <div>
-                                <dt>PUNTOS GENERADOS EN LA COMPRA</dt>
-                                <dd>{{ item.compra.puntos_generados | number: '1.0-0' }} PTS</dd>
-                            </div>
-                        </dl>
-                    </div>
-                </article>
-            } @empty {
-                <p class="state-message">
-                    Todavía no realizaste compras. Cuando compres entradas, aparecerán acá.
-                </p>
-            }
-        </div>
+                    <button type="button" class="download-button" [disabled]="!!descargandoId()"
+                        (click)="descargarCandy(item.compra)">
+                        {{ descargandoId() === item.compra.id ? 'PREPARANDO TICKET...' : 'DESCARGAR TICKET' }}
+                    </button>
+                </div>
+                }
+            </footer>
+        </article>
+        } @empty {
+        <p class="state-message">Todavía no realizaste compras. Cuando compres entradas o candy, aparecerán acá.</p>
+        }
+    </div>
     }
 </main>
+
+<app-qr-compra
+    [imagen]="qrImagen()"
+    [codigoManual]="qrCompra()?.codigo_manual ?? null"
+    [esCandy]="true"
+    (cerrar)="cerrarQr()"
+/>

@@ -106,7 +106,7 @@ export class HomePage implements OnInit {
 
     ejecutarAccionHero(heroItem: ItemHero): void {
         if (heroItem.esCombo) {
-            this.router.navigate(['/menu']);
+            this.router.navigate(['/tienda']);
             return;
         }
         const peliculaEncontrada = this.peliculas().find((p) => p.id === heroItem.id);

@@ -8,6 +8,7 @@ export abstract class CompraRepository {
     abstract crear(datos: CompraInput): Promise<Compra>;
     abstract confirmarCompra(datos: ConfirmarCompraInput): Promise<string>;
     abstract validarQr(codigoQr: string): Promise<CompraValidadaQr | null>;
+    abstract obtenerTicketConfirmado(solicitudId: string): Promise<CompraValidadaQr>;
     abstract cancelarCompra(compraId: string): Promise<number>;
     abstract cambiarEstado(id: string, estado: EstadoCompra): Promise<void>;
 }

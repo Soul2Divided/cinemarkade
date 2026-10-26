@@ -1,0 +1,40 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+}
+
+.ticket-items {
+    padding: 1.2rem 0 0.4rem;
+}
+
+.ticket-items h3 {
+    margin: 0 0 0.8rem;
+    color: theme.$arcade-cyan;
+    font: 0.95rem theme.$font-pixel;
+}
+
+.ticket-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    color: #ccc;
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
+
+.ticket-line strong {
+    flex: 0 0 auto;
+    color: #fff;
+}
+
+.ticket-line.muted {
+    color: #85858d;
+}
+
+@media (max-width: 520px) {
+    .ticket-line {
+        font-size: 0.92rem;
+    }
+}

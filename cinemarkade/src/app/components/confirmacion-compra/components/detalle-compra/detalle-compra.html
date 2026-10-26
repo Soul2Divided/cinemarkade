@@ -1,0 +1,28 @@
+<section class="ticket-items">
+    @if (recompensas().length) {
+        <h3>RECOMPENSAS CANJEADAS</h3>
+    }
+
+    @for (item of recompensas(); track item.id) {
+        <div class="ticket-line">
+            <span>{{ item.cantidad }} × {{ item.nombre }}</span>
+            <strong>{{ item.importe | number }} PTS</strong>
+        </div>
+    }
+
+    <h3>CANDY BAR</h3>
+
+    @for (item of productos(); track $index) {
+        <div class="ticket-line">
+            <span>{{ item.cantidad }} × {{ item.nombre }}</span>
+            <strong>{{ item.importe | currency: 'ARS' : 'symbol' : '1.0-0' }}</strong>
+        </div>
+    }
+
+    @if (!productos().length && !recompensas().length) {
+        <div class="ticket-line muted">
+            <span>Sin productos de candy</span>
+            <strong>—</strong>
+        </div>
+    }
+</section>

@@ -1,0 +1,108 @@
+<section class="order-summary" aria-labelledby="titulo-pedido">
+    <header>
+        <span class="eyebrow">TU SELECCIÓN · {{ carrito.cantidadArticulos() }} UNIDADES</span>
+        <h2 id="titulo-pedido">MI PEDIDO</h2>
+    </header>
+
+    @for (item of carrito.lineas(); track item.tipo + ':' + item.id) {
+        <article class="order-item">
+            <h3>{{ item.nombre }}</h3>
+            @if (!item.disponible && catalogo.cargado()) {
+                <p class="order-warning">
+                    Este artículo ya no está disponible. Quitalo del pedido.
+                </p>
+            }
+            @if (item.tipo === 'recompensa') {
+                <p>{{ item.cantidad }} canje(s) · {{ item.unidades }} unidad(es) por canje</p>
+                <strong>{{ item.puntos * item.cantidad | number }} PTS</strong>
+            } @else {
+                <p>{{ item.precio | currency: 'ARS' : 'symbol' : '1.0-0' }} por unidad</p>
+                <strong>
+                    {{ item.precio * item.cantidad | currency: 'ARS' : 'symbol' : '1.0-0' }}
+                </strong>
+            }
+
+            <div class="item-actions">
+                <label>
+                    {{ item.tipo === 'recompensa' ? 'Canjes' : 'Cantidad' }}
+                    <input
+                        type="number"
+                        min="1"
+                        max="99"
+                        step="1"
+                        [value]="item.cantidad"
+                        [disabled]="
+                            carrito.sesionCargando() || catalogo.cargando() || !item.disponible
+                        "
+                        (change)="actualizarCantidad(item, $event)"
+                        [attr.aria-label]="'Cantidad de ' + item.nombre"
+                    />
+                </label>
+                <button
+                    type="button"
+                    class="remove-item"
+                    (click)="carrito.quitar(item.tipo, item.id)"
+                >
+                    QUITAR
+                </button>
+            </div>
+        </article>
+    } @empty {
+        <div class="empty-order">
+            <span class="bag-icon" aria-hidden="true">🛍️</span>
+            <h3>TU PEDIDO ESTÁ VACÍO</h3>
+            <p>Los productos, combos y canjes que elijas aparecerán acá.</p>
+        </div>
+    }
+
+    <dl>
+        <div>
+            <dt>Productos y combos</dt>
+            <dd>{{ carrito.total() | currency: 'ARS' : 'symbol' : '1.0-0' }}</dd>
+        </div>
+        <div>
+            <dt>Puntos a utilizar</dt>
+            <dd>{{ carrito.puntosUsados() | number }} PTS</dd>
+        </div>
+        @if (carrito.registrado()) {
+            <div>
+                <dt>Puntos a sumar</dt>
+                <dd>{{ carrito.puntosEstimados() | number }} PTS</dd>
+            </div>
+        }
+        <div class="total-line">
+            <dt>TOTAL</dt>
+            <dd>{{ carrito.total() | currency: 'ARS' : 'symbol' : '1.0-0' }}</dd>
+        </div>
+    </dl>
+
+    @if (carrito.saldoInsuficiente()) {
+        <p class="order-warning" role="alert">
+            Tu saldo ya no alcanza para estos canjes. Reducí la cantidad o quitá alguno.
+        </p>
+    }
+
+    @if (carrito.lineas().length) {
+        <button type="button" class="clear-order" (click)="carrito.vaciar()">VACIAR PEDIDO</button>
+    }
+
+    <button
+        type="button"
+        [disabled]="
+            !carrito.lineas().length ||
+            carrito.sesionCargando() ||
+            catalogo.cargando() ||
+            !catalogo.cargado() ||
+            !!catalogo.error() ||
+            carrito.saldoInsuficiente() ||
+            carrito.hayNoDisponibles()
+        "
+        (click)="continuar()"
+    >
+        REVISAR PEDIDO
+    </button>
+    <p id="confirmacion-pendiente" class="pickup-note">
+        Revisá el resumen antes de confirmar. Recibirás un ticket con QR y código manual para
+        retirar tu candy.
+    </p>
+</section>

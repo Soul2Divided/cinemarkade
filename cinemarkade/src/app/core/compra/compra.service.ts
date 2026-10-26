@@ -1,12 +1,18 @@
 import { Inject, Injectable } from '@angular/core';
 import { CompraRepository } from './compra.repository';
-import { Compra, CompraInput, CompraValidadaQr, ConfirmarCompraInput, EstadoCompra } from './compra.model';
+import {
+    Compra,
+    CompraInput,
+    CompraValidadaQr,
+    ConfirmarCompraInput,
+    EstadoCompra,
+} from './compra.model';
 
 @Injectable({ providedIn: 'root' })
 export class CompraService {
     constructor(
         @Inject(CompraRepository)
-        private readonly compraRepository: CompraRepository
+        private readonly compraRepository: CompraRepository,
     ) {}
 
     async obtenerPorId(id: string): Promise<Compra> {
@@ -28,7 +34,7 @@ export class CompraService {
             this.validarUuid(datos.usuario_id, 'usuario');
         }
 
-        if (!Number.isInteger(datos.proyeccion_id) || datos.proyeccion_id <= 0) {
+        if (!Number.isInteger(datos.proyeccion_id) || (datos.proyeccion_id ?? 0) <= 0) {
             throw new Error('La proyección indicada no es válida.');
         }
 
@@ -47,24 +53,56 @@ export class CompraService {
     }
 
     async confirmarCompra(datos: ConfirmarCompraInput): Promise<string> {
-        if (!Number.isInteger(datos.proyeccion_id) || datos.proyeccion_id <= 0) {
+        const candy = datos.tipo_compra === 'candy';
+
+        if (candy) {
+            if (
+                datos.proyeccion_id !== null ||
+                datos.butacas.length ||
+                (!datos.detalles.length && !datos.recompensas.length)
+            ) {
+                throw new Error(
+                    'El pedido de candy debe incluir artículos y no puede tener función ni butacas.',
+                );
+            }
+        } else if (!Number.isInteger(datos.proyeccion_id) || (datos.proyeccion_id ?? 0) <= 0) {
             throw new Error('La proyección indicada no es válida.');
         }
         this.validarImporte(datos.total);
         this.validarPuntos(datos.creditos_usados);
         this.validarPuntos(datos.puntos_generados);
-        if (datos.butacas.length === 0) {
+        if (!candy && datos.butacas.length === 0) {
             throw new Error('La compra debe incluir al menos una butaca.');
         }
-        if (datos.butacas.some(butaca => !Number.isInteger(butaca.butaca_proyeccion_id) || butaca.butaca_proyeccion_id <= 0)) {
+        if (
+            datos.butacas.some(
+                (butaca) =>
+                    !Number.isInteger(butaca.butaca_proyeccion_id) ||
+                    butaca.butaca_proyeccion_id <= 0,
+            )
+        ) {
             throw new Error('Hay una butaca seleccionada que no es válida.');
         }
         return this.compraRepository.confirmarCompra(datos);
     }
 
     async validarQr(codigoQr: string): Promise<CompraValidadaQr | null> {
-        this.validarUuid(codigoQr, 'código QR');
-        return this.compraRepository.validarQr(codigoQr);
+        const codigo = codigoQr.trim().toUpperCase();
+        const manual = codigo.replace(/[\s-]/g, '');
+
+        if (/^[0-9A-F]{10}$/.test(manual)) {
+            return this.compraRepository.validarQr(manual);
+        }
+
+        this.validarUuid(codigo, 'código QR');
+
+        return this.compraRepository.validarQr(codigo.toLowerCase());
+    }
+
+    async obtenerTicketConfirmado(solicitudId: string): Promise<CompraValidadaQr> {
+        this.validarUuid(solicitudId, 'solicitud');
+
+        return this.compraRepository.obtenerTicketConfirmado(solicitudId);
     }
 
     async cancelarCompra(compraId: string): Promise<number> {
@@ -96,7 +134,9 @@ export class CompraService {
 
     private validarUuid(valor: string, entidad: string): void {
         const uuidValido =
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(valor);
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+                valor,
+            );
 
         if (!uuidValido) {
             throw new Error(`El identificador de ${entidad} no es válido.`);

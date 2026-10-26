@@ -78,6 +78,18 @@ export class SupabaseCompraAdapter implements CompraRepository {
         return data as CompraValidadaQr | null;
     }
 
+    async obtenerTicketConfirmado(solicitudId: string): Promise<CompraValidadaQr> {
+        const { data, error } = await this.supabaseService.supabaseClient.rpc('obtener_ticket_compra', {
+            p_solicitud_id: solicitudId
+        });
+
+        if (error || !data) {
+            throw new Error(error?.message ?? 'No se pudo recuperar el ticket confirmado.');
+        }
+
+        return data as CompraValidadaQr;
+    }
+
     async cancelarCompra(compraId: string): Promise<number> {
         const { data, error } = await this.supabaseService.supabaseClient.rpc('cancelar_compra', {
             p_compra_id: compraId

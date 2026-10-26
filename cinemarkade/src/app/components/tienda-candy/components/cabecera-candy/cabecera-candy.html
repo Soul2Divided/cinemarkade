@@ -1,0 +1,9 @@
+@if (destacados().length) {
+    <app-hero [elementos]="destacados()" />
+} @else {
+    <header class="candy-heading">
+        <span>CINEMARKADE / TIENDA</span>
+        <h1>CANDY BAR</h1>
+        <p>Elegí productos, combos o canjeá tus puntos.</p>
+    </header>
+}

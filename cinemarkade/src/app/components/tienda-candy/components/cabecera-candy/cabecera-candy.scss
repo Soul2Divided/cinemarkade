@@ -1,0 +1,30 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+    margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.candy-heading {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #37373f;
+}
+
+.candy-heading span {
+    color: theme.$arcade-cyan;
+    font: 0.6rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+h1 {
+    margin: 1rem 0;
+    color: theme.$arcade-yellow;
+    font: clamp(1.3rem, 3vw, 2rem) theme.$font-pixel;
+    line-height: 1.8;
+}
+
+p {
+    margin: 0;
+    color: #b8b8c2;
+    line-height: 1.7;
+}

@@ -1,0 +1,51 @@
+@if (codigoManual()) {
+    <div class="confirmation-code">
+        <small>{{ esCandy() ? 'CÓDIGO MANUAL DE RETIRO' : 'CÓDIGO MANUAL DE INGRESO' }}</small>
+        <strong>{{ codigoManual().slice(0, 5) }}-{{ codigoManual().slice(5) }}</strong>
+    </div>
+}
+
+<app-modal
+    [isOpen]="abierto()"
+    title="COMPRA REALIZADA CON ÉXITO"
+    [subtitle]="esCandy() ? 'TU PEDIDO YA ESTÁ REGISTRADO' : 'TUS ENTRADAS YA ESTÁN REGISTRADAS'"
+    variant="cyan"
+    (close)="cerrar.emit()"
+>
+    @if (compraAnonima()) {
+        <p>
+            La compra quedó confirmada. Iniciamos la descarga del ticket con el QR; si el navegador
+            la bloqueó, podés descargarlo desde acá.
+        </p>
+    } @else {
+        <p>
+            {{
+                esCandy()
+                    ? 'Podés retirar tu candy con el QR o el código manual del ticket.'
+                    : 'La compra quedó confirmada. Podés ingresar con el QR o el código manual que figura en el ticket.'
+            }}
+        </p>
+    }
+    @if (error()) {
+        <p class="action-error" role="alert">{{ error() }}</p>
+    }
+    <div modal-actions class="result-actions">
+        @if (compraAnonima()) {
+            <button type="button" class="confirm-button modal-action" (click)="volver.emit()">
+                VOLVER AL INICIO
+            </button>
+        } @else {
+            <button type="button" class="back-button modal-action" (click)="volver.emit()">
+                VOLVER
+            </button>
+            <button type="button" class="confirm-button modal-action" (click)="verEntradas.emit()">
+                {{ esCandy() ? 'HISTORIAL DE COMPRAS' : 'IR A MIS ENTRADAS' }}
+            </button>
+        }
+        @if (compraId()) {
+            <button type="button" class="back-button modal-action" (click)="descargar.emit()">
+                {{ ticketDisponible() ? 'DESCARGAR PDF' : 'REINTENTAR DESCARGA' }}
+            </button>
+        }
+    </div>
+</app-modal>

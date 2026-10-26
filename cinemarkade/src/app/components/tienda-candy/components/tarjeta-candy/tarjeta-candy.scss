@@ -1,0 +1,135 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+    height: 100%;
+}
+
+.candy-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #111116;
+    border: 1px solid #37373f;
+    box-shadow: 4px 4px 0 #000;
+}
+
+.card-visual {
+    display: grid;
+    place-items: center;
+    min-height: 150px;
+    background: radial-gradient(ellipse at center, #343023, #18181e 75%);
+    border-bottom: 1px solid #33333d;
+    font-size: 4.5rem;
+}
+
+.card-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1.25rem;
+}
+
+.card-category {
+    color: theme.$arcade-cyan;
+    font: 0.5rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+h3 {
+    margin: 0.8rem 0;
+    color: #fff;
+    font: 0.7rem theme.$font-pixel;
+    line-height: 1.9;
+    overflow-wrap: anywhere;
+}
+
+.card-description {
+    flex: 1;
+    margin: 0 0 1.5rem;
+    color: #aaaab5;
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.card-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #42424c;
+}
+
+.card-price {
+    color: theme.$arcade-yellow;
+    font: 0.7rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+button {
+    padding: 0.75rem;
+    color: #a6a39a;
+    background: #25241b;
+    border: 1px solid #55513a;
+    font: 0.5rem theme.$font-pixel;
+    line-height: 1.8;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:not(:disabled):hover {
+    color: #000;
+    background: theme.$arcade-yellow;
+    border-color: theme.$arcade-yellow;
+}
+
+button:focus-visible {
+    outline: 2px solid theme.$arcade-cyan;
+    outline-offset: 3px;
+}
+
+.card-visual img {
+    width: 100%;
+    height: 170px;
+    object-fit: contain;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.reward-card {
+    background: #0a151a;
+    border-color: #32616b;
+}
+
+.reward-card .card-visual {
+    background: radial-gradient(ellipse at center, #183d45, #0a151a 75%);
+    border-bottom-color: #23545a;
+}
+
+.reward-card .card-price {
+    color: theme.$arcade-cyan;
+}
+
+.reward-card button {
+    color: theme.$arcade-cyan;
+    background: #172b30;
+    border-color: #32616b;
+}
+
+.reward-card button:not(:disabled):hover {
+    color: #000;
+    background: theme.$arcade-cyan;
+    border-color: theme.$arcade-cyan;
+}

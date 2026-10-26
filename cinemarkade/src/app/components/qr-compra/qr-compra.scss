@@ -1,0 +1,66 @@
+@use '../../../styles/themes/arcade-theme' as theme;
+
+.purchase-qr {
+    display: grid;
+    justify-items: center;
+    gap: 1.25rem;
+    text-align: center;
+}
+
+.purchase-qr img {
+    display: block;
+    width: min(100%, 320px);
+    height: auto;
+    background: #fff;
+}
+
+.purchase-qr p {
+    margin: 0;
+    font:
+        1.25rem/1.6 Arial,
+        sans-serif;
+}
+
+.manual-code {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.manual-code span {
+    color: #c1c1cb;
+    font:
+        1.125rem/1.6 Arial,
+        sans-serif;
+}
+
+.manual-code strong {
+    color: theme.$arcade-cyan;
+    font: 1.75rem/1.6 monospace;
+    overflow-wrap: anywhere;
+}
+
+.qr-actions {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+button {
+    min-height: 52px;
+    padding: 1rem 1.25rem;
+    color: theme.$arcade-cyan;
+    background: #111116;
+    border: 1px solid theme.$arcade-cyan;
+    font: 1rem/1.8 theme.$font-pixel;
+    cursor: pointer;
+}
+
+button:hover {
+    color: #000;
+    background: theme.$arcade-cyan;
+}
+
+button:focus-visible {
+    outline: 3px solid theme.$arcade-yellow;
+    outline-offset: 4px;
+}

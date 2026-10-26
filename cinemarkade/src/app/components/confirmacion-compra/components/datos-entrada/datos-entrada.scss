@@ -1,0 +1,76 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+}
+
+.ticket-brand {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #36363d;
+}
+
+.ticket-icon {
+    display: grid;
+    place-items: center;
+    width: 66px;
+    height: 66px;
+    flex: 0 0 auto;
+    color: #000;
+    background: theme.$arcade-yellow;
+    font-size: 2.2rem;
+}
+
+.ticket-brand small,
+.ticket-facts small,
+.ticket-seats small {
+    display: block;
+    color: #92929a;
+    font: 0.78rem theme.$font-pixel;
+    letter-spacing: 0.06em;
+}
+
+.ticket-brand h2 {
+    margin: 0.5rem 0 0;
+    color: #fff;
+    font: clamp(1.2rem, 2.5vw, 1.8rem) theme.$font-pixel;
+    line-height: 1.5;
+}
+
+.ticket-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #36363d;
+}
+
+.ticket-facts strong,
+.ticket-seats strong {
+    display: block;
+    margin-top: 0.5rem;
+    color: #fff;
+    font-size: 1.15rem;
+    line-height: 1.5;
+    text-transform: capitalize;
+}
+
+.ticket-seats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    padding: 1.3rem 0;
+    border-bottom: 1px dashed #55555e;
+}
+
+@media (max-width: 520px) {
+    .ticket-facts {
+        gap: 0.9rem;
+    }
+    .ticket-facts strong,
+    .ticket-seats strong {
+        font-size: 1rem;
+    }
+}

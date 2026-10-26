@@ -1,0 +1,263 @@
+@use '../themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+    min-height: 100vh;
+    color: #f3f3f5;
+    background: theme.$arcade-bg;
+    font: 1.25rem/1.6 Arial, sans-serif;
+}
+
+.purchase-history {
+    display: grid;
+    gap: 2rem;
+    box-sizing: border-box;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem clamp(1rem, 4vw, 3rem) 4rem;
+}
+
+.back-button,
+.retry-button,
+.qr-button,
+.download-button {
+    justify-self: start;
+    box-sizing: border-box;
+    min-height: 52px;
+    padding: 1rem 1.25rem;
+    color: theme.$arcade-cyan;
+    background: #111116;
+    border: 1px solid theme.$arcade-cyan;
+    font: 1rem/1.8 theme.$font-pixel;
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    color: #000;
+    background: theme.$arcade-cyan;
+}
+
+button:focus-visible {
+    outline: 3px solid theme.$arcade-yellow;
+    outline-offset: 4px;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.history-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #3c3c46;
+}
+
+.history-header h1 {
+    margin: 0;
+    color: theme.$arcade-yellow;
+    font: clamp(1.25rem, 2.5vw, 1.8rem)/1.8 theme.$font-pixel;
+    overflow-wrap: anywhere;
+}
+
+.history-header p {
+    margin: 0.75rem 0 0;
+    color: #c1c1cb;
+    font-size: 1.25rem;
+}
+
+.history-count {
+    color: theme.$arcade-cyan;
+    font-size: 1.25rem;
+    white-space: nowrap;
+}
+
+.purchases-list {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.purchase-card {
+    overflow: hidden;
+    background: #141418;
+    border: 1px solid #45454f;
+    border-top: 4px solid theme.$arcade-yellow;
+    box-shadow: 5px 5px 0 #000;
+}
+
+.candy-purchase {
+    border-top-color: theme.$arcade-cyan;
+}
+
+.purchase-heading {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem 0;
+}
+
+.purchase-poster {
+    flex: 0 0 auto;
+    width: 80px;
+    height: 112px;
+    object-fit: cover;
+    background: #222;
+}
+
+.purchase-icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 80px;
+    height: 80px;
+    background: #1b292d;
+    border: 1px solid #34535a;
+    font-size: 2.75rem;
+}
+
+.purchase-title {
+    min-width: 0;
+}
+
+.purchase-category {
+    color: #b8b8c5;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+}
+
+.purchase-title h2 {
+    margin: 0.4rem 0 0;
+    color: #fff;
+    font: clamp(1.1rem, 2vw, 1.4rem)/1.8 theme.$font-pixel;
+    overflow-wrap: anywhere;
+}
+
+.purchase-state {
+    margin: 0.4rem 0 0;
+    color: theme.$arcade-cyan;
+    font-size: 1.125rem;
+}
+
+.purchase-state.cancelled {
+    color: #ffadb9;
+}
+
+.purchase-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    padding: 0 1.75rem;
+}
+
+.purchase-details dt,
+.purchase-total > span {
+    margin-bottom: 0.35rem;
+    color: #b8b8c5;
+    font-size: 1.125rem;
+}
+
+.purchase-details dd {
+    margin: 0;
+    color: #fff;
+    font-size: 1.375rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.purchase-details .pickup-code {
+    color: theme.$arcade-cyan;
+    font: 1.375rem/1.6 monospace;
+    letter-spacing: 0.06em;
+}
+
+.purchase-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1.25rem 1.75rem;
+    background: #1b1b21;
+    border-top: 1px solid #3c3c46;
+}
+
+.purchase-total {
+    display: grid;
+}
+
+.purchase-total strong {
+    color: theme.$arcade-yellow;
+    font-size: 2rem;
+    line-height: 1.4;
+}
+
+.qr-button {
+    color: #000;
+    background: theme.$arcade-cyan;
+}
+
+.qr-button:hover:not(:disabled) {
+    color: theme.$arcade-cyan;
+    background: transparent;
+}
+
+.purchase-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+}
+
+.state-message {
+    margin: 0;
+    padding: 1.5rem;
+    border: 1px dashed #777;
+    font-size: 1.25rem;
+}
+
+.state-message p {
+    margin: 0 0 1rem;
+}
+
+.error-message {
+    color: #ffadb9;
+}
+
+@media (max-width: 600px) {
+    .purchase-heading {
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem 1.25rem 0;
+    }
+
+    .purchase-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 2rem;
+    }
+
+    .purchase-poster {
+        width: 56px;
+        height: 80px;
+    }
+
+    .purchase-details {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 0 1.25rem;
+    }
+
+    .purchase-footer {
+        align-items: stretch;
+        padding: 1.25rem;
+    }
+
+    .purchase-actions,
+    .qr-button,
+    .download-button {
+        width: 100%;
+    }
+}

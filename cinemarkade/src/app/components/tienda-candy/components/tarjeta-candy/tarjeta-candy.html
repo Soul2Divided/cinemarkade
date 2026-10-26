@@ -1,0 +1,57 @@
+<article class="candy-card" [class.reward-card]="esRecompensa()">
+    <div class="card-visual">
+        @if (imagen() && !imagenFallida()) {
+            <img
+                [src]="imagen()"
+                [alt]="nombre()"
+                loading="lazy"
+                (error)="imagenFallida.set(true)"
+            />
+        } @else {
+            <span aria-hidden="true"><ng-content select="[candy-icono]" /></span>
+        }
+    </div>
+
+    <div class="card-content">
+        <span class="card-category"><ng-content select="[candy-categoria]" /></span>
+        <h3><ng-content select="[candy-nombre]" /></h3>
+        <p class="card-description"><ng-content select="[candy-descripcion]" /></p>
+
+        <div class="card-footer">
+            <span class="card-price"><ng-content select="[candy-precio]" /></span>
+            @if (cantidad() === 0) {
+                <button
+                    type="button"
+                    [disabled]="bloqueada() || bloquearIncremento()"
+                    (click)="agregar.emit()"
+                >
+                    {{ etiquetaAgregar() }}
+                </button>
+            } @else {
+                <div
+                    class="quantity-control"
+                    role="group"
+                    [attr.aria-label]="'Cantidad de ' + nombre()"
+                >
+                    <button
+                        type="button"
+                        [disabled]="bloqueada()"
+                        (click)="cambiarCantidad.emit(cantidad() - 1)"
+                        aria-label="Quitar una unidad"
+                    >
+                        −
+                    </button>
+                    <span aria-live="polite">{{ cantidad() }}</span>
+                    <button
+                        type="button"
+                        [disabled]="bloqueada() || bloquearIncremento() || cantidad() >= maximo()"
+                        (click)="cambiarCantidad.emit(cantidad() + 1)"
+                        aria-label="Agregar una unidad"
+                    >
+                        +
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</article>

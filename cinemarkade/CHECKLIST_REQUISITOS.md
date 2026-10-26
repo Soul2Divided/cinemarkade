@@ -1,11 +1,13 @@
 # Checklist de requisitos funcionales
 
+Actualizada al 26/10/2026. Las casillas completas indican implementación en el proyecto. Las verificaciones manuales y de configuración pendientes se detallan al final.
+
 ## 1. Crear cuenta
 
 - [x] Crear cuenta.
 - [x] Ver perfil.
 - [x] Consultar los puntos asociados al usuario.
-- [ ] Ver historial de canjes.
+- [x] Ver historial de canjes.
 - [ ] Consultar “Mis películas”.
     - [ ] Mostrar películas vistas con su póster.
     - [ ] Mostrar la fecha en que se vio cada película.
@@ -23,11 +25,12 @@
 
 - [x] Completar el circuito de compra de entradas.
     - [x] Seleccionar horarios.
-    - [x] Seleccionar formato: 2D, 3D, 4D o 5D.
+    - [x] Seleccionar formato: 2D, 3D o 4D.
     - [x] Seleccionar idioma.
     - [x] Seleccionar butaca en tiempo real y mostrar las ocupadas.
     - [x] Generar un PDF con los datos de la entrada y del candy.
     - [x] Generar un QR para presentar al ingresar a la película.
+    - [x] Mostrar el QR y el código manual en “Mis entradas”, sin exigir la descarga del PDF.
     - [ ] Habilitar la preventa siete días antes del estreno de las películas de “Próximamente”.
 
 ## 5. Cancelar compra
@@ -56,6 +59,16 @@
 - [x] Permitir comprar candy online.
     - [x] Mostrar los productos a la venta.
     - [x] Comprar candy al mismo tiempo que la entrada.
+    - [x] Ofrecer una tienda de candy independiente de la compra de entradas.
+        - [x] Permitir comprar productos y combos sin seleccionar función ni butacas.
+        - [x] Permitir a los usuarios registrados canjear puntos por productos y combos de candy.
+        - [x] Mostrar el resumen y confirmar la compra con las mismas reglas de importes y puntos del flujo de entradas.
+        - [x] Generar un ticket PDF con el detalle de productos, combos, canjes y total.
+        - [x] Generar un QR y un código manual para retirar la compra.
+        - [x] Implementar la validación única del QR o código manual por el empleado; requiere instalar las funciones SQL correspondientes.
+        - [x] Conservar el carrito en un servicio con signals y localStorage separado por usuario e invitado.
+        - [x] Limitar las cantidades a 99 unidades por artículo y controlar el saldo para canjes.
+        - [x] Mostrar el QR de retiro desde el historial; la descarga del PDF es opcional.
 
 ## 10. Reporte de ventas
 
@@ -69,7 +82,10 @@
     - [x] Disponible para usuarios registrados.
     - [x] Acumular un punto por cada $1 de compra.
     - [x] Mostrar los puntos acumulados en el perfil.
-    - [ ] Mostrar el historial de canjes.
+    - [x] Mostrar el historial de canjes.
+    - [x] Mostrar el historial de compras de entradas y candy.
+    - [x] Unificar los historiales de compras y canjes en una sola pantalla.
+    - [ ] Incorporar filtros por contenido de la compra y medio de pago: dinero, puntos o mixto.
 
 ## 12. Sistema de notificaciones
 
@@ -129,13 +145,14 @@ Estas condiciones acompañan a los requisitos numerados y a la definición de ro
 
 - [ ] Mostrar la cartelera de “Próximamente”.
 - [x] Permitir consultar reseñas antes de comprar.
-- [ ] Mostrar primero las tres películas más vendidas y los combos destacados en la homepage.
+- [x] Mostrar combos destacados vigentes en el Hero de la homepage y de la tienda.
+- [ ] Ordenar las películas de la homepage por ventas y destacar las tres más vendidas.
 - [x] Impedir la compra a usuarios que no cumplen la edad mínima.
 - [x] Mostrar el aviso de acompañamiento de un adulto para películas +18 indicado en el enunciado.
 - [x] Seleccionar fechas y horarios sin calendarios.
 - [ ] Aplicar un precio especial de preventa.
 - [x] Permitir cancelar compras hasta dos horas antes de la función.
-- [x] Reintegrar el dinero de las cancelaciones en forma de créditos.
+- [ ] Alinear el reintegro de cancelaciones con el requisito de créditos: actualmente se acredita en puntos y se devuelven los puntos utilizados.
 
 ### Beneficios
 
@@ -151,7 +168,8 @@ Estas condiciones acompañan a los requisitos numerados y a la definición de ro
 - [x] Administrar productos.
 - [x] Gestionar la distribución de butacas.
 - [x] Configurar recompensas por puntos.
-- [x] Crear combos que incluyan entradas y candy.
+- [x] Crear combos de productos de candy.
+- [ ] Permitir combos que incluyan entradas y candy; el modelo actual de combos solo relaciona productos.
 - [ ] Exportar reportes de facturación a PDF.
 - [ ] Exportar reportes de facturación a Excel.
 - [ ] Mostrar gráficos de películas más vistas por semana y por mes.
@@ -163,8 +181,17 @@ Estas condiciones acompañan a los requisitos numerados y a la definición de ro
 ### Empleado, cliente y anónimo
 
 - [x] Permitir al empleado escanear los QR de entradas y candy.
+- [x] Permitir al empleado ingresar un código manual como alternativa al escaneo.
 - [x] Permitir al cliente iniciar sesión.
-- [ ] Permitir al cliente editar su perfil.
+- [x] Implementar el formulario de edición de perfil y su guardado.
 - [x] Permitir al anónimo consultar homepage, cartelera, “Próximamente”, detalles, reseñas y promedio.
 - [x] Permitir al anónimo usar el buscador y filtro por género.
 - [x] Permitir al anónimo comprar entradas y candy sin acumular puntos ni acceder a cupones o beneficios.
+
+## Verificaciones pendientes de cierre
+
+- [ ] Verificar la instalación en Supabase de las funciones SQL de códigos manuales y compra independiente de candy.
+- [ ] Validar manualmente el ingreso y retiro por QR y por código manual, incluido el rechazo de un segundo uso o de compras canceladas.
+- [ ] Validar manualmente una compra pagada solo con puntos y otra mixta, comprobando saldo, ticket e historial.
+- [ ] Verificar los permisos RLS para editar el perfil del propio usuario, sin permitir modificar perfiles ajenos.
+- [ ] Contrastar los requisitos originales de 5D, créditos y combos con entradas con la implementación antes de dar esos puntos por completos.

@@ -5,12 +5,14 @@ export type EstadoCompra = string;
 export interface Compra {
     id: string;
     usuario_id: string | null;
-    proyeccion_id: number;
+    proyeccion_id: number | null;
     fecha_compra: string | null;
     estado: EstadoCompra | null;
     total: number;
     creditos_usados: number | null;
     codigo_qr: string | null;
+    codigo_manual?: string;
+    solicitud_id?: string;
     url_pdf: string | null;
     puntos_generados: number;
 }
@@ -23,10 +25,16 @@ export type CompraInput = Omit<Compra, 'id' | 'fecha_compra' | 'codigo_qr' | 'ur
 };
 
 export interface ConfirmarCompraInput {
+    tipo_compra?: 'entradas' | 'candy';
     solicitud_id: string;
     cupon_codigo: string | null;
-    recompensas: { recompensa_id: number; cantidad: number; costo_puntos: number; version?: number }[];
-    proyeccion_id: number;
+    recompensas: {
+        recompensa_id: number;
+        cantidad: number;
+        costo_puntos: number;
+        version?: number;
+    }[];
+    proyeccion_id: number | null;
     total: number;
     creditos_usados: number;
     puntos_generados: number;
@@ -58,11 +66,18 @@ export interface CompraValidadaQr {
     sala_id: number;
     formato: string;
     idioma: string;
-    butacas: { fila: string; columna: number; tipo: string; precio_unitario: number }[];
+    butacas: {
+        fila: string;
+        columna: number;
+        tipo: string;
+        precio_unitario: number;
+        puntos_usados?: number;
+    }[];
     detalles: {
         nombre_item: string;
         cantidad: number;
         precio_unitario: number;
         tipo_item: 'producto' | 'combo';
+        puntos_usados?: number;
     }[];
 }

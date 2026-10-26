@@ -1,0 +1,56 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+section {
+    padding: clamp(1rem, 3vw, 1.75rem);
+    background: #0d171b;
+    border: 1px solid #23545a;
+    border-top: 3px solid theme.$arcade-cyan;
+    scroll-margin-top: 2rem;
+}
+
+.rewards-heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rewards-icon {
+    color: theme.$arcade-cyan;
+    font-size: 2.5rem;
+}
+
+.eyebrow {
+    color: theme.$arcade-cyan;
+    font: 0.5rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+h2 {
+    margin: 0.7rem 0;
+    color: #fff;
+    font: 0.8rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+p {
+    color: #b1bec2;
+    line-height: 1.7;
+}
+
+.rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.member-note {
+    margin: 1rem 0 0;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 650px) {
+    .rewards-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

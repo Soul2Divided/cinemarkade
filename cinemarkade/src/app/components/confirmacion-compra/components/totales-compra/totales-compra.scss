@@ -1,0 +1,76 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+}
+
+.ticket-coupon {
+    margin-top: 0.8rem;
+    padding: 0.7rem;
+    color: theme.$arcade-cyan;
+    border: 1px dashed theme.$arcade-cyan;
+    font: 0.78rem theme.$font-pixel;
+    line-height: 1.6;
+}
+
+.vip-line {
+    margin: 0 clamp(1.3rem, 4vw, 2.5rem);
+    border-top: 1px dashed #55555e;
+    color: theme.$arcade-yellow;
+}
+
+.vip-line strong {
+    color: theme.$arcade-yellow;
+}
+
+.ticket-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem clamp(1.3rem, 4vw, 2.5rem) 0;
+    padding: 1.3rem 0;
+    border-top: 2px solid theme.$arcade-yellow;
+    font: 1rem theme.$font-pixel;
+}
+
+.ticket-total strong {
+    color: theme.$arcade-yellow;
+    font: clamp(1.5rem, 3vw, 2.15rem) theme.$font-pixel;
+}
+
+.ticket-points {
+    padding: 0.85rem 1rem;
+    color: #aaa;
+    background: #19191e;
+    text-align: center;
+    font: 0.8rem theme.$font-pixel;
+    line-height: 1.7;
+}
+
+.ticket-points strong {
+    color: theme.$arcade-yellow;
+}
+
+.ticket-adjustments {
+    padding: 0 clamp(1.3rem, 4vw, 2.5rem) clamp(1.3rem, 4vw, 2.5rem);
+}
+
+.ticket-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    font-size: 1.05rem;
+    line-height: 1.4;
+}
+
+.ticket-line strong {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 520px) {
+    .ticket-line {
+        font-size: 0.92rem;
+    }
+}

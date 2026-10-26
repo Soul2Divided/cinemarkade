@@ -1,0 +1,45 @@
+<app-navbar />
+
+<main class="candy-page">
+    <a class="back-link" routerLink="/">← VOLVER AL INICIO</a>
+
+    <app-cabecera-candy />
+
+    @if (catalogo.cargando() || carrito.sesionCargando()) {
+        <app-loader message="CARGANDO CANDY..." />
+    }
+
+    @if (catalogo.error()) {
+        <div class="preview-note" role="alert">
+            <p>{{ catalogo.error() }}</p>
+            <button type="button" (click)="catalogo.cargar()" [disabled]="catalogo.cargando()">
+                REINTENTAR
+            </button>
+        </div>
+    }
+
+    @if (carrito.mensaje()) {
+        <p class="preview-note" role="status">{{ carrito.mensaje() }}</p>
+    }
+
+    @if (carrito.avisoAlmacenamiento()) {
+        <p class="preview-note" role="status">{{ carrito.avisoAlmacenamiento() }}</p>
+    }
+
+    <div class="shop-layout">
+        <div class="shop-content">
+            <nav class="catalog-links" aria-label="Secciones de la tienda">
+                <a href="#productos-candy">PRODUCTOS</a>
+                <a href="#combos-candy">COMBOS</a>
+                <a href="#recompensas-candy">CANJEAR PUNTOS</a>
+            </nav>
+
+            <app-catalogo-candy />
+            <app-recompensas-candy />
+        </div>
+
+        <aside aria-label="Resumen de la compra de candy">
+            <app-resumen-candy />
+        </aside>
+    </div>
+</main>

@@ -39,6 +39,15 @@ export const routes: Routes = [
             ),
     },
     {
+        path: 'tienda',
+        loadComponent: () => import('./components/tienda-candy/tienda-candy').then((m) => m.TiendaCandy),
+    },
+    {
+        path: 'candy',
+        redirectTo: 'tienda',
+        pathMatch: 'full',
+    },
+    {
         path: 'compra',
         loadComponent: () => import('./components/compra/compra').then((m) => m.Compra),
     },

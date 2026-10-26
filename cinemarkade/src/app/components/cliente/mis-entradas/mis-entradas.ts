@@ -14,11 +14,13 @@ import { TicketPdfService } from '../../../core/compra/ticket-pdf.service';
 import { Loader } from '../../loader/loader';
 import { Modal } from '../../modal/modal';
 import { Navbar } from '../../navbar/navbar';
+import { QrCompra } from '../../qr-compra/qr-compra';
 import QRCode from 'qrcode';
 
 interface EntradaPendiente {
     compra: Compra;
     pelicula: string;
+    imagen: string | null;
     proyeccionId: number;
     fecha: string;
     horario: string;
@@ -28,10 +30,10 @@ interface EntradaPendiente {
 }
 
 @Component({
-    imports: [CommonModule, Navbar, Loader, Modal],
+    imports: [CommonModule, Navbar, Loader, Modal, QrCompra],
     selector: 'app-mis-entradas',
     styleUrl: './mis-entradas.scss',
-    templateUrl: './mis-entradas.html'
+    templateUrl: './mis-entradas.html',
 })
 export class MisEntradas implements OnInit {
     private readonly router = inject(Router);
@@ -47,7 +49,8 @@ export class MisEntradas implements OnInit {
     readonly entradas = signal<EntradaPendiente[]>([]);
     readonly cargando = signal(true);
     readonly error = signal('');
-    readonly qrVisible = signal(false);
+    readonly cargandoQrId = signal<string | null>(null);
+    readonly qrCompra = signal<Compra | null>(null);
     readonly qrImagen = signal<string | null>(null);
     readonly cargandoPdfId = signal<string | null>(null);
     readonly errorPdf = signal('');
@@ -68,10 +71,13 @@ export class MisEntradas implements OnInit {
             const [compras, funciones, peliculas] = await Promise.all([
                 this.compraService.listarPorUsuario(usuarioId),
                 this.funcionService.listarFunciones(),
-                this.peliculaService.listarPeliculas()
+                this.peliculaService.listarPeliculas(),
             ]);
-            const peliculaPorId = new Map(peliculas.map(pelicula => [pelicula.id, pelicula.nombre]));
-            const funcionPorProyeccion = new Map<number, { funcion: Funcion; proyeccion: Proyeccion }>();
+            const peliculaPorId = new Map(peliculas.map((pelicula) => [pelicula.id, pelicula]));
+            const funcionPorProyeccion = new Map<
+                number,
+                { funcion: Funcion; proyeccion: Proyeccion }
+            >();
             for (const funcion of funciones) {
                 for (const proyeccion of funcion.proyecciones) {
                     funcionPorProyeccion.set(proyeccion.id, { funcion, proyeccion });
@@ -81,15 +87,21 @@ export class MisEntradas implements OnInit {
             const ahora = Date.now();
             this.entradas.set(
                 compras
-                    .flatMap(compra => {
-                        const asociacion = funcionPorProyeccion.get(compra.proyeccion_id);
+                    .flatMap((compra) => {
+                        const asociacion = funcionPorProyeccion.get(compra.proyeccion_id ?? -1);
 
-                        if (!asociacion || !compra.codigo_qr || compra.estado?.toLowerCase() !== 'confirmada') {
+                        if (
+                            !asociacion ||
+                            !compra.codigo_qr ||
+                            compra.estado?.toLowerCase() !== 'confirmada'
+                        ) {
                             return [];
                         }
 
                         const { funcion, proyeccion } = asociacion;
-                        const fechaHora = new Date(`${funcion.fecha.slice(0, 10)}T${proyeccion.horario}`).getTime();
+                        const fechaHora = new Date(
+                            `${funcion.fecha.slice(0, 10)}T${proyeccion.horario}`,
+                        ).getTime();
 
                         if (fechaHora <= ahora) {
                             return [];
@@ -98,58 +110,88 @@ export class MisEntradas implements OnInit {
                         return [
                             {
                                 compra,
-                                pelicula: peliculaPorId.get(funcion.pelicula_id) ?? 'Película',
+                                pelicula:
+                                    peliculaPorId.get(funcion.pelicula_id)?.nombre ?? 'Película',
+                                imagen: peliculaPorId.get(funcion.pelicula_id)?.imagen ?? null,
                                 proyeccionId: proyeccion.id,
                                 fecha: funcion.fecha,
                                 horario: proyeccion.horario,
                                 salaId: funcion.sala_id,
                                 formato: funcion.formato,
-                                idioma: funcion.idioma
-                            }
+                                idioma: funcion.idioma,
+                            },
                         ];
                     })
-                    .sort((a, b) => this.fechaHora(a).localeCompare(this.fechaHora(b)))
+                    .sort((a, b) => this.fechaHora(a).localeCompare(this.fechaHora(b))),
             );
         } catch (error) {
             console.error('No se pudieron cargar las entradas:', error);
-            this.error.set(error instanceof Error ? error.message : 'No se pudieron cargar tus entradas.');
+            this.error.set(
+                error instanceof Error ? error.message : 'No se pudieron cargar tus entradas.',
+            );
         } finally {
             this.cargando.set(false);
         }
     }
 
     async mostrarQr(entrada: EntradaPendiente): Promise<void> {
+        if (this.cargandoQrId() || this.cancelandoId()) {
+            return;
+        }
+
+        this.cargandoQrId.set(entrada.compra.id);
         this.errorPdf.set('');
+        this.cerrarQr();
 
         try {
-            this.qrImagen.set(await QRCode.toDataURL(entrada.compra.codigo_qr!, { width: 360, margin: 2 }));
-            this.qrVisible.set(true);
+            const compra = await this.obtenerCompraDisponible(entrada);
+            const imagen = await QRCode.toDataURL(compra.codigo_qr!, { width: 480, margin: 4 });
+            this.qrCompra.set(compra);
+            this.qrImagen.set(imagen);
         } catch (error) {
-            this.errorPdf.set(error instanceof Error ? error.message : 'No se pudo generar el código QR.');
+            this.errorPdf.set(
+                error instanceof Error ? error.message : 'No se pudo generar el código QR.',
+            );
+        } finally {
+            this.cargandoQrId.set(null);
         }
     }
 
     cerrarQr(): void {
-        this.qrVisible.set(false);
         this.qrImagen.set(null);
+        this.qrCompra.set(null);
     }
 
     async descargarTicket(entrada: EntradaPendiente): Promise<void> {
+        if (this.cargandoPdfId() || this.cancelandoId()) {
+            return;
+        }
+
         this.cargandoPdfId.set(entrada.compra.id);
         this.errorPdf.set('');
 
         try {
+            const compra = await this.obtenerCompraDisponible(entrada);
             const [filasButaca, detalles, butacasProyeccion] = await Promise.all([
                 this.compraButacaService.listarPorCompra(entrada.compra.id),
                 this.detalleCompraService.listarPorCompra(entrada.compra.id),
-                this.butacaProyeccionService.listarPorProyeccion(entrada.proyeccionId)
+                this.butacaProyeccionService.listarPorProyeccion(entrada.proyeccionId),
             ]);
             const butacas = filasButaca
-                .map(fila => butacasProyeccion.find(item => item.id === fila.butaca_proyeccion_id))
+                .map((fila) =>
+                    butacasProyeccion.find((item) => item.id === fila.butaca_proyeccion_id),
+                )
                 .filter((item): item is NonNullable<typeof item> => !!item);
-            const qr = await QRCode.toDataURL(entrada.compra.codigo_qr!, { width: 320, margin: 2 });
+            if (filasButaca.length === 0 || butacas.length !== filasButaca.length) {
+                throw new Error(
+                    'No se pudieron recuperar todas las butacas. Intentá nuevamente antes de descargar el ticket.',
+                );
+            }
+
+            const qr = await QRCode.toDataURL(compra.codigo_qr!, { width: 320, margin: 2 });
             const pdf = this.ticketPdfService.generar({
                 compraId: entrada.compra.id,
+                codigoManual: compra.codigo_manual,
                 qrDataUrl: qr,
                 pelicula: entrada.pelicula,
                 fecha: this.formatearFecha(entrada.fecha),
@@ -157,31 +199,35 @@ export class MisEntradas implements OnInit {
                 sala: entrada.salaId,
                 formato: entrada.formato,
                 idioma: entrada.idioma,
-                butacas: butacas.map(item => `${item.butaca.fila}${item.butaca.columna}`),
-                detalles: detalles.map(detalle => ({
-                    nombre: detalle.nombre_item ?? 'Producto',
+                butacas: butacas.map((item) => `${item.butaca.fila}${item.butaca.columna}`),
+                detalles: detalles.map((detalle) => ({
+                    nombre: `${detalle.nombre_item ?? 'Producto'}${detalle.medio_pago === 'puntos' ? ` (${detalle.puntos_usados ?? 0} PTS)` : ''}`,
                     cantidad: detalle.cantidad ?? 1,
-                    total: (detalle.precio_unitario ?? 0) * (detalle.cantidad ?? 1)
+                    total: (detalle.precio_unitario ?? 0) * (detalle.cantidad ?? 1),
                 })),
                 cupon: null,
-                recargoVip: butacas.filter(item => item.butaca.tipo === 'vip').length * 5000,
-                total: entrada.compra.total,
-                puntos: entrada.compra.puntos_generados,
+                recargoVip: butacas.filter((item) => item.butaca.tipo === 'vip').length * 5000,
+                total: compra.total,
+                puntos: compra.puntos_generados,
                 puntosUsados:
                     filasButaca.reduce((s, b) => s + Number(b.puntos_usados ?? 0), 0) +
-                    detalles.reduce((s, d) => s + Number(d.puntos_usados ?? 0), 0)
+                    detalles.reduce((s, d) => s + Number(d.puntos_usados ?? 0), 0),
             });
             this.ticketPdfService.descargar(pdf, entrada.compra.id);
         } catch (error) {
             console.error('No se pudo preparar el ticket:', error);
-            this.errorPdf.set(error instanceof Error ? error.message : 'No se pudo descargar el ticket.');
+            this.errorPdf.set(
+                error instanceof Error ? error.message : 'No se pudo descargar el ticket.',
+            );
         } finally {
             this.cargandoPdfId.set(null);
         }
     }
 
     puedeCancelar(entrada: EntradaPendiente): boolean {
-        const inicio = new Date(`${entrada.fecha.slice(0, 10)}T${entrada.horario.slice(0, 8)}-03:00`).getTime();
+        const inicio = new Date(
+            `${entrada.fecha.slice(0, 10)}T${entrada.horario.slice(0, 8)}-03:00`,
+        ).getTime();
 
         return inicio - Date.now() >= 2 * 60 * 60 * 1000;
     }
@@ -212,12 +258,16 @@ export class MisEntradas implements OnInit {
 
         try {
             const puntos = await this.compraService.cancelarCompra(entrada.compra.id);
-            this.entradas.update(actuales => actuales.filter(item => item.compra.id !== entrada.compra.id));
+            this.entradas.update((actuales) =>
+                actuales.filter((item) => item.compra.id !== entrada.compra.id),
+            );
             await this.authService.refrescarUsuarioActual();
             this.puntosReintegrados.set(puntos);
         } catch (error) {
             console.error('No se pudo cancelar la compra:', error);
-            this.errorPdf.set(error instanceof Error ? error.message : 'No se pudo cancelar la compra.');
+            this.errorPdf.set(
+                error instanceof Error ? error.message : 'No se pudo cancelar la compra.',
+            );
         } finally {
             this.cancelandoId.set(null);
         }
@@ -231,6 +281,30 @@ export class MisEntradas implements OnInit {
         return `${entrada.fecha.slice(0, 10)}T${entrada.horario}`;
     }
 
+    private async obtenerCompraDisponible(entrada: EntradaPendiente): Promise<Compra> {
+        const compra = await this.compraService.obtenerPorId(entrada.compra.id);
+        const inicio = new Date(
+            `${entrada.fecha.slice(0, 10)}T${entrada.horario.slice(0, 8)}-03:00`,
+        ).getTime();
+
+        if (
+            compra.proyeccion_id !== entrada.proyeccionId ||
+            compra.estado?.toLowerCase() !== 'confirmada' ||
+            !compra.codigo_qr ||
+            !Number.isFinite(inicio) ||
+            inicio <= Date.now()
+        ) {
+            this.entradas.update((items) => items.filter((item) => item.compra.id !== compra.id));
+            throw new Error('Esta entrada ya fue utilizada, cancelada o su función ya comenzó.');
+        }
+
+        this.entradas.update((items) =>
+            items.map((item) => (item.compra.id === compra.id ? { ...item, compra } : item)),
+        );
+
+        return compra;
+    }
+
     formatearFecha(fecha: string): string {
         const [anio, mes, dia] = fecha.slice(0, 10).split('-').map(Number);
 
@@ -242,7 +316,7 @@ export class MisEntradas implements OnInit {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
         });
     }
 }

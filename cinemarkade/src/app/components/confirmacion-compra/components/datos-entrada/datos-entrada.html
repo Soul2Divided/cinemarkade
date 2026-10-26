@@ -1,0 +1,37 @@
+<div class="ticket-brand">
+    <span class="ticket-icon">▣</span>
+    <div>
+        <small>ENTRADA DE CINE</small>
+        <h2>{{ datos().pelicula }}</h2>
+    </div>
+</div>
+<div class="ticket-facts">
+    <div>
+        <small>FECHA</small>
+        <strong>{{ datos().fecha }}</strong>
+    </div>
+    <div>
+        <small>HORARIO</small>
+        <strong>{{ datos().horario }}</strong>
+    </div>
+    <div>
+        <small>SALA</small>
+        <strong>{{ datos().sala }}</strong>
+    </div>
+    <div>
+        <small>FORMATO · IDIOMA</small>
+        <strong>{{ datos().formato }} · {{ datos().idioma }}</strong>
+    </div>
+</div>
+<div class="ticket-seats">
+    <div>
+        <small>ENTRADAS</small>
+        <strong>{{ datos().cantidadEntradas }} · GENERAL</strong>
+    </div>
+    <div>
+        <small>BUTACAS</small>
+        <strong>
+            {{ datos().butacas.join(' · ') || 'Sin seleccionar' }}
+        </strong>
+    </div>
+</div>

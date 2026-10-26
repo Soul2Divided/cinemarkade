@@ -1,0 +1,58 @@
+@use '../../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: grid;
+    gap: 2.5rem;
+}
+
+section {
+    scroll-margin-top: 2rem;
+}
+
+.section-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-number {
+    padding: .75rem;
+    color: theme.$arcade-yellow;
+    background: #211f11;
+    border: 1px solid #5a5427;
+    font: .65rem theme.$font-pixel;
+}
+
+h2 {
+    margin: 0 0 .6rem;
+    color: #fff;
+    font: .8rem theme.$font-pixel;
+    line-height: 1.8;
+}
+
+p {
+    margin: 0;
+    color: #aaaab5;
+    line-height: 1.7;
+}
+
+.product-grid,
+.combo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+
+@media (min-width: 1250px) {
+    .product-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .product-grid,
+    .combo-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

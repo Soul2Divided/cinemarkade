@@ -1,55 +1,126 @@
 <app-navbar></app-navbar>
 
 <main class="employee-page">
-  <section class="employee-panel">
-    <span class="eyebrow">CONTROL DE ACCESO</span>
-    <h1>VALIDAR ENTRADA</h1>
+    <section class="employee-panel">
+        <span class="eyebrow">CONTROL DE ACCESO</span>
+        <h1>VALIDAR COMPRA</h1>
 
-    @if (validando()) {
-    <app-loader message="VALIDANDO ENTRADA..." />
-    } @else if (entrada(); as ticket) {
-    <div class="validation-result valid">
-      <span class="result-icon">✓</span>
-      <h2>ENTRADA VALIDADA</h2>
-      <h3>{{ ticket.pelicula }}</h3>
-      <p>{{ formatearFecha(ticket.fecha) }} · {{ ticket.horario.slice(0, 5) }}</p>
-      <p>SALA {{ ticket.sala_id }} · {{ ticket.formato }} · {{ ticket.idioma }}</p>
+        @if (validando()) {
+            <app-loader message="VALIDANDO ENTRADA..." />
+        } @else if (entrada(); as ticket) {
+            <div class="validation-result valid">
+                <span class="result-icon">✓</span>
+                <h2>
+                    {{
+                        ticket.compra.proyeccion_id === null
+                            ? 'PEDIDO ENTREGADO'
+                            : 'ENTRADA VALIDADA'
+                    }}
+                </h2>
+                <h3>{{ ticket.pelicula }}</h3>
+                @if (ticket.compra.proyeccion_id !== null) {
+                    <p>{{ formatearFecha(ticket.fecha) }} · {{ ticket.horario.slice(0, 5) }}</p>
+                    <p>SALA {{ ticket.sala_id }} · {{ ticket.formato }} · {{ ticket.idioma }}</p>
 
-      <div class="verification-section">
-        <h4>BUTACAS</h4>
-        @for (butaca of ticket.butacas; track $index) {
-        <div class="verification-line"><span>{{ butaca.fila }}{{ butaca.columna }} · {{ butaca.tipo }}</span><strong>{{
-            butaca.precio_unitario | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
-        }
-      </div>
+                    <div class="verification-section">
+                        <h4>BUTACAS</h4>
+                        @for (butaca of ticket.butacas; track $index) {
+                            <div class="verification-line">
+                                <span>
+                                    {{ butaca.fila }}{{ butaca.columna }} · {{ butaca.tipo }}
+                                </span>
+                                <strong>
+                                    {{
+                                        butaca.precio_unitario
+                                            | currency: 'ARS' : 'symbol' : '1.0-0'
+                                    }}
+                                </strong>
+                            </div>
+                        }
+                    </div>
+                }
 
-      <div class="verification-section">
-        <h4>CANDY BAR</h4>
-        @if (ticket.detalles.length) {
-        @for (detalle of ticket.detalles; track $index) {
-        <div class="verification-line"><span>{{ detalle.cantidad }} × {{ detalle.nombre_item }}</span><strong>{{
-            detalle.precio_unitario * detalle.cantidad | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
-        }
+                <div class="verification-section">
+                    <h4>CANDY BAR</h4>
+                    @if (ticket.detalles.length) {
+                        @for (detalle of ticket.detalles; track $index) {
+                            <div class="verification-line">
+                                <span>{{ detalle.cantidad }} × {{ detalle.nombre_item }}</span>
+                                <strong>
+                                    {{
+                                        detalle.precio_unitario * detalle.cantidad
+                                            | currency: 'ARS' : 'symbol' : '1.0-0'
+                                    }}
+                                </strong>
+                            </div>
+                        }
+                    } @else {
+                        <p>Sin productos ni combos.</p>
+                    }
+                </div>
+
+                <div class="verification-total">
+                    <span>TOTAL</span>
+                    <strong>
+                        {{ ticket.compra.total | currency: 'ARS' : 'symbol' : '1.0-0' }}
+                    </strong>
+                </div>
+                <p class="consumed-note">
+                    La compra ya fue validada. Ni el QR ni el código manual pueden volver a
+                    validarse.
+                </p>
+                <button type="button" class="scan-button" (click)="nuevaLectura()">
+                    ESCANEAR OTRA COMPRA
+                </button>
+            </div>
+        } @else if (escaneando()) {
+            <div class="camera-panel">
+                <video #preview autoplay playsinline></video>
+                <p>Enfocá el código QR dentro del recuadro.</p>
+                <button type="button" class="cancel-button" (click)="nuevaLectura()">
+                    CANCELAR ESCANEO
+                </button>
+            </div>
         } @else {
-        <p>Sin productos ni combos.</p>
-        }
-      </div>
+            <p class="instructions">
+                Escaneá el QR o ingresá el código manual del ticket para validar el acceso.
+            </p>
+            @if (error()) {
+                <p class="scan-error" role="alert">{{ error() }}</p>
+            }
+            <button type="button" class="scan-button" (click)="iniciarEscaneo()">
+                <span>▦</span>
+                ESCANEAR ENTRADA
+            </button>
 
-      <div class="verification-total"><span>TOTAL</span><strong>{{ ticket.compra.total | currency:'ARS':'symbol':'1.0-0'
-          }}</strong></div>
-      <p class="consumed-note">Este QR ya fue utilizado y no puede volver a validarse.</p>
-      <button type="button" class="scan-button" (click)="nuevaLectura()">ESCANEAR OTRA ENTRADA</button>
-    </div>
-    } @else if (escaneando()) {
-    <div class="camera-panel">
-      <video #preview autoplay playsinline></video>
-      <p>Enfocá el código QR dentro del recuadro.</p>
-      <button type="button" class="cancel-button" (click)="nuevaLectura()">CANCELAR ESCANEO</button>
-    </div>
-    } @else {
-    <p class="instructions">Escaneá el QR del ticket para consultar la compra y validar el acceso.</p>
-    @if (error()) { <p class="scan-error">{{ error() }}</p> }
-    <button type="button" class="scan-button" (click)="iniciarEscaneo()"><span>▦</span> ESCANEAR ENTRADA</button>
-    }
-  </section>
+            <form class="manual-entry" (ngSubmit)="validarManual()">
+                <label for="codigo-manual">INGRESAR CÓDIGO MANUAL</label>
+                <p>Si la cámara no puede leer el QR, ingresá el código de 10 caracteres.</p>
+
+                <input
+                    id="codigo-manual"
+                    name="codigoManual"
+                    type="text"
+                    autocomplete="off"
+                    autocapitalize="characters"
+                    spellcheck="false"
+                    maxlength="21"
+                    placeholder="7B2F9-A4C6D"
+                    [ngModel]="codigoManual()"
+                    (ngModelChange)="codigoManual.set($event)"
+                    aria-describedby="codigo-manual-ayuda"
+                    required
+                />
+
+                <small id="codigo-manual-ayuda">Podés escribirlo con o sin el guion.</small>
+                <button
+                    type="submit"
+                    class="scan-button"
+                    [disabled]="!codigoManual().trim() || validando()"
+                >
+                    VALIDAR CÓDIGO
+                </button>
+            </form>
+        }
+    </section>
 </main>

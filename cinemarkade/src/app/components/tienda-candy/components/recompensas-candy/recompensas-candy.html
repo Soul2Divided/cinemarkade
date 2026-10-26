@@ -1,0 +1,59 @@
+<section id="recompensas-candy" aria-labelledby="titulo-recompensas">
+    <div class="rewards-heading">
+        <span class="rewards-icon" aria-hidden="true">✦</span>
+        <div>
+            <span class="eyebrow">TUS PUNTOS TIENEN SABOR</span>
+            <h2 id="titulo-recompensas">CANJEÁ TUS PUNTOS</h2>
+        </div>
+    </div>
+
+    @if (carrito.registrado()) {
+        <p>
+            Saldo:
+            <strong>{{ carrito.puntosDisponibles() | number }} PTS</strong>
+            · En el carrito: {{ carrito.puntosUsados() | number }} PTS
+        </p>
+        <p>
+            Disponibles para nuevos canjes:
+            {{ (carrito.puntosRestantes() > 0 ? carrito.puntosRestantes() : 0) | number }} PTS
+        </p>
+    } @else {
+        <p class="member-note">
+            Iniciá sesión para canjear tus puntos por productos y combos de candy.
+        </p>
+    }
+
+    <div class="rewards-grid">
+        @for (recompensa of recompensas(); track recompensa.id) {
+            <app-tarjeta-candy
+                [nombre]="recompensa.nombreArticulo"
+                [imagen]="recompensa.imagen"
+                [cantidad]="carrito.cantidad('recompensa', recompensa.id)"
+                [esRecompensa]="true"
+                etiquetaAgregar="CANJEAR +"
+                [maximo]="recompensa.maximoCanjes"
+                [bloqueada]="
+                    !carrito.registrado() || carrito.sesionCargando() || catalogo.cargando()
+                "
+                [bloquearIncremento]="
+                    recompensa.costo_puntos > carrito.puntosRestantes() ||
+                    carrito.cantidad('recompensa', recompensa.id) >= recompensa.maximoCanjes
+                "
+                (agregar)="carrito.agregar('recompensa', recompensa.id)"
+                (cambiarCantidad)="carrito.cambiarCantidad('recompensa', recompensa.id, $event)"
+            >
+                <span candy-icono>🍿</span>
+                <span candy-categoria>{{ recompensa.nombre }}</span>
+                <span candy-nombre>{{ recompensa.nombreArticulo }}</span>
+                <span candy-descripcion>
+                    {{ recompensa.cantidad }} unidad(es) por canje. {{ recompensa.descripcion }}
+                </span>
+                <span candy-precio>{{ recompensa.costo_puntos | number }} PTS</span>
+            </app-tarjeta-candy>
+        } @empty {
+            @if (!catalogo.cargando() && !catalogo.error()) {
+                <p>No hay recompensas de candy disponibles en este momento.</p>
+            }
+        }
+    </div>
+</section>

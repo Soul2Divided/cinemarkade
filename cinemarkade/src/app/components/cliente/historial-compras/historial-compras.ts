@@ -7,7 +7,10 @@ import { CompraService } from '../../../core/compra/compra.service';
 import { Funcion, Proyeccion } from '../../../core/funcion/funcion.model';
 import { FuncionService } from '../../../core/funcion/funcion.service';
 import { PeliculaService } from '../../../core/pelicula/pelicula.service';
+import QRCode from 'qrcode';
+import { TicketPdfService } from '../../../core/compra/ticket-pdf.service';
 import { Navbar } from '../../navbar/navbar';
+import { QrCompra } from '../../qr-compra/qr-compra';
 
 interface CompraHistorial {
     compra: Compra;
@@ -22,12 +25,13 @@ interface CompraHistorial {
 
 @Component({
     selector: 'app-historial-compras',
-    imports: [CommonModule, Navbar],
+    imports: [CommonModule, Navbar, QrCompra],
     templateUrl: './historial-compras.html',
     styleUrl: './historial-compras.scss',
 })
 export class HistorialCompras implements OnInit {
     private readonly router = inject(Router);
+    private readonly ticketPdfService = inject(TicketPdfService);
     private readonly authService = inject(AuthService);
     private readonly compraService = inject(CompraService);
     private readonly funcionService = inject(FuncionService);
@@ -37,6 +41,11 @@ export class HistorialCompras implements OnInit {
     readonly cargando = signal(true);
     readonly error = signal('');
     readonly aviso = signal('');
+    readonly descargandoId = signal<string | null>(null);
+    readonly errorTicket = signal('');
+    readonly cargandoQrId = signal<string | null>(null);
+    readonly qrImagen = signal<string | null>(null);
+    readonly qrCompra = signal<Compra | null>(null);
     private consultaEnCurso = false;
 
     async ngOnInit(): Promise<void> {
@@ -105,14 +114,17 @@ export class HistorialCompras implements OnInit {
 
             this.historial.set(
                 compras.map((compra) => {
-                    const asociacion = funcionPorProyeccion.get(compra.proyeccion_id);
+                    const asociacion = funcionPorProyeccion.get(compra.proyeccion_id ?? -1);
                     const pelicula = asociacion
                         ? peliculaPorId.get(asociacion.funcion.pelicula_id)
                         : null;
 
                     return {
                         compra,
-                        pelicula: pelicula?.nombre ?? 'Película no disponible',
+                        pelicula:
+                            compra.proyeccion_id === null
+                                ? 'Pedido de candy'
+                                : (pelicula?.nombre ?? 'Película no disponible'),
                         imagen: pelicula?.imagen ?? null,
                         fechaFuncion: asociacion?.funcion.fecha ?? null,
                         horario: asociacion?.proyeccion.horario.slice(0, 5) ?? null,
@@ -128,6 +140,73 @@ export class HistorialCompras implements OnInit {
         } finally {
             this.consultaEnCurso = false;
             this.cargando.set(false);
+        }
+    }
+
+    async mostrarQr(compra: Compra): Promise<void> {
+        if (this.cargandoQrId()) {
+            return;
+        }
+
+        this.cargandoQrId.set(compra.id);
+        this.errorTicket.set('');
+        this.cerrarQr();
+
+        try {
+            const actual = await this.compraService.obtenerPorId(compra.id);
+            this.historial.update(items => items.map(item =>
+                item.compra.id === actual.id ? { ...item, compra: actual } : item
+            ));
+
+            if (actual.proyeccion_id !== null || actual.estado?.toLowerCase() !== 'confirmada' || !actual.codigo_qr) {
+                throw new Error('Este pedido ya fue retirado o cancelado y no tiene un QR disponible.');
+            }
+
+            const imagen = await QRCode.toDataURL(actual.codigo_qr, { width: 480, margin: 4 });
+            this.qrCompra.set(actual);
+            this.qrImagen.set(imagen);
+        } catch (error) {
+            this.errorTicket.set(error instanceof Error ? error.message : 'No se pudo mostrar el QR del pedido.');
+        } finally {
+            this.cargandoQrId.set(null);
+        }
+    }
+
+    cerrarQr(): void {
+        this.qrImagen.set(null);
+        this.qrCompra.set(null);
+    }
+
+    async descargarCandy(compra: Compra): Promise<void> {
+        if (this.descargandoId()) {
+            return;
+        }
+
+        this.descargandoId.set(compra.id);
+        this.errorTicket.set('');
+
+        try {
+            if (!compra.solicitud_id) {
+                throw new Error('No se encontró la solicitud para recuperar el ticket.');
+            }
+
+            const ticket = await this.compraService.obtenerTicketConfirmado(compra.solicitud_id);
+
+            if (!ticket.compra.codigo_qr) {
+                throw new Error('El pedido ya no tiene un código de retiro disponible.');
+            }
+
+            const qr = await QRCode.toDataURL(ticket.compra.codigo_qr, { width: 320, margin: 2 });
+            this.ticketPdfService.descargar(
+                this.ticketPdfService.generarDesdeCompra(ticket, qr),
+                compra.id,
+            );
+        } catch (error) {
+            this.errorTicket.set(
+                error instanceof Error ? error.message : 'No se pudo descargar el ticket.',
+            );
+        } finally {
+            this.descargandoId.set(null);
         }
     }
 
