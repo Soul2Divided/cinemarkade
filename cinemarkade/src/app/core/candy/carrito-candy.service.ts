@@ -235,7 +235,15 @@ export class CarritoCandyService {
             try {
                 const { solicitudId: anterior, ...datos } = JSON.parse(previo);
 
-                if (anterior && JSON.stringify(datos) === JSON.stringify(borrador)) {
+                const firma = (compra: BorradorCompra) => JSON.stringify({
+                    tipo: compra.tipoCompra,
+                    usuario: compra.usuarioId,
+                    productos: compra.productos,
+                    combos: compra.combos,
+                    recompensas: compra.recompensas?.map(item => ({ id: item.recompensa.id, cantidad: item.cantidad }))
+                });
+
+                if (anterior && firma(datos) === firma(borrador)) {
                     solicitudId = anterior;
                 }
             } catch {

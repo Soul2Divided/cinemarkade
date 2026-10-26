@@ -85,7 +85,7 @@ Actualizada al 26/10/2026. Las casillas completas indican implementación en el 
     - [x] Mostrar el historial de canjes.
     - [x] Mostrar el historial de compras de entradas y candy.
     - [x] Unificar los historiales de compras y canjes en una sola pantalla.
-    - [ ] Incorporar filtros por contenido de la compra y medio de pago: dinero, puntos o mixto.
+    - [x] Incorporar filtros por contenido de la compra y medio de pago: dinero, puntos o mixto.
 
 ## 12. Sistema de notificaciones
 
@@ -152,12 +152,12 @@ Estas condiciones acompañan a los requisitos numerados y a la definición de ro
 - [x] Seleccionar fechas y horarios sin calendarios.
 - [ ] Aplicar un precio especial de preventa.
 - [x] Permitir cancelar compras hasta dos horas antes de la función.
-- [ ] Alinear el reintegro de cancelaciones con el requisito de créditos: actualmente se acredita en puntos y se devuelven los puntos utilizados.
+- [ ] Consultar con el profesor si el reintegro puede acreditarse en puntos o requiere créditos separados. Actualmente se devuelven puntos.
 
 ### Beneficios
 
-- [ ] Entregar un cupón de bienvenida de 20% por defecto para la primera compra.
-- [ ] Permitir al dueño configurar el porcentaje de bienvenida.
+- [x] Implementar el cupón de bienvenida de 20% por defecto para la primera compra, aplicado en la confirmación. Requiere instalar el SQL del beneficio.
+- [x] Permitir al dueño configurar el porcentaje de bienvenida desde Gestión de cupones.
 - [x] Canjear puntos por entradas gratis.
 - [x] Canjear puntos por productos de candy.
 
@@ -169,7 +169,6 @@ Estas condiciones acompañan a los requisitos numerados y a la definición de ro
 - [x] Gestionar la distribución de butacas.
 - [x] Configurar recompensas por puntos.
 - [x] Crear combos de productos de candy.
-- [ ] Permitir combos que incluyan entradas y candy; el modelo actual de combos solo relaciona productos.
 - [ ] Exportar reportes de facturación a PDF.
 - [ ] Exportar reportes de facturación a Excel.
 - [ ] Mostrar gráficos de películas más vistas por semana y por mes.
@@ -194,4 +193,10 @@ Estas condiciones acompañan a los requisitos numerados y a la definición de ro
 - [ ] Validar manualmente el ingreso y retiro por QR y por código manual, incluido el rechazo de un segundo uso o de compras canceladas.
 - [ ] Validar manualmente una compra pagada solo con puntos y otra mixta, comprobando saldo, ticket e historial.
 - [ ] Verificar los permisos RLS para editar el perfil del propio usuario, sin permitir modificar perfiles ajenos.
-- [ ] Contrastar los requisitos originales de 5D, créditos y combos con entradas con la implementación antes de dar esos puntos por completos.
+- [ ] Instalar el SQL del cupón de bienvenida y verificar el descuento en la primera compra y su rechazo en compras posteriores.
+- [ ] Confirmar con el profesor la modalidad de reintegro por cancelaciones.
+
+## Alcance funcional
+
+- Los formatos requeridos son 2D, 3D y 4D. No se requiere 5D, según la aclaración del profesor.
+- Los combos incluyen productos de candy. No se requiere incluir entradas.

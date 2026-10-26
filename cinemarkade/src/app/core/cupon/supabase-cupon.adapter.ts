@@ -17,6 +17,21 @@ export class SupabaseCuponAdapter implements CuponRepository {
         return data as Cupon[];
     }
 
+    async obtenerBienvenidaDisponible(): Promise<Cupon | null> {
+        /*
+         * Que haya una sesión iniciada.
+         * Que el cupón esté activo y vigente.
+         * Que ese usuario no tenga compras anteriores.
+         */
+        const { data, error } = await this.supabaseService.supabaseClient.rpc('cupon_bienvenida_disponible');
+
+        if (error) {
+            throw new Error(`No se pudo consultar el cupón de bienvenida: ${error.message}`);
+        }
+
+        return data as Cupon | null;
+    }
+
     async obtenerPorId(id: number): Promise<Cupon | null> {
         const { data, error } = await this.supabaseService.supabaseClient
             .from('cupon')
@@ -31,7 +46,7 @@ export class SupabaseCuponAdapter implements CuponRepository {
     async crear(datos: CuponInput): Promise<Cupon> {
         const { data, error } = await this.supabaseService.supabaseClient
             .from('cupon')
-            .insert({ ...datos, activo: true })
+            .insert({ ...datos, activa: true })
             .select('*')
             .single();
 

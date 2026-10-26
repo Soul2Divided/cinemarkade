@@ -6,6 +6,7 @@ export interface Cupon {
     fecha_inicio: string;
     fecha_fin: string;
     activa: boolean;
+    es_bienvenida?: boolean;
 }
 
 export type CuponInput = Omit<Cupon, 'id' | 'activa'>;

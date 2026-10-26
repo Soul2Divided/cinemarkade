@@ -1,6 +1,12 @@
 @use '../../../../styles/themes/arcade-theme' as theme;
 @use '../../../../styles/mixins/pixel-art' as mixins;
 
+.welcome-note {
+    margin: 1rem 0;
+    color: theme.$arcade-cyan;
+    font: 1.125rem/1.7 Arial, sans-serif;
+}
+
 :host {
     display: block;
     width: 100%;

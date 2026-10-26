@@ -124,10 +124,6 @@ export class MiPerfil {
         this.router.navigate(['/mis-resenas']);
     }
 
-    irAHistorialCanjes(): void {
-        this.router.navigate(['/historial-canjes']);
-    }
-
     irAHistorialFunciones(): void {
         this.router.navigate(['/historial-funciones']);
     }

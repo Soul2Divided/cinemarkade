@@ -1,8 +1,8 @@
 <div class="ticket-adjustments">
     @if (datos().cupon?.codigo) {
         <div class="ticket-coupon">
-            CUPÓN APLICADO · {{ datos().cupon?.codigo }} ({{ datos().cupon?.porcentaje_descuento }}%
-            OFF)
+            {{ datos().cupon?.es_bienvenida ? 'BIENVENIDA · PRIMERA COMPRA' : 'CUPÓN APLICADO' }} ·
+            {{ datos().cupon?.codigo }} ({{ datos().cupon?.porcentaje_descuento }}% OFF)
         </div>
     }
     @if (datos().recargoVip) {

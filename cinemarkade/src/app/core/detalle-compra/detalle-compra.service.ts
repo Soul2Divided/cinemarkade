@@ -14,6 +14,14 @@ export class DetalleCompraService {
         return this.detalleCompraRepository.listarPorCompra(compraId);
     }
 
+    async listarPorCompras(compraIds: string[]): Promise<DetalleCompra[]> {
+        for (const id of compraIds) {
+            this.validarUuid(id);
+        }
+
+        return this.detalleCompraRepository.listarPorCompras(compraIds);
+    }
+
     async crearVarios(detalles: DetalleCompraInput[]): Promise<DetalleCompra[]> {
         if (detalles.length === 0) {
             return [];

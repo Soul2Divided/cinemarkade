@@ -29,7 +29,7 @@ export interface BorradorCompra {
     }[];
     productos: ItemBorrador[];
     combos: ItemBorrador[];
-    cupon?: { codigo?: string; porcentaje_descuento?: number } | null;
+    cupon?: { codigo?: string; porcentaje_descuento?: number; es_bienvenida?: boolean } | null;
     subtotal: number;
     total: number;
     puntosEstimados: number;

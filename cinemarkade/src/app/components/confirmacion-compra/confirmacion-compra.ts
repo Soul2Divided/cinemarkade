@@ -12,6 +12,7 @@ import {
 } from '../../core/compra/preparacion-compra.service';
 import { TicketPdfService } from '../../core/compra/ticket-pdf.service';
 import { AuthService } from '../../auth/auth.service';
+import { CuponService } from '../../core/cupon/cupon.service';
 import { DatosEntrada } from './components/datos-entrada/datos-entrada';
 import { DetalleCompra } from './components/detalle-compra/detalle-compra';
 import { TotalesCompra } from './components/totales-compra/totales-compra';
@@ -33,6 +34,7 @@ export class ConfirmacionCompra implements OnInit {
     private readonly preparacionCompra = inject(PreparacionCompraService);
     private readonly ticketPdfService = inject(TicketPdfService);
     private readonly authService = inject(AuthService);
+    private readonly cuponService = inject(CuponService);
     private readonly catalogos = signal<CatalogosConfirmacionCompra>({
         peliculas: [],
         productos: [],
@@ -62,8 +64,15 @@ export class ConfirmacionCompra implements OnInit {
     async ngOnInit(): Promise<void> {
         try {
             const borrador = this.preparacionCompra.recuperarBorrador(this.esCandy);
-            this.borrador.set(borrador);
             this.catalogos.set(await this.preparacionCompra.cargarCatalogos(borrador));
+            const tieneSesion = await this.authService.haySesionActiva();
+            const bienvenida = tieneSesion
+                ? await this.cuponService.obtenerBienvenidaDisponible()
+                : null;
+            const actualizado = this.preparacionCompra.aplicarBienvenida(borrador, bienvenida);
+            actualizado.puntosEstimados = tieneSesion ? Math.floor(actualizado.total) : 0;
+            this.borrador.set(actualizado);
+            sessionStorage.setItem('cinemarkade-compra-borrador', JSON.stringify(actualizado));
         } catch (error) {
             console.error('No se pudo preparar el ticket:', error);
             this.error.set(

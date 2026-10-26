@@ -1,5 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RecompensaService } from '../../../core/recompensa/recompensa.service';
+import { CanjeRecompensa } from '../../../core/recompensa/recompensa.model';
+import { DetalleCompraService } from '../../../core/detalle-compra/detalle-compra.service';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../auth/auth.service';
 import { Compra } from '../../../core/compra/compra.model';
@@ -21,6 +24,10 @@ interface CompraHistorial {
     sala: number | null;
     formato: string | null;
     idioma: string | null;
+    canjes: CanjeRecompensa[];
+    puntosUsados: number;
+    contenido: string;
+    pago: string;
 }
 
 @Component({
@@ -34,10 +41,21 @@ export class HistorialCompras implements OnInit {
     private readonly ticketPdfService = inject(TicketPdfService);
     private readonly authService = inject(AuthService);
     private readonly compraService = inject(CompraService);
+    private readonly recompensaService = inject(RecompensaService);
+    private readonly detalleCompraService = inject(DetalleCompraService);
     private readonly funcionService = inject(FuncionService);
     private readonly peliculaService = inject(PeliculaService);
 
     readonly historial = signal<CompraHistorial[]>([]);
+    readonly filtroContenido = signal('todos');
+    readonly filtroPago = signal('todos');
+    readonly historialFiltrado = computed(() =>
+        this.historial().filter(
+            (item) =>
+                (this.filtroContenido() === 'todos' || item.contenido === this.filtroContenido()) &&
+                (this.filtroPago() === 'todos' || item.pago === this.filtroPago()),
+        ),
+    );
     readonly cargando = signal(true);
     readonly error = signal('');
     readonly aviso = signal('');
@@ -77,6 +95,19 @@ export class HistorialCompras implements OnInit {
                 this.historial.set([]);
 
                 return;
+            }
+
+            const [canjes, detalles] = await Promise.all([
+                this.recompensaService.historial(),
+                this.detalleCompraService.listarPorCompras(compras.map((compra) => compra.id)),
+            ]);
+            const canjesPorCompra = new Map<string, CanjeRecompensa[]>();
+            const comprasConCandy = new Set(detalles.map((detalle) => detalle.compra_id));
+
+            for (const canje of canjes) {
+                const anteriores = canjesPorCompra.get(canje.compra_id) ?? [];
+                anteriores.push(canje);
+                canjesPorCompra.set(canje.compra_id, anteriores);
             }
 
             const [resultadoFunciones, resultadoPeliculas] = await Promise.allSettled([
@@ -119,6 +150,12 @@ export class HistorialCompras implements OnInit {
                         ? peliculaPorId.get(asociacion.funcion.pelicula_id)
                         : null;
 
+                    const canjesCompra = canjesPorCompra.get(compra.id) ?? [];
+                    const puntosUsados = canjesCompra.reduce(
+                        (total, canje) => total + Number(canje.puntos_utilizados),
+                        0,
+                    );
+
                     return {
                         compra,
                         pelicula:
@@ -131,6 +168,20 @@ export class HistorialCompras implements OnInit {
                         sala: asociacion?.funcion.sala_id ?? null,
                         formato: asociacion?.funcion.formato ?? null,
                         idioma: asociacion?.funcion.idioma ?? null,
+                        canjes: canjesCompra,
+                        puntosUsados,
+                        contenido:
+                            compra.proyeccion_id === null
+                                ? 'candy'
+                                : comprasConCandy.has(compra.id)
+                                  ? 'mixto'
+                                  : 'entradas',
+                        pago:
+                            puntosUsados > 0
+                                ? Number(compra.total) > 0
+                                    ? 'mixto'
+                                    : 'puntos'
+                                : 'dinero',
                     };
                 }),
             );
@@ -154,19 +205,29 @@ export class HistorialCompras implements OnInit {
 
         try {
             const actual = await this.compraService.obtenerPorId(compra.id);
-            this.historial.update(items => items.map(item =>
-                item.compra.id === actual.id ? { ...item, compra: actual } : item
-            ));
+            this.historial.update((items) =>
+                items.map((item) =>
+                    item.compra.id === actual.id ? { ...item, compra: actual } : item,
+                ),
+            );
 
-            if (actual.proyeccion_id !== null || actual.estado?.toLowerCase() !== 'confirmada' || !actual.codigo_qr) {
-                throw new Error('Este pedido ya fue retirado o cancelado y no tiene un QR disponible.');
+            if (
+                actual.proyeccion_id !== null ||
+                actual.estado?.toLowerCase() !== 'confirmada' ||
+                !actual.codigo_qr
+            ) {
+                throw new Error(
+                    'Este pedido ya fue retirado o cancelado y no tiene un QR disponible.',
+                );
             }
 
             const imagen = await QRCode.toDataURL(actual.codigo_qr, { width: 480, margin: 4 });
             this.qrCompra.set(actual);
             this.qrImagen.set(imagen);
         } catch (error) {
-            this.errorTicket.set(error instanceof Error ? error.message : 'No se pudo mostrar el QR del pedido.');
+            this.errorTicket.set(
+                error instanceof Error ? error.message : 'No se pudo mostrar el QR del pedido.',
+            );
         } finally {
             this.cargandoQrId.set(null);
         }

@@ -227,11 +227,8 @@ export const routes: Routes = [
     },
     {
         path: 'historial-canjes',
-        canActivate: [authGuard],
-        loadComponent: () =>
-            import('./components/cliente/historial-canjes/historial-canjes').then(
-                (m) => m.HistorialCanjes,
-            ),
+        redirectTo: 'historial-compras',
+        pathMatch: 'full',
     },
     {
         path: 'empleado',

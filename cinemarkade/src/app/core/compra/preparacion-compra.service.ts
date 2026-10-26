@@ -10,6 +10,7 @@ import { ProductoService } from '../producto/producto.service';
 import { Producto } from '../producto/producto.model';
 import { ComboService } from '../combo/combo.service';
 import { Combo } from '../combo/combo.model';
+import { Cupon } from '../cupon/cupon.model';
 
 export interface CatalogosConfirmacionCompra {
     peliculas: Pelicula[];
@@ -94,6 +95,24 @@ export class PreparacionCompraService {
             productos: productos ?? [],
             combos: combos ?? [],
             butacas: butacas ?? [],
+        };
+    }
+
+    aplicarBienvenida(borrador: BorradorCompra, bienvenida: Cupon | null): BorradorCompra {
+        if (borrador.cupon && !borrador.cupon.es_bienvenida) {
+            return borrador;
+        }
+
+        const porcentaje = bienvenida?.porcentaje_descuento ?? 0;
+        const total =
+            Math.max(0, borrador.subtotal * (1 - porcentaje / 100)) +
+            (borrador.recargoButacasVip ?? 0);
+
+        return {
+            ...borrador,
+            cupon: bienvenida,
+            total,
+            puntosEstimados: Math.floor(total),
         };
     }
 

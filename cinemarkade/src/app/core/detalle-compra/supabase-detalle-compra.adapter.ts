@@ -21,6 +21,24 @@ export class SupabaseDetalleCompraAdapter implements DetalleCompraRepository {
         return (data ?? []) as DetalleCompra[];
     }
 
+    async listarPorCompras(compraIds: string[]): Promise<DetalleCompra[]> {
+        if (compraIds.length === 0) {
+            return [];
+        }
+
+        const { data, error } = await this.supabaseService.supabaseClient
+            .from('detalle_compra')
+            .select('*')
+            .in('compra_id', compraIds)
+            .order('id', { ascending: true });
+
+        if (error) {
+            throw new Error(`No se pudieron cargar los detalles del historial: ${error.message}`);
+        }
+
+        return data ?? [];
+    }
+
     async crearVarios(detalles: DetalleCompraInput[]): Promise<DetalleCompra[]> {
         if (detalles.length === 0) {
             return [];

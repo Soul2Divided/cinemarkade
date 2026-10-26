@@ -12,6 +12,10 @@ export class CuponService {
         return this.cuponRepository.listar();
     }
 
+    obtenerBienvenidaDisponible(): Promise<Cupon | null> {
+        return this.cuponRepository.obtenerBienvenidaDisponible();
+    }
+
     obtenerPorId(id: number): Promise<Cupon | null> {
         this.validarId(id);
         return this.cuponRepository.obtenerPorId(id);
