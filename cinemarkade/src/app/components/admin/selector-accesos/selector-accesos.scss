@@ -1,0 +1,59 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid #3f626a;
+}
+
+legend {
+    color: theme.$arcade-cyan;
+    font: 1.125rem/1.7 Arial, sans-serif;
+}
+
+p {
+    margin: 0 0 1rem;
+    color: #c1c1cb;
+    font: 1.125rem/1.7 Arial, sans-serif;
+}
+
+.access-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 48px;
+    padding: 0.7rem 1rem;
+    color: #ddd;
+    background: #141418;
+    border: 1px solid #555;
+    font: 1.125rem/1.6 Arial, sans-serif;
+    cursor: pointer;
+}
+
+label.selected {
+    color: theme.$arcade-cyan;
+    background: #10282e;
+    border-color: theme.$arcade-cyan;
+}
+
+label:focus-within {
+    outline: 2px solid theme.$arcade-yellow;
+    outline-offset: 3px;
+}
+
+input {
+    width: 20px;
+    height: 20px;
+    accent-color: theme.$arcade-cyan;
+}
+
+fieldset:disabled label {
+    cursor: default;
+}

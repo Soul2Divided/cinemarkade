@@ -67,7 +67,7 @@ export class Login {
             this.rolLogueado === 'admin'
                 ? '/admin'
                 : this.rolLogueado === 'empleado'
-                  ? '/empleado'
+                  ? '/admin'
                   : '/home';
         this.router.navigate([destino]);
     }

@@ -1,0 +1,44 @@
+<section class="sales-report">
+    <header class="report-heading">
+        <div>
+            <p class="eyebrow">ADMINISTRACIÓN</p>
+            <h1>REPORTE DE VENTAS</h1>
+            <p>Consultá la facturación y las entradas vendidas por día.</p>
+        </div>
+
+        <div class="date-control">
+            <label for="fecha-reporte">DÍA DEL REPORTE</label>
+            <input
+                id="fecha-reporte"
+                type="date"
+                [value]="fechaSeleccionada()"
+                (change)="cambiarFecha($event)"
+            />
+        </div>
+    </header>
+
+    @if (cargando()) {
+        <p class="report-state" role="status">CARGANDO EL REPORTE...</p>
+    } @else if (error()) {
+        <section class="report-state report-error" role="alert">
+            <p>{{ error() }}</p>
+            <button type="button" (click)="cargarReporte()">REINTENTAR</button>
+        </section>
+    } @else if (reporte(); as datos) {
+        <p class="report-date">{{ datos.fecha | date: 'EEEE d MMMM y' : 'UTC' }}</p>
+
+        <div class="report-cards">
+            <article class="report-card billing-card">
+                <span class="card-label">FACTURACIÓN DEL DÍA</span>
+                <strong>{{ datos.facturacionPesos | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
+                <span class="card-description">Entradas y compras de candy</span>
+            </article>
+
+            <article class="report-card tickets-card">
+                <span class="card-label">ENTRADAS VENDIDAS</span>
+                <strong>{{ datos.entradasVendidas }}</strong>
+                <span class="card-description">Butacas incluidas en compras del día</span>
+            </article>
+        </div>
+    }
+</section>

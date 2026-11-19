@@ -1,46 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-
-export interface SeccionAdmin {
-  route: string;
-  label: string;
-  icon: string;
-  categoria?: string;
-}
+import { PermisosAdminService, SECCIONES_ADMIN } from '../../../core/user/permisos-admin.service';
 
 @Component({
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
-  selector: 'app-admin-layout',
-  styleUrl: './admin-layout.scss',
-  templateUrl: './admin-layout.html',
+    imports: [RouterLink, RouterLinkActive, RouterOutlet],
+    selector: 'app-admin-layout',
+    styleUrl: './admin-layout.scss',
+    templateUrl: './admin-layout.html'
 })
-
 export class AdminLayout {
-  secciones: SeccionAdmin[] = [
-    // --- CARTELERÍA Y SALAS ---
-    { route: '/admin/peliculas', label: 'PELÍCULAS', icon: '🎬' },
-    { route: '/admin/salas', label: 'SALAS', icon: '🏛️' },
-    { route: '/admin/funciones', label: 'FUNCIONES', icon: '⏰' },
+    private readonly accesos = inject(PermisosAdminService);
 
-    // --- CANDYBAR Y COMBOS ---
-    { route: '/admin/productos', label: 'PRODUCTOS CANDY', icon: '🍿' },
-    { route: '/admin/combos', label: 'COMBOS & OFERTAS', icon: '🎟️' },
-    { route: '/admin/puntos', label: 'RECOMPENSAS PUNTOS', icon: '🪙' },
-
-    // --- CUPONES ---
-    {route: '/admin/cupones', label: 'CUPONES', icon: '🏷️'},
-
-    // --- EMPLEADOS ---
-    { route: '/admin/nuevo-empleado', label: 'DAR DE ALTA EMPLEADO', icon: '👤' },
-
-    // --- METRICAS Y FACTURACIÓN ---
-    { route: '/admin/reportes', label: 'REPORTES & PDF', icon: '📊' },
-    { route: '/admin/estadisticas', label: 'ESTADÍSTICAS & VENTAS', icon: '📈' },
-
-    // --- AUDITORÍA ---
-    { route: '/admin/log-actividad', label: 'LOG DE AUDITORÍA', icon: '📜' },
-
-    // --- VISTA HOMEPAGE ---
-    { route: '/home', label: 'HOME', icon: '🏠' }
-  ];
+    readonly secciones = computed(() => [
+        ...SECCIONES_ADMIN.filter(seccion => this.accesos.permite(seccion.permiso)),
+        ...(this.accesos.esAdmin() ? [
+            { route: '/admin/nuevo-empleado', label: 'Alta de empleado', icon: '👤' }
+        ] : []),
+        { route: '/home', label: 'Inicio', icon: '🏠' }
+    ]);
 }

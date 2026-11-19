@@ -1,0 +1,83 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+.form-login {
+    max-width: 900px;
+}
+
+.form-login .form-header {
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-login .form-group .form-label,
+.form-login .step-content .step-subtitle,
+.form-login .form-header .stage-badge,
+.form-login .field-error,
+.form-login .error-message,
+.form-login .color-btn,
+.form-login .stage-actions .btn-prev-stage,
+.form-login .form-login-footer-container .btn-back-bottom {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+.form-login .form-control {
+    min-height: 52px;
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+}
+
+.form-login .field-error {
+    color: #ffaaaa;
+}
+
+.form-login .btn-pixel {
+    min-height: 52px;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.form-login .stage-actions,
+.form-login .color-options-grid {
+    flex-wrap: wrap;
+}
+
+.access-configuration {
+    display: grid;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.access-configuration h3 {
+    margin: 0;
+    color: theme.$arcade-cyan;
+    font: 1rem/1.8 theme.$font-pixel;
+}
+
+.access-configuration label,
+.access-configuration p {
+    margin: 0;
+    color: #c1c1cb;
+    font: 1.125rem/1.7 Arial, sans-serif;
+}
+
+.access-configuration input,
+.access-configuration select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 52px;
+    padding: 0.8rem;
+    color: #fff;
+    background: #141418;
+    border: 1px solid #52727a;
+    font: 1.25rem/1.6 Arial, sans-serif;
+}
+
+.access-configuration input:focus-visible,
+.access-configuration select:focus-visible {
+    outline: 2px solid theme.$arcade-cyan;
+    outline-offset: 3px;
+}

@@ -1,0 +1,54 @@
+<app-navbar></app-navbar>
+
+<main class="my-movies-page">
+    <a class="back-link" routerLink="/perfil">← VOLVER A MI PERFIL</a>
+    <header class="page-heading">
+        <p class="eyebrow">TU HISTORIAL EN CINEMARKADE</p>
+        <h1>MIS PELÍCULAS</h1>
+        <p>Películas que ya viste, con tu fecha de función y calificación.</p>
+    </header>
+
+    @if (cargando()) {
+        <p class="state-message" role="status">CARGANDO TUS PELÍCULAS...</p>
+    } @else if (error()) {
+        <section class="state-panel" role="alert">
+            <p>{{ error() }}</p>
+            <button type="button" (click)="cargarPeliculas()">REINTENTAR</button>
+        </section>
+    } @else if (peliculas().length === 0) {
+        <section class="state-panel">
+            <p>Todavía no tenés películas vistas en tu historial.</p>
+        </section>
+    } @else {
+        <section class="movie-grid" aria-label="Películas vistas">
+            @for (item of peliculas(); track item.compraId) {
+                <article class="movie-card">
+                    <img [src]="item.pelicula.imagen" [alt]="'Póster de ' + item.pelicula.nombre" />
+                    <div class="movie-info">
+                        <h2>{{ item.pelicula.nombre }}</h2>
+                        <p class="watched-date">
+                            Vista el {{ item.fechaVista | date: 'd MMMM y' : 'UTC' }} · {{ item.horario }}
+                        </p>
+                        <div
+                            class="rating"
+                            [attr.aria-label]="
+                                item.estrellas
+                                    ? 'Tu calificación: ' + item.estrellas + ' de 5 estrellas'
+                                    : 'Película sin calificación'
+                            "
+                        >
+                            @if (item.estrellas; as estrellas) {
+                                <span class="stars" aria-hidden="true">
+                                    {{ '★'.repeat(estrellas) }}{{ '☆'.repeat(5 - estrellas) }}
+                                </span>
+                                <span>{{ estrellas }}/5</span>
+                            } @else {
+                                <span class="unrated">SIN CALIFICAR</span>
+                            }
+                        </div>
+                    </div>
+                </article>
+            }
+        </section>
+    }
+</main>

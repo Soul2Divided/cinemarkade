@@ -1,4 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
+import { SECCIONES_ADMIN } from './permisos-admin.service';
 import { UserRepository } from './user.repository';
 import { ActualizarPerfilInput, User, CrearUserCommand, CrearUserData } from './user.model';
 
@@ -18,13 +19,19 @@ export class UserService {
         return this.userRepository.createUser(usuario);
     }
 
-    async crearEmpleado(datos: CrearUserCommand): Promise<User> {
+    async crearEmpleado(datos: CrearUserCommand, permisos: string[] = []): Promise<User> {
         this.validarDatosBasicos(datos);
+
+        if (permisos.some(permiso => permiso === 'validacion' ||
+            !SECCIONES_ADMIN.some(seccion => seccion.permiso === permiso))) {
+            throw new Error('Hay permisos de administración inválidos.');
+        }
 
         const usuario: CrearUserData = {
             ...datos,
             rol: 'empleado',
             puntos: null,
+            permisos_admin: [...new Set(permisos)],
         };
 
         return this.userRepository.createEmployee(usuario);

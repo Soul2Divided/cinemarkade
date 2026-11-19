@@ -1,19 +1,16 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { SupabaseService } from '../core/services/supabase.service';
+import { PermisosAdminService } from '../core/user/permisos-admin.service';
 
 export const employeeGuard: CanActivateFn = async () => {
-  const supabase = inject(SupabaseService).supabaseClient;
-  const router = inject(Router);
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return router.createUrlTree(['/login']);
+    const accesos = inject(PermisosAdminService);
+    const router = inject(Router);
 
-  const { data: usuario, error } = await supabase
-    .from('usuario')
-    .select('rol')
-    .eq('id', session.user.id)
-    .single();
+    try {
+        await accesos.cargarAccesos();
 
-  if (error || usuario?.rol !== 'empleado') return router.createUrlTree(['/home']);
-  return true;
+        return accesos.permite('validacion') || router.createUrlTree(['/home']);
+    } catch {
+        return router.createUrlTree(['/home']);
+    }
 };

@@ -1,0 +1,14 @@
+<fieldset [disabled]="bloqueado()">
+    <legend>Secciones permitidas</legend>
+    <p>Cada etiqueta habilita el acceso a esa sección y sus operaciones.</p>
+
+    <div class="access-tags">
+        @for (opcion of opciones; track opcion.permiso) {
+            <label [class.selected]="seleccion().includes(opcion.permiso)">
+                <input type="checkbox" [checked]="seleccion().includes(opcion.permiso)" (change)="alternar(opcion.permiso)" />
+                <span aria-hidden="true">{{ opcion.icon }}</span>
+                <span>{{ opcion.label }}</span>
+            </label>
+        }
+    </div>
+</fieldset>

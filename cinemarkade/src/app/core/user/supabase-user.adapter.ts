@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { UserRepository } from './user.repository';
 import { ActualizarPerfilInput, CrearUserData, User } from './user.model';
 import { SupabaseService } from '../services/supabase.service';
+import { createClient } from '@supabase/supabase-js';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseUserAdapter implements UserRepository {
@@ -38,45 +40,47 @@ export class SupabaseUserAdapter implements UserRepository {
 
     async createEmployee(user: CrearUserData): Promise<User> {
         const supabase = this.supabaseService.supabaseClient;
-        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError)
-            throw new Error(
-                `No se pudo recuperar la sesión del administrador: ${sessionError.message}`,
-            );
-        const sesionAdmin = sessionData.session;
-        let sesionRestaurada = false;
+        const { data: autenticacion, error: errorSesion } = await supabase.auth.getUser();
 
-        try {
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: user.mail,
-                password: user.password,
-            });
-            if (authError) throw new Error(`Error al crear usuario en auth: ${authError.message}`);
-            if (!authData.user) throw new Error('No se pudo crear el usuario');
-
-            if (sesionAdmin) {
-                const { error } = await supabase.auth.setSession({
-                    access_token: sesionAdmin.access_token,
-                    refresh_token: sesionAdmin.refresh_token,
-                });
-                if (error)
-                    throw new Error(
-                        `No se pudo restaurar la sesión del administrador: ${error.message}`,
-                    );
-                sesionRestaurada = true;
-            }
-
-            return await this.insertarPerfil(authData.user.id, user);
-        } finally {
-            if (sesionAdmin && !sesionRestaurada) {
-                const { error } = await supabase.auth.setSession({
-                    access_token: sesionAdmin.access_token,
-                    refresh_token: sesionAdmin.refresh_token,
-                });
-                if (error)
-                    console.error('No se pudo restaurar la sesión del administrador:', error);
-            }
+        if (errorSesion || !autenticacion.user) {
+            throw new Error('Iniciá sesión como administrador para crear empleados.');
         }
+
+        // El cliente de alta no reemplaza la sesión del administrador.
+        const clienteAlta = createClient(environment.SUPABASE_URL, environment.SUPABASE_KEY, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false,
+                storageKey: 'cinemarkade-alta-empleado'
+            }
+        });
+        const { data, error } = await clienteAlta.auth.signUp({ email: user.mail, password: user.password });
+
+        if (error || !data.user || data.user.identities?.length === 0) {
+            throw new Error(error?.message ?? 'El correo ya está registrado o no pudo crearse la cuenta.');
+        }
+
+        const { data: perfil, error: errorPerfil } = await supabase.rpc('crear_perfil_empleado', {
+            p_usuario_id: data.user.id,
+            p_datos: {
+                nombre: user.nombre,
+                apellido: user.apellido,
+                mail: user.mail,
+                fecha_nacimiento: user.fecha_nacimiento,
+                tipo_sangre: user.tipo_sangre,
+                color_ojos: user.color_ojos,
+                cantidad_dias_vacaciones: user.cantidad_dias_vacaciones,
+                permisos_admin: user.permisos_admin ?? []
+            }
+        });
+
+        if (errorPerfil || !perfil) {
+            throw new Error('Se creó la cuenta de acceso, pero no se pudo completar el perfil del empleado: ' +
+                (errorPerfil?.message ?? 'No se recibió el perfil.'));
+        }
+
+        return this.mapToModel(perfil as User);
     }
 
     async createUser(user: CrearUserData): Promise<User> {
@@ -134,6 +138,7 @@ export class SupabaseUserAdapter implements UserRepository {
             cantidad_dias_vacaciones: row.cantidad_dias_vacaciones,
             puntos: row.puntos,
             rol: row.rol,
+            permisos_admin: row.permisos_admin ?? [],
         };
     }
 

@@ -124,6 +124,10 @@ export class MiPerfil {
         this.router.navigate(['/mis-resenas']);
     }
 
+    irAMisPeliculas(): void {
+        this.router.navigate(['/mis-peliculas']);
+    }
+
     irAHistorialFunciones(): void {
         this.router.navigate(['/historial-funciones']);
     }

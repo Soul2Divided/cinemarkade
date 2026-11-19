@@ -1,0 +1,18 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+    padding: 2rem;
+}
+
+h1 {
+    color: theme.$arcade-yellow;
+    font-size: 28px;
+}
+
+p {
+    color: #fff;
+    font-family: Arial, sans-serif;
+    font-size: 22px;
+    line-height: 1.6;
+}

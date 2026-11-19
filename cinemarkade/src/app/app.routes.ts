@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
-import { adminGuard } from './guards/admin-guard';
+import { adminGuard, seccionAdminGuard } from './guards/admin-guard';
 import { authGuard } from './guards/auth-guard';
 import { employeeGuard } from './guards/employee-guard';
-import path from 'path';
 
 export const routes: Routes = [
     {
@@ -68,28 +67,54 @@ export const routes: Routes = [
     {
         path: 'admin',
         canActivate: [adminGuard],
+        canActivateChild: [seccionAdminGuard],
         loadComponent: () =>
             import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
         children: [
             {
+                path: '',
+                pathMatch: 'full',
+                loadComponent: () => import('./components/admin/seccion-pendiente/seccion-pendiente').then(m => m.SeccionPendiente)
+            },
+            {
+                path: 'reportes',
+                data: { permiso: 'reportes', titulo: 'Reportes y estadísticas' },
+                loadComponent: () =>
+                    import('./components/admin/reporte-ventas/reporte-ventas').then(
+                        (m) => m.ReporteVentas,
+                    ),
+            },
+            {
+                path: 'estadisticas',
+                redirectTo: 'reportes',
+                pathMatch: 'full'
+            },
+            {
+                path: 'log-actividad',
+                data: { permiso: 'auditoria', titulo: 'Registro de actividad' },
+                loadComponent: () => import('./components/admin/seccion-pendiente/seccion-pendiente').then(m => m.SeccionPendiente)
+            },
+            {
                 path: 'puntos',
+                data: { permiso: 'recompensas' },
                 loadComponent: () =>
                     import('./components/admin/recompensas/recompensas').then((m) => m.Recompensas),
             },
             {
                 path: 'nueva-recompensa',
-                data: { formulario: true },
+                data: { formulario: true, permiso: 'recompensas' },
                 loadComponent: () =>
                     import('./components/admin/recompensas/recompensas').then((m) => m.Recompensas),
             },
             {
                 path: 'editar-recompensa/:id',
-                data: { formulario: true },
+                data: { formulario: true, permiso: 'recompensas' },
                 loadComponent: () =>
                     import('./components/admin/recompensas/recompensas').then((m) => m.Recompensas),
             },
             {
                 path: 'peliculas',
+                data: { permiso: 'peliculas' },
                 loadComponent: () =>
                     import('./components/admin/abm-pelicula/abm-pelicula').then(
                         (m) => m.AbmPelicula,
@@ -97,6 +122,7 @@ export const routes: Routes = [
             },
             {
                 path: 'nueva-pelicula',
+                data: { permiso: 'peliculas' },
                 loadComponent: () =>
                     import('./components/admin/add-pelicula/add-pelicula').then(
                         (m) => m.AddPelicula,
@@ -104,6 +130,7 @@ export const routes: Routes = [
             },
             {
                 path: 'editar-pelicula/:id',
+                data: { permiso: 'peliculas' },
                 loadComponent: () =>
                     import('./components/admin/add-pelicula/add-pelicula').then(
                         (m) => m.AddPelicula,
@@ -111,21 +138,25 @@ export const routes: Routes = [
             },
             {
                 path: 'salas',
+                data: { permiso: 'salas' },
                 loadComponent: () =>
                     import('./components/admin/abm-sala/abm-sala').then((m) => m.AbmSala),
             },
             {
                 path: 'nueva-sala',
+                data: { permiso: 'salas' },
                 loadComponent: () =>
                     import('./components/admin/add-sala/add-sala').then((m) => m.AddSala),
             },
             {
                 path: 'editar-sala/:id',
+                data: { permiso: 'salas' },
                 loadComponent: () =>
                     import('./components/admin/add-sala/add-sala').then((m) => m.AddSala),
             },
             {
                 path: 'productos',
+                data: { permiso: 'productos' },
                 loadComponent: () =>
                     import('./components/admin/abm-producto/abm-producto').then(
                         (m) => m.AbmProducto,
@@ -133,6 +164,7 @@ export const routes: Routes = [
             },
             {
                 path: 'nuevo-producto',
+                data: { permiso: 'productos' },
                 loadComponent: () =>
                     import('./components/admin/add-producto/add-producto').then(
                         (m) => m.AddProducto,
@@ -140,6 +172,7 @@ export const routes: Routes = [
             },
             {
                 path: 'editar-producto/:id',
+                data: { permiso: 'productos' },
                 loadComponent: () =>
                     import('./components/admin/add-producto/add-producto').then(
                         (m) => m.AddProducto,
@@ -147,51 +180,61 @@ export const routes: Routes = [
             },
             {
                 path: 'combos',
+                data: { permiso: 'combos' },
                 loadComponent: () =>
                     import('./components/admin/abm-combo/abm-combo').then((m) => m.AbmCombo),
             },
             {
                 path: 'nuevo-combo',
+                data: { permiso: 'combos' },
                 loadComponent: () =>
                     import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo),
             },
             {
                 path: 'editar-combo/:id',
+                data: { permiso: 'combos' },
                 loadComponent: () =>
                     import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo),
             },
             {
                 path: 'funciones',
+                data: { permiso: 'funciones' },
                 loadComponent: () =>
                     import('./components/admin/abm-funcion/abm-funcion').then((m) => m.AbmFuncion),
             },
             {
                 path: 'nueva-funcion',
+                data: { permiso: 'funciones' },
                 loadComponent: () =>
                     import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion),
             },
             {
                 path: 'editar-funcion/:id',
+                data: { permiso: 'funciones' },
                 loadComponent: () =>
                     import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion),
             },
             {
                 path: 'cupones',
+                data: { permiso: 'cupones' },
                 loadComponent: () =>
                     import('./components/admin/abm-cupon/abm-cupon').then((m) => m.AbmCupon),
             },
             {
                 path: 'nuevo-cupon',
+                data: { permiso: 'cupones' },
                 loadComponent: () =>
                     import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon),
             },
             {
                 path: 'editar-cupon/:id',
+                data: { permiso: 'cupones' },
                 loadComponent: () =>
                     import('./components/admin/add-cupon/add-cupon').then((m) => m.AddCupon),
             },
             {
                 path: 'nuevo-empleado',
+                data: { soloAdmin: true },
                 loadComponent: () =>
                     import('./components/admin/add-empleado/add-empleado').then(
                         (m) => m.AddEmpleado,
@@ -224,6 +267,12 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () =>
             import('./components/cliente/mis-resenas/mis-resenas').then((m) => m.MisResenas),
+    },
+    {
+        path: 'mis-peliculas',
+        canActivate: [authGuard],
+        loadComponent: () =>
+            import('./components/cliente/mis-peliculas/mis-peliculas').then((m) => m.MisPeliculas),
     },
     {
         path: 'historial-canjes',

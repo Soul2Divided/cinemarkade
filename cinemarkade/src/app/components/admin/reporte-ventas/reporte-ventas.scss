@@ -1,0 +1,136 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+}
+
+.sales-report {
+    display: grid;
+    gap: 1.5rem;
+    padding: 2rem;
+    color: theme.$arcade-text-white;
+}
+
+.report-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+
+    h1 {
+        margin: 0.5rem 0;
+        color: theme.$arcade-yellow;
+        font: 1rem/1.7 theme.$font-pixel;
+    }
+
+    p {
+        margin: 0;
+        color: #c5c5c5;
+        font: 1rem/1.5 sans-serif;
+    }
+
+    .eyebrow {
+        color: theme.$arcade-cyan;
+        font: 0.55rem/1.6 theme.$font-pixel;
+    }
+}
+
+.date-control {
+    display: grid;
+    gap: 0.5rem;
+
+    label {
+        color: theme.$arcade-text-white;
+        font: 0.55rem/1.6 theme.$font-pixel;
+    }
+
+    input {
+        min-width: 210px;
+        padding: 0.8rem;
+        border: 2px solid theme.$arcade-cyan;
+        border-radius: 0;
+        background: #090909;
+        color: #fff;
+        color-scheme: dark;
+        font: 1rem sans-serif;
+
+        &:focus-visible {
+            outline: 2px solid theme.$arcade-yellow;
+            outline-offset: 2px;
+        }
+    }
+}
+
+.report-date {
+    margin: 0;
+    color: #aaa;
+    font: 0.6rem/1.8 theme.$font-pixel;
+    text-transform: uppercase;
+}
+
+.report-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.report-card {
+    display: grid;
+    gap: 0.9rem;
+    min-height: 170px;
+    align-content: center;
+    padding: 1.5rem;
+    border: 2px solid #4d4d4d;
+    background: #141418;
+
+    strong {
+        color: theme.$arcade-yellow;
+        font: 1.4rem/1.5 theme.$font-pixel;
+        overflow-wrap: anywhere;
+    }
+}
+
+.tickets-card strong {
+    color: theme.$arcade-cyan;
+}
+
+.card-label {
+    color: #fff;
+    font: 0.6rem/1.6 theme.$font-pixel;
+}
+
+.card-description {
+    color: #aaa;
+    font: 0.9rem/1.5 sans-serif;
+}
+
+.report-state {
+    color: #ccc;
+    font: 0.65rem/1.8 theme.$font-pixel;
+}
+
+.report-error {
+    padding: 1rem;
+    border: 2px solid #ff547a;
+    background: #141418;
+
+    button {
+        padding: 0.75rem 1rem;
+        border: 2px solid theme.$arcade-cyan;
+        background: #090909;
+        color: theme.$arcade-cyan;
+        cursor: pointer;
+        font: 0.55rem theme.$font-pixel;
+    }
+}
+
+@media (max-width: 700px) {
+    .sales-report {
+        padding: 1.25rem;
+    }
+
+    .report-cards {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

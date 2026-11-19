@@ -9,6 +9,7 @@ export interface User {
     cantidad_dias_vacaciones: number;
     puntos: number | null;
     rol: 'cliente' | 'empleado' | 'admin';
+    permisos_admin?: string[];
 }
 
 export interface CrearUserCommand {
@@ -25,6 +26,7 @@ export interface CrearUserCommand {
 export interface CrearUserData extends CrearUserCommand {
     rol: 'cliente' | 'empleado' | 'admin';
     puntos: number | null;
+    permisos_admin?: string[];
 }
 
 export type ActualizarPerfilInput = Pick<

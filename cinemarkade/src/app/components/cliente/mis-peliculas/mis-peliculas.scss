@@ -1,0 +1,125 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+    min-height: 100vh;
+}
+
+.my-movies-page {
+    width: min(1100px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding: 2rem 0 4rem;
+    color: theme.$arcade-text-white;
+}
+
+.back-link {
+    color: theme.$arcade-cyan;
+    font: 0.65rem/1.6 theme.$font-pixel;
+    text-decoration: none;
+}
+
+.page-heading {
+    margin: 2rem 0;
+
+    h1 {
+        margin: 0.5rem 0;
+        color: theme.$arcade-cyan;
+        font: 1.1rem/1.6 theme.$font-pixel;
+    }
+
+    p {
+        color: #c5c5c5;
+        font: 1rem/1.5 sans-serif;
+    }
+
+    .eyebrow {
+        color: #ffcf4a;
+        font: 0.55rem/1.6 theme.$font-pixel;
+    }
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.movie-card {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid #4d4d4d;
+    background: #141418;
+
+    img {
+        width: 110px;
+        height: 160px;
+        object-fit: cover;
+        background: #090909;
+    }
+}
+
+.movie-info {
+    align-self: center;
+
+    h2 {
+        margin: 0 0 0.75rem;
+        color: #fff;
+        font: 0.7rem/1.6 theme.$font-pixel;
+    }
+}
+
+.watched-date {
+    color: #c5c5c5;
+    font: 0.9rem/1.5 sans-serif;
+}
+
+.rating {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+    color: #fff;
+    font: 0.8rem sans-serif;
+}
+
+.stars {
+    color: #ffcf4a;
+    letter-spacing: 0.1rem;
+}
+
+.unrated,
+.state-message {
+    color: #aaa;
+    font: 0.6rem/1.8 theme.$font-pixel;
+}
+
+.state-panel {
+    padding: 1.5rem;
+    border: 2px solid #4d4d4d;
+    background: #141418;
+    color: #ddd;
+    font: 1rem/1.6 sans-serif;
+
+    button {
+        padding: 0.75rem 1rem;
+        border: 2px solid theme.$arcade-cyan;
+        background: #090909;
+        color: theme.$arcade-cyan;
+        cursor: pointer;
+        font: 0.55rem theme.$font-pixel;
+    }
+}
+
+@media (max-width: 520px) {
+    .movie-card {
+        grid-template-columns: 82px minmax(0, 1fr);
+
+        img {
+            width: 82px;
+            height: 124px;
+        }
+    }
+}

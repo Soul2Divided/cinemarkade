@@ -1,26 +1,38 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
-import { SupabaseService } from '../core/services/supabase.service';
+import { CanActivateFn, CanActivateChildFn, Router } from '@angular/router';
+import { PermisosAdminService } from '../core/user/permisos-admin.service';
 
 export const adminGuard: CanActivateFn = async () => {
-  const supabase = inject(SupabaseService).supabaseClient;
-  const router = inject(Router);
+    const accesos = inject(PermisosAdminService);
+    const router = inject(Router);
 
-  const { data: { session } } = await supabase.auth.getSession();
+    try {
+        await accesos.cargarAccesos();
 
-  if (!session) {
-    return router.createUrlTree(['/home']);
-  }
+        if (accesos.esAdmin() || accesos.secciones().some(seccion => seccion !== 'validacion')) {
+            return true;
+        }
 
-  const { data: usuario, error } = await supabase
-    .from('usuario')
-    .select('rol')
-    .eq('id', session.user.id)
-    .single();
+        return router.createUrlTree([accesos.primeraRuta()]);
+    } catch {
+        return router.createUrlTree(['/home']);
+    }
+};
 
-  if (error || usuario?.rol !== 'admin') {
-    return router.createUrlTree(['/home']);
-  }
+export const seccionAdminGuard: CanActivateChildFn = async (ruta) => {
+    const accesos = inject(PermisosAdminService);
+    const router = inject(Router);
 
-  return true;
+    try {
+        await accesos.cargarAccesos();
+
+        if (ruta.data['soloAdmin'] ? accesos.esAdmin() :
+            ruta.data['permiso'] && accesos.permite(ruta.data['permiso'])) {
+            return true;
+        }
+
+        return router.createUrlTree([accesos.primeraRuta()]);
+    } catch {
+        return router.createUrlTree(['/home']);
+    }
 };

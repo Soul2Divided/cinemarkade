@@ -41,6 +41,8 @@ import { ResenaRepository } from './core/resena/resena.repository';
 import { SupabaseResenaAdapter } from './core/resena/supabase-resena.adapter';
 import { UsuarioPruebaRepository } from './core/usuario-prueba/usuario-prueba.repository';
 import { SupabaseUsuarioPruebaAdapter } from './core/usuario-prueba/supabase-usuario-prueba.adapter';
+import { ReporteVentasRepository } from './core/reporte-ventas/reporte-ventas.repository';
+import { SupabaseReporteVentasAdapter } from './core/reporte-ventas/supabase-reporte-ventas.adapter';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
@@ -69,5 +71,6 @@ export const appConfig: ApplicationConfig = {
         { provide: ButacaRepository, useClass: SupabaseButacaAdapter },
         { provide: ButacaProyeccionRepository, useClass: SupabaseButacaProyeccionAdapter },
         { provide: CompraButacaRepository, useClass: SupabaseCompraButacaAdapter },
+        { provide: ReporteVentasRepository, useClass: SupabaseReporteVentasAdapter },
     ],
 };

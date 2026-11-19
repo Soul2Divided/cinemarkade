@@ -39,6 +39,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Checklist privada del proyecto
+/CHECKLIST_REQUISITOS.md
+
 # System files
 .DS_Store
 Thumbs.db
