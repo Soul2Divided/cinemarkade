@@ -1,0 +1,4 @@
+project_id = "iuiwcdacaboljvkhkzjs"
+
+[functions.enviar-notificaciones-estrenos]
+verify_jwt = false

@@ -11,6 +11,11 @@ export interface Pelicula {
     created_at?: string;
 }
 
+export interface VentasPelicula {
+    pelicula_id: number;
+    entradas_vendidas: number;
+}
+
 export type PeliculaInput = Omit<Pelicula, 'id' | 'created_at' | 'activa'>;
 
 export const GENEROS = [

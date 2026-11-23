@@ -19,6 +19,10 @@ export interface BorradorCompra {
         formato: string;
         idioma: string;
         salaId: number;
+        esEstreno?: boolean;
+        esPreventa?: boolean;
+        fechaDisponiblePreventa?: string | null;
+        porcentajeRecargoPreventa?: number | null;
     };
     cantidadEntradas: number;
     entradas?: {

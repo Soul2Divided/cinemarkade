@@ -1,0 +1,39 @@
+<app-navbar></app-navbar>
+
+<main class="notifications-page">
+    <header class="page-heading">
+        <span class="eyebrow">TU CUENTA · AVISOS</span>
+        <h1>CENTRO DE NOTIFICACIONES</h1>
+        <p>Recordatorios de estrenos y novedades de tus compras.</p>
+    </header>
+
+    @if (cargando()) {
+        <p class="state-message">CARGANDO NOTIFICACIONES...</p>
+    } @else if (error()) {
+        <p class="state-message error" role="alert">{{ error() }}</p>
+    } @else {
+        <section class="notification-list" aria-label="Historial de notificaciones">
+            @for (notificacion of notificacionService.notificaciones(); track notificacion.id) {
+                <article class="notification-card" [class.unread]="!notificacion.leida_en">
+                    <div>
+                        <span class="notification-type">🔔 CINEMARKADE</span>
+                        <h2>{{ notificacion.titulo }}</h2>
+                        <p>{{ notificacion.mensaje }}</p>
+                        <time [attr.datetime]="notificacion.creada_en">
+                            {{ notificacion.creada_en | date: 'dd/MM/yyyy HH:mm' : '' : 'es-AR' }}
+                        </time>
+                    </div>
+                    @if (!notificacion.leida_en) {
+                        <button type="button" (click)="marcarLeida(notificacion.id)">
+                            MARCAR COMO LEÍDA
+                        </button>
+                    } @else {
+                        <span class="read-state">LEÍDA</span>
+                    }
+                </article>
+            } @empty {
+                <div class="empty-state">TODAVÍA NO TENÉS NOTIFICACIONES.</div>
+            }
+        </section>
+    }
+</main>

@@ -43,6 +43,16 @@ import { UsuarioPruebaRepository } from './core/usuario-prueba/usuario-prueba.re
 import { SupabaseUsuarioPruebaAdapter } from './core/usuario-prueba/supabase-usuario-prueba.adapter';
 import { ReporteVentasRepository } from './core/reporte-ventas/reporte-ventas.repository';
 import { SupabaseReporteVentasAdapter } from './core/reporte-ventas/supabase-reporte-ventas.adapter';
+import { NotificacionRepository } from './core/notificacion/notificacion.repository';
+import { SupabaseNotificacionAdapter } from './core/notificacion/supabase-notificacion.adapter';
+import { PeticionPeliculaRepository } from './core/peticion-pelicula/peticion-pelicula.repository';
+import { SupabasePeticionPeliculaAdapter } from './core/peticion-pelicula/supabase-peticion-pelicula.adapter';
+import { TicketStorageRepository } from './core/compra/ticket-storage.repository';
+import { SupabaseTicketStorageAdapter } from './core/compra/supabase-ticket-storage.adapter';
+import { BorradorCompraRepository } from './core/compra/borrador-compra.repository';
+import { BrowserBorradorCompraAdapter } from './core/compra/browser-borrador-compra.adapter';
+import { CarritoCandyRepository } from './core/candy/carrito-candy.repository';
+import { BrowserCarritoCandyAdapter } from './core/candy/browser-carrito-candy.adapter';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
@@ -72,5 +82,10 @@ export const appConfig: ApplicationConfig = {
         { provide: ButacaProyeccionRepository, useClass: SupabaseButacaProyeccionAdapter },
         { provide: CompraButacaRepository, useClass: SupabaseCompraButacaAdapter },
         { provide: ReporteVentasRepository, useClass: SupabaseReporteVentasAdapter },
+        { provide: NotificacionRepository, useClass: SupabaseNotificacionAdapter },
+        { provide: PeticionPeliculaRepository, useClass: SupabasePeticionPeliculaAdapter },
+        { provide: TicketStorageRepository, useClass: SupabaseTicketStorageAdapter },
+        { provide: BorradorCompraRepository, useClass: BrowserBorradorCompraAdapter },
+        { provide: CarritoCandyRepository, useClass: BrowserCarritoCandyAdapter },
     ],
 };

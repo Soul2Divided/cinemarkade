@@ -44,6 +44,16 @@ export class AddPelicula implements OnInit {
       this.esEdicion = true;
       this.peliculaId = Number(idParam);
       await this.cargarPeliculaParaEditar(this.peliculaId);
+    } else {
+      const propuesta = this.router.getCurrentNavigation()?.extras.state?.['propuesta']
+        ?? (typeof window !== 'undefined' ? window.history.state?.['propuesta'] : null);
+
+      if (propuesta) {
+        this.formMovie.patchValue({
+          nombre: propuesta.titulo ?? '',
+          sinopsis: propuesta.descripcion ?? '',
+        });
+      }
     }
   }
 

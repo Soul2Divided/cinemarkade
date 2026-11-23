@@ -1,0 +1,74 @@
+<section class="requests-page">
+    <header class="requests-header">
+        <div>
+            <p class="eyebrow">BANDEJA DE ENTRADA</p>
+            <h1>PETICIONES DE USUARIOS</h1>
+        </div>
+        <button type="button" class="refresh-button" (click)="cargar()" [disabled]="cargando()">
+            ACTUALIZAR
+        </button>
+    </header>
+
+    @if (error()) {
+        <p class="request-error" role="alert">{{ error() }}</p>
+    }
+
+    @if (cargando()) {
+        <p class="empty-state">CARGANDO PETICIONES...</p>
+    } @else if (peticiones().length === 0) {
+        <p class="empty-state">NO HAY PETICIONES PENDIENTES.</p>
+    } @else {
+        <ul class="request-list">
+            @for (peticion of peticiones(); track peticion.id) {
+                <li>
+                    <button type="button" class="request-row" (click)="seleccionada.set(peticion)">
+                        <span class="request-icon" aria-hidden="true">🎬</span>
+                        <span class="request-info">
+                            <strong>{{ peticion.titulo }}</strong>
+                            <span>Propuesta por {{ peticion.usuario_nombre }} {{ peticion.usuario_apellido }}</span>
+                        </span>
+                        <time [attr.datetime]="peticion.created_at">{{ peticion.created_at | date:'dd/MM/yyyy' }}</time>
+                        <span class="open-indicator" aria-hidden="true">›</span>
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</section>
+
+<app-modal
+    [isOpen]="!!seleccionada()"
+    title="DETALLE DE LA PROPUESTA"
+    subtitle="REVISIÓN DE CLIENTE"
+    variant="cyan"
+    (close)="seleccionada.set(null)"
+>
+    @if (seleccionada(); as peticion) {
+        <article class="request-detail">
+            <div class="poster-placeholder" aria-label="La propuesta no incluye poster">🎞️</div>
+            <div class="detail-copy">
+                <p class="detail-label">PELÍCULA PROPUESTA</p>
+                <h2>{{ peticion.titulo }}</h2>
+                <p><strong>Cliente:</strong> {{ peticion.usuario_nombre }} {{ peticion.usuario_apellido }}</p>
+                <p><strong>Descripción:</strong> {{ peticion.descripcion }}</p>
+                <p><strong>Motivo:</strong> {{ peticion.motivo }}</p>
+            </div>
+        </article>
+
+        @if (error()) {
+            <p class="request-error" role="alert">{{ error() }}</p>
+        }
+
+    }
+
+    @if (seleccionada()) {
+        <ng-container modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="rechazar()" [disabled]="procesando()">
+                RECHAZAR
+            </button>
+            <button type="button" class="btn btn-pixel cyan" (click)="aceptar()" [disabled]="procesando()">
+                {{ procesando() ? 'PROCESANDO...' : 'ACEPTAR Y DAR DE ALTA' }}
+            </button>
+        </ng-container>
+    }
+</app-modal>

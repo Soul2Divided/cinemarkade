@@ -1,0 +1,158 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+.requests-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    color: theme.$arcade-text-white;
+}
+
+.requests-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px dashed #444;
+}
+
+.eyebrow,
+.detail-label {
+    margin: 0 0 0.5rem;
+    color: theme.$arcade-cyan;
+    font: 0.65rem theme.$font-pixel;
+}
+
+h1 {
+    margin: 0;
+    color: theme.$arcade-yellow;
+    font: 1rem/1.6 theme.$font-pixel;
+}
+
+.refresh-button,
+.request-row {
+    color: inherit;
+    background: #101014;
+    border: 1px solid #444;
+}
+
+.refresh-button {
+    padding: 0.75rem 1rem;
+    color: theme.$arcade-cyan;
+    font: 0.65rem theme.$font-pixel;
+    cursor: pointer;
+}
+
+.request-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.request-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+    padding: 1rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.request-row:hover,
+.request-row:focus-visible {
+    border-color: theme.$arcade-yellow;
+    outline: 2px solid theme.$arcade-yellow;
+    outline-offset: 1px;
+}
+
+.request-icon {
+    font-size: 1.7rem;
+}
+
+.request-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.request-info strong {
+    color: theme.$arcade-yellow;
+    font: 0.7rem/1.6 theme.$font-pixel;
+}
+
+.request-info span,
+time {
+    color: #bbb;
+    font: 0.9rem/1.5 Arial, sans-serif;
+}
+
+.open-indicator {
+    color: theme.$arcade-cyan;
+    font-size: 1.8rem;
+}
+
+.empty-state,
+.request-error {
+    padding: 1.25rem;
+    background: #101014;
+    border: 1px solid #333;
+    color: #ccc;
+    font: 0.7rem/1.8 theme.$font-pixel;
+}
+
+.request-error {
+    color: #ff6f8a;
+}
+
+.request-detail {
+    display: grid;
+    grid-template-columns: minmax(100px, 0.7fr) 1.5fr;
+    gap: 1rem;
+}
+
+.poster-placeholder {
+    display: grid;
+    min-height: 170px;
+    place-items: center;
+    background: linear-gradient(145deg, #17252a, #101014 70%);
+    border: 1px solid #36525a;
+    color: theme.$arcade-cyan;
+    font-size: 2rem;
+}
+
+.detail-copy h2 {
+    margin: 0 0 1rem;
+    color: theme.$arcade-yellow;
+    font: 0.85rem/1.6 theme.$font-pixel;
+}
+
+.detail-copy p:not(.detail-label) {
+    color: #ddd;
+    font: 0.95rem/1.6 Arial, sans-serif;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+    .request-detail {
+        grid-template-columns: 1fr;
+    }
+
+    .poster-placeholder {
+        min-height: 100px;
+    }
+
+    .request-row {
+        gap: 0.6rem;
+        padding: 0.75rem;
+    }
+
+    time {
+        display: none;
+    }
+}

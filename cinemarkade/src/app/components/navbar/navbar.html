@@ -70,6 +70,21 @@
 
     <div class="nav-actions">
         @if (authService.usuarioActual(); as usuario) {
+            @if (usuario.rol === 'cliente') {
+                <a
+                    routerLink="/notificaciones"
+                    class="notification-bell"
+                    aria-label="Centro de notificaciones"
+                    title="Notificaciones"
+                >
+                    <span aria-hidden="true">🔔</span>
+                    @if (notificacionService.noLeidas() > 0) {
+                        <span class="notification-count" aria-label="Notificaciones sin leer">
+                            {{ notificacionService.noLeidas() > 99 ? '99+' : notificacionService.noLeidas() }}
+                        </span>
+                    }
+                </a>
+            }
             <div class="menu-perfil-container">
                 <button
                     type="button"
@@ -90,6 +105,12 @@
 
                         <ul class="dropdown-list">
                             @if (usuario.rol === 'cliente') {
+                                <li>
+                                    <button type="button" class="dropdown-item" (click)="abrirFormularioPeticion()">
+                                        <span class="item-icon">🎞️</span>
+                                        PROPONER PELÍCULA
+                                    </button>
+                                </li>
                                 <li>
                                     <a
                                         routerLink="/perfil"
@@ -186,4 +207,44 @@
     <div modal-actions>
         <button type="button" class="btn btn-pixel-outline" (click)="cerrarModal()">ACEPTAR</button>
     </div>
+</app-modal>
+
+<app-modal
+    [isOpen]="mostrarPeticion()"
+    title="PROPONER PELÍCULA"
+    subtitle="CONTANOS QUÉ TE GUSTARÍA VER"
+    variant="yellow"
+    (close)="cerrarFormularioPeticion()"
+>
+    @if (mensajePeticion()) {
+        <p>{{ mensajePeticion() }}</p>
+    } @else {
+        <form class="proposal-form" [formGroup]="formularioPeticion" (ngSubmit)="enviarPeticion()">
+            <label for="peticion-titulo">TÍTULO DE LA PELÍCULA</label>
+            <input id="peticion-titulo" type="text" formControlName="titulo" maxlength="150">
+
+            <label for="peticion-descripcion">DESCRIPCIÓN</label>
+            <textarea id="peticion-descripcion" rows="3" formControlName="descripcion" maxlength="3000"></textarea>
+
+            <label for="peticion-motivo">¿POR QUÉ TE GUSTARÍA VERLA EN EL CINE?</label>
+            <textarea id="peticion-motivo" rows="3" formControlName="motivo" maxlength="2000"></textarea>
+
+            @if (errorPeticion()) {
+                <p class="proposal-error" role="alert">{{ errorPeticion() }}</p>
+            }
+
+            <div modal-actions>
+                <button type="button" class="btn btn-pixel-outline" (click)="cerrarFormularioPeticion()">CANCELAR</button>
+                <button type="submit" class="btn btn-pixel cyan" [disabled]="formularioPeticion.invalid || enviandoPeticion()">
+                    {{ enviandoPeticion() ? 'ENVIANDO...' : 'ENVIAR PROPUESTA' }}
+                </button>
+            </div>
+        </form>
+    }
+
+    @if (mensajePeticion()) {
+        <div modal-actions>
+            <button type="button" class="btn btn-pixel-outline" (click)="cerrarFormularioPeticion()">CERRAR</button>
+        </div>
+    }
 </app-modal>

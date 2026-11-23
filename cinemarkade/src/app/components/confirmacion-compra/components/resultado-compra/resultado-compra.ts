@@ -11,6 +11,9 @@ export class ResultadoCompra {
     readonly esCandy = input(false);
     readonly abierto = input(false);
     readonly compraAnonima = input(false);
+    readonly esPreventa = input(false);
+    readonly recordatorioPreventaActivo = input(false);
+    readonly pushPreventaActivo = input(false);
     readonly compraId = input('');
     readonly codigoManual = input('');
     readonly ticketDisponible = input(false);

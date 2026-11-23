@@ -121,6 +121,14 @@ export const routes: Routes = [
                     ),
             },
             {
+                path: 'peticiones',
+                data: { permiso: 'peticiones', titulo: 'Peticiones de usuarios' },
+                loadComponent: () =>
+                    import('./components/admin/peticiones-usuarios/peticiones-usuarios').then(
+                        (m) => m.PeticionesUsuarios,
+                    ),
+            },
+            {
                 path: 'nueva-pelicula',
                 data: { permiso: 'peliculas' },
                 loadComponent: () =>
@@ -273,6 +281,12 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () =>
             import('./components/cliente/mis-peliculas/mis-peliculas').then((m) => m.MisPeliculas),
+    },
+    {
+        path: 'notificaciones',
+        canActivate: [authGuard],
+        loadComponent: () =>
+            import('./components/cliente/notificaciones/notificaciones').then((m) => m.Notificaciones),
     },
     {
         path: 'historial-canjes',

@@ -26,6 +26,17 @@
             }}
         </p>
     }
+    @if (!esCandy() && esPreventa()) {
+        @if (recordatorioPreventaActivo() && pushPreventaActivo()) {
+            <p>Te avisaremos cuando la película esté disponible en el cine.</p>
+        } @else if (recordatorioPreventaActivo()) {
+            <p>Guardamos el recordatorio en tu centro de notificaciones, pero el navegador no habilitó el aviso push.</p>
+        } @else if (compraAnonima()) {
+            <p>Iniciá sesión y activá las notificaciones para recibir un aviso cuando llegue el día de la función.</p>
+        } @else {
+            <p>No pudimos activar el aviso push. Podés revisar tus recordatorios en el centro de notificaciones.</p>
+        }
+    }
     @if (error()) {
         <p class="action-error" role="alert">{{ error() }}</p>
     }

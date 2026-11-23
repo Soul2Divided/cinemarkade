@@ -1,7 +1,7 @@
 import { Injectable, Inject, signal } from '@angular/core';
 
 import { PeliculaRepository } from './pelicula.repository';
-import { Pelicula, PeliculaInput, RESTRICCIONES_EDAD } from './pelicula.model';
+import { Pelicula, PeliculaInput, RESTRICCIONES_EDAD, VentasPelicula } from './pelicula.model';
 
 @Injectable({ providedIn: 'root' })
 export class PeliculaService {
@@ -49,6 +49,10 @@ export class PeliculaService {
 
     async obtenerPorId(id: number): Promise<Pelicula> {
         return this.peliculaRepository.obtenerPorId(id);
+    }
+
+    async obtenerVentasPorPelicula(): Promise<VentasPelicula[]> {
+        return this.peliculaRepository.obtenerVentasPorPelicula();
     }
 
     async crearPelicula(datos: PeliculaInput): Promise<Pelicula> {

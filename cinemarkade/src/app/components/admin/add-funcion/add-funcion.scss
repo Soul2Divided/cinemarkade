@@ -103,6 +103,15 @@
                     padding: 0.2rem 0.4rem;
                     font-weight: bold;
                 }
+
+                .stub-badge-estreno {
+                    padding: 0.2rem 0.4rem;
+                    background-color: theme.$arcade-yellow;
+                    color: #000;
+                    font-family: theme.$font-pixel;
+                    font-size: 0.6rem;
+                    font-weight: bold;
+                }
             }
 
             .stub-poster {

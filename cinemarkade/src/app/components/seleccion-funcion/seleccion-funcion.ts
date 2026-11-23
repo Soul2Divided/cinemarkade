@@ -353,7 +353,22 @@ export class SeleccionFuncion implements OnInit {
     }
 
     seleccionarHorario(opcion: OpcionHorario): void {
+        if (!this.preventaDisponible(opcion.funcion)) {
+            return;
+        }
+
         this.horarioSeleccionado.set(opcion);
+    }
+
+    preventaDisponible(funcion: Funcion): boolean {
+        if (!funcion.es_preventa) {
+            return true;
+        }
+
+        return Boolean(
+            funcion.fecha_disponible_preventa &&
+                funcion.fecha_disponible_preventa <= this.hoy(),
+        );
     }
 
     async continuarCompra(): Promise<void> {
@@ -391,6 +406,10 @@ export class SeleccionFuncion implements OnInit {
                 formato: seleccion.funcion.formato,
                 idioma: seleccion.funcion.idioma,
                 salaId: seleccion.funcion.sala_id,
+                esEstreno: seleccion.funcion.es_estreno,
+                esPreventa: seleccion.funcion.es_preventa,
+                fechaDisponiblePreventa: seleccion.funcion.fecha_disponible_preventa,
+                porcentajeRecargoPreventa: seleccion.funcion.porcentaje_recargo_preventa,
             }),
         );
         void this.router.navigate(['/compra']);

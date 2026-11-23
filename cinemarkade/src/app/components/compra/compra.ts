@@ -24,6 +24,10 @@ interface SeleccionProyeccion {
     formato: FormatoSala;
     idioma: string;
     salaId: number;
+    esEstreno: boolean;
+    esPreventa: boolean;
+    fechaDisponiblePreventa: string | null;
+    porcentajeRecargoPreventa: number | null;
 }
 
 interface ItemSeleccionado {
@@ -133,7 +137,15 @@ export class Compra implements OnInit {
             this.combos.set((combos ?? []).filter(combo => combo.activo && this.comboVigente(combo)));
             this.cupones.set((cupones ?? []).filter(cupon => cupon.activa));
             this.tarifaBase.set(tarifa.precio_base);
-            this.precioEntrada.set(tarifa.precio_final);
+            const recargoPreventa =
+                seleccion.esPreventa &&
+                seleccion.fechaDisponiblePreventa !== null &&
+                seleccion.fechaDisponiblePreventa <= this.fechaHoy()
+                    ? (seleccion.porcentajeRecargoPreventa ?? 0)
+                    : 0;
+            this.precioEntrada.set(
+                Math.round(tarifa.precio_final * (1 + recargoPreventa / 100) * 100) / 100,
+            );
             this.esDiaPromocional.set(tarifa.descuento_dia_aplicado);
 
             try {

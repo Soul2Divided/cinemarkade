@@ -11,6 +11,7 @@ import { Producto } from '../producto/producto.model';
 import { ComboService } from '../combo/combo.service';
 import { Combo } from '../combo/combo.model';
 import { Cupon } from '../cupon/cupon.model';
+import { BorradorCompraService } from './borrador-compra.service';
 
 export interface CatalogosConfirmacionCompra {
     peliculas: Pelicula[];
@@ -25,15 +26,14 @@ export class PreparacionCompraService {
     private readonly productoService = inject(ProductoService);
     private readonly comboService = inject(ComboService);
     private readonly butacaProyeccionService = inject(ButacaProyeccionService);
+    private readonly borradorCompraService = inject(BorradorCompraService);
 
     recuperarBorrador(tipoCandy = false): BorradorCompra {
-        const guardado = sessionStorage.getItem('cinemarkade-compra-borrador');
+        const borrador = this.borradorCompraService.recuperar();
 
-        if (!guardado) {
+        if (!borrador) {
             throw new Error('No encontramos una compra para confirmar. Volvé a iniciar la compra.');
         }
-
-        const borrador = JSON.parse(guardado) as BorradorCompra;
 
         if ((borrador.tipoCompra === 'candy') !== tipoCandy) {
             throw new Error('No encontramos una compra de este tipo para confirmar.');
@@ -41,7 +41,7 @@ export class PreparacionCompraService {
 
         if (!borrador.solicitudId) {
             borrador.solicitudId = crypto.randomUUID();
-            sessionStorage.setItem('cinemarkade-compra-borrador', JSON.stringify(borrador));
+            this.borradorCompraService.guardar(borrador);
         }
 
         if (

@@ -2,27 +2,18 @@ import { Injectable, computed, effect, inject, signal, untracked } from '@angula
 import { BorradorCompra } from '../compra/borrador-compra.model';
 import { AuthService } from '../../auth/auth.service';
 import { CatalogoCandyService } from './catalogo-candy.service';
+import { BorradorCompraService } from '../compra/borrador-compra.service';
+import { CarritoCandyRepository } from './carrito-candy.repository';
+import { LineaCarritoCandy, SeleccionCandy, TipoItemCandy } from './carrito-candy.model';
 
-export type TipoItemCandy = 'producto' | 'combo' | 'recompensa';
-
-export interface SeleccionCandy {
-    tipo: TipoItemCandy;
-    id: number;
-    cantidad: number;
-}
-
-export interface LineaCarritoCandy extends SeleccionCandy {
-    nombre: string;
-    precio: number;
-    puntos: number;
-    unidades: number;
-    disponible: boolean;
-}
+export type { LineaCarritoCandy, SeleccionCandy, TipoItemCandy } from './carrito-candy.model';
 
 @Injectable({ providedIn: 'root' })
 export class CarritoCandyService {
     private readonly authService = inject(AuthService);
     private readonly catalogo = inject(CatalogoCandyService);
+    private readonly repository = inject(CarritoCandyRepository);
+    private readonly borradorService = inject(BorradorCompraService);
     private readonly seleccion = signal<SeleccionCandy[]>([]);
     private readonly clave = signal<string | null>(null);
 
@@ -82,7 +73,7 @@ export class CarritoCandyService {
                 }
 
                 this.clave.set(clave);
-                this.seleccion.set(this.restaurar(clave));
+                this.seleccion.set(this.repository.restaurar(clave));
                 this.mensaje.set('');
             });
         });
@@ -96,7 +87,7 @@ export class CarritoCandyService {
             }
 
             try {
-                localStorage.setItem(clave, JSON.stringify({ version: 1, items: seleccion }));
+                this.repository.guardar(clave, seleccion);
                 this.avisoAlmacenamiento.set('');
             } catch {
                 this.avisoAlmacenamiento.set('El navegador no permite guardar el carrito. Se conservará mientras sigas en la aplicación.');
@@ -228,56 +219,6 @@ export class CarritoCandyService {
             total: this.total(),
             puntosEstimados: this.puntosEstimados()
         };
-        const previo = sessionStorage.getItem('cinemarkade-compra-borrador');
-        let solicitudId = crypto.randomUUID();
-
-        if (previo) {
-            try {
-                const { solicitudId: anterior, ...datos } = JSON.parse(previo);
-
-                const firma = (compra: BorradorCompra) => JSON.stringify({
-                    tipo: compra.tipoCompra,
-                    usuario: compra.usuarioId,
-                    productos: compra.productos,
-                    combos: compra.combos,
-                    recompensas: compra.recompensas?.map(item => ({ id: item.recompensa.id, cantidad: item.cantidad }))
-                });
-
-                if (anterior && firma(datos) === firma(borrador)) {
-                    solicitudId = anterior;
-                }
-            } catch {
-                // Un borrador ilegible se reemplaza por la selección actual.
-            }
-        }
-
-        borrador.solicitudId = solicitudId;
-        sessionStorage.setItem('cinemarkade-compra-borrador', JSON.stringify(borrador));
-
-        return borrador;
-    }
-
-    private restaurar(clave: string): SeleccionCandy[] {
-        try {
-            const datos = JSON.parse(localStorage.getItem(clave) ?? 'null');
-
-            if (datos?.version !== 1 || !Array.isArray(datos.items)) {
-                return [];
-            }
-
-            const items = new Map<string, SeleccionCandy>();
-
-            for (const item of datos.items) {
-                if (['producto', 'combo', 'recompensa'].includes(item?.tipo) &&
-                    Number.isSafeInteger(item.id) && item.id > 0 &&
-                    Number.isSafeInteger(item.cantidad) && item.cantidad >= 1 && item.cantidad <= 99) {
-                    items.set(`${item.tipo}:${item.id}`, { tipo: item.tipo, id: item.id, cantidad: item.cantidad });
-                }
-            }
-
-            return [...items.values()];
-        } catch {
-            return [];
-        }
+        return this.borradorService.guardarConSolicitud(borrador);
     }
 }

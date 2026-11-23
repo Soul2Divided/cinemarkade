@@ -47,6 +47,12 @@
                                     LUNES A MIÉRCOLES · 50% OFF EN ENTRADAS
                                 </span>
                             }
+                            @if (funcion.esPreventa) {
+                                <span class="weekday-discount">
+                                    PREVENTA · RECARGO DE
+                                    {{ funcion.porcentajeRecargoPreventa }}% SOLO EN ENTRADAS
+                                </span>
+                            }
                             <span class="ticket-price">
                                 @if (esDiaPromocional()) {
                                     <del>

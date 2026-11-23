@@ -7,26 +7,66 @@
 
         <section class="catalog-section">
             <div class="section-header">
-                <h2 class="section-title">TOP 3 PELÍCULAS MÁS VISTAS</h2>
+                <h2 class="section-title">TOP 3 PELÍCULAS MÁS VENDIDAS</h2>
             </div>
-            <div class="ranking-pending">
-                <span class="pending-icon">🏆</span>
-                <p>EL TOP 3 SE MOSTRARÁ CUANDO REGISTREMOS LAS VISUALIZACIONES DE CADA PELÍCULA.</p>
+            <div class="top-sales-grid">
+                @for (item of topTresPeliculas(); track item.pelicula.id; let posicion = $index) {
+                    <article class="top-sales-card" [class.first-place]="posicion === 0">
+                        <span class="sales-rank">#{{ posicion + 1 }}</span>
+                        <app-card-pelicula
+                            [pelicula]="item.pelicula"
+                            (seleccionarPelicula)="seleccionarPelicula($event)"
+                        ></app-card-pelicula>
+                        <p>{{ item.entradas }} ENTRADAS VENDIDAS</p>
+                    </article>
+                } @empty {
+                    <div class="ranking-pending">
+                        <span class="pending-icon">🏆</span>
+                        <p>TODAVÍA NO HAY VENTAS DE ENTRADAS PARA ARMAR EL RANKING.</p>
+                    </div>
+                }
             </div>
         </section>
 
         <section class="catalog-section">
             <div class="section-header">
-                <h2 class="section-title">ESTRENOS EXCLUSIVOS</h2>
+                <h2 class="section-title">PRÓXIMOS ESTRENOS EN CINEMARKADE</h2>
             </div>
             <div class="posters-grid">
-                @for (pelicula of peliculasEstrenos(); track pelicula.id) {
-                <app-card-pelicula 
-                    [pelicula]="pelicula"
-                    (seleccionarPelicula)="seleccionarPelicula($event)"
-                ></app-card-pelicula>
+                @for (item of estrenosProgramados(); track item.funcion.id) {
+                    <article class="estreno-card">
+                        <app-card-pelicula
+                            [pelicula]="item.pelicula"
+                            (seleccionarPelicula)="seleccionarPelicula($event)"
+                        ></app-card-pelicula>
+                        <p class="preventa-date">
+                            ESTRENO · {{ item.funcion.fecha | date: 'dd/MM/yyyy' : '' : 'es-AR' }}
+                        </p>
+                        <button
+                            type="button"
+                            class="notify-button"
+                            [disabled]="
+                                funcionConRecordatorioEnProceso() === item.funcion.id ||
+                                idsConRecordatorio().has(item.funcion.id)
+                            "
+                            (click)="activarRecordatorio(item.funcion)"
+                        >
+                            {{
+                                idsConRecordatorio().has(item.funcion.id)
+                                    ? '🔔 RECORDATORIO ACTIVADO'
+                                    : '🔔 NOTIFICARME'
+                            }}
+                        </button>
+                    </article>
+                } @empty {
+                    <div class="upcoming-placeholder">
+                        <p>NO HAY ESTRENOS PROGRAMADOS POR EL MOMENTO.</p>
+                    </div>
                 }
             </div>
+            @if (mensajeRecordatorio()) {
+                <p class="recordatorio-message" role="status">{{ mensajeRecordatorio() }}</p>
+            }
         </section>
 
 
@@ -58,11 +98,28 @@
             <div class="section-header">
                 <h2 class="section-title">PRÓXIMAS FUNCIONES EN PREVENTA</h2>
             </div>
-            <div class="upcoming-placeholder">
-                <span class="pending-icon">⏳</span>
-                <p>
-                    LAS FUNCIONES EN PREVENTA APARECERÁN ACÁ CUANDO ESTÉ DISPONIBLE ESA INFORMACIÓN.
-                </p>
+            <div class="posters-grid">
+                @for (item of preventasProgramadas(); track item.pelicula.id) {
+                    <article class="preventa-card">
+                        <app-card-pelicula
+                            [pelicula]="item.pelicula"
+                            (seleccionarPelicula)="seleccionarPelicula($event)"
+                        ></app-card-pelicula>
+                        <p class="preventa-date">
+                            @if (item.fechaDisponible <= hoyEnBuenosAires()) {
+                                PREVENTA DISPONIBLE
+                            } @else {
+                                DISPONIBLE DESDE
+                                {{ item.fechaDisponible | date: 'dd/MM/yyyy' : '' : 'es-AR' }}
+                            }
+                        </p>
+                    </article>
+                } @empty {
+                    <div class="upcoming-placeholder">
+                        <span class="pending-icon">⏳</span>
+                        <p>NO HAY FUNCIONES EN PREVENTA PROGRAMADAS.</p>
+                    </div>
+                }
             </div>
         </section>
     </main>

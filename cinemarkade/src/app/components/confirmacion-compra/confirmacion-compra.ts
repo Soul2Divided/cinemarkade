@@ -18,6 +18,8 @@ import { DetalleCompra } from './components/detalle-compra/detalle-compra';
 import { TotalesCompra } from './components/totales-compra/totales-compra';
 import { ResultadoCompra } from './components/resultado-compra/resultado-compra';
 import QRCode from 'qrcode';
+import { NotificacionService } from '../../core/notificacion/notificacion.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     imports: [Navbar, Loader, Modal, DatosEntrada, DetalleCompra, TotalesCompra, ResultadoCompra],
@@ -35,6 +37,7 @@ export class ConfirmacionCompra implements OnInit {
     private readonly ticketPdfService = inject(TicketPdfService);
     private readonly authService = inject(AuthService);
     private readonly cuponService = inject(CuponService);
+    private readonly notificacionService = inject(NotificacionService);
     private readonly catalogos = signal<CatalogosConfirmacionCompra>({
         peliculas: [],
         productos: [],
@@ -53,6 +56,8 @@ export class ConfirmacionCompra implements OnInit {
     compraAnonima = signal(false);
     mostrarModalConfirmacion = signal(false);
     mostrarModalExito = signal(false);
+    recordatorioPreventaActivo = signal(false);
+    pushPreventaActivo = signal(false);
     error = signal('');
 
     readonly resumen = computed(() => {
@@ -108,8 +113,25 @@ export class ConfirmacionCompra implements OnInit {
         this.confirmando.set(true);
 
         try {
+            const esPreventa = !this.esCandy && borrador.proyeccion?.esPreventa === true;
+            const usuarioActualId = this.authService.usuarioActual()?.id;
+            const promesaSuscripcionPush = esPreventa && usuarioActualId
+                ? this.notificacionService.suscribirPush(
+                      usuarioActualId,
+                      environment.VAPID_PUBLIC_KEY,
+                  )
+                : null;
             const tieneSesion = await this.authService.haySesionActiva();
             this.compraAnonima.set(!tieneSesion);
+
+            if (esPreventa && tieneSesion && promesaSuscripcionPush) {
+                try {
+                    await promesaSuscripcionPush;
+                    this.pushPreventaActivo.set(true);
+                } catch (error) {
+                    console.info('La compra continuará sin activar push:', error);
+                }
+            }
 
             if (this.esCandy) {
                 const usuarioId = await this.authService.obtenerIdUsuarioSesion();
@@ -129,6 +151,17 @@ export class ConfirmacionCompra implements OnInit {
 
             const id = await this.compraService.confirmarCompra(datos);
             this.compraId.set(id);
+
+            if (esPreventa && tieneSesion && borrador.proyeccion?.proyeccionId) {
+                try {
+                    await this.notificacionService.activarRecordatorioPorCompra(
+                        borrador.proyeccion.proyeccionId,
+                    );
+                    this.recordatorioPreventaActivo.set(true);
+                } catch (error) {
+                    console.error('La compra quedó confirmada, pero falló el recordatorio:', error);
+                }
+            }
 
             if (this.esCandy) {
                 this.carrito.vaciar();

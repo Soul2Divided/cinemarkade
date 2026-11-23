@@ -1,8 +1,10 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { SupabaseService } from '../services/supabase.service';
+import { AuthService } from '../../auth/auth.service';
+import { UserRepository } from './user.repository';
 
 export const SECCIONES_ADMIN = [
     { permiso: 'peliculas', route: '/admin/peliculas', label: 'Películas', icon: '🎬' },
+    { permiso: 'peticiones', route: '/admin/peticiones', label: 'Peticiones de usuarios', icon: '📨' },
     { permiso: 'salas', route: '/admin/salas', label: 'Salas y butacas', icon: '🏛️' },
     { permiso: 'funciones', route: '/admin/funciones', label: 'Funciones', icon: '⏰' },
     { permiso: 'productos', route: '/admin/productos', label: 'Productos candy', icon: '🍿' },
@@ -16,7 +18,8 @@ export const SECCIONES_ADMIN = [
 
 @Injectable({ providedIn: 'root' })
 export class PermisosAdminService {
-    private readonly client = inject(SupabaseService).supabaseClient;
+    private readonly authService = inject(AuthService);
+    private readonly userRepository = inject(UserRepository);
     readonly esAdmin = signal(false);
     readonly esEmpleado = signal(false);
     readonly secciones = signal<string[]>([]);
@@ -34,17 +37,16 @@ export class PermisosAdminService {
         this.esAdmin.set(false);
         this.esEmpleado.set(false);
         this.secciones.set([]);
-        const { data: autenticacion, error: errorSesion } = await this.client.auth.getUser();
+        const usuarioId = await this.authService.obtenerIdUsuarioSesion();
 
-        if (errorSesion || !autenticacion.user) {
+        if (!usuarioId) {
             return;
         }
 
-        const { data: usuario, error } = await this.client.from('usuario')
-            .select('rol, permisos_admin').eq('id', autenticacion.user.id).single();
+        const usuario = await this.userRepository.findById(usuarioId);
 
-        if (error) {
-            throw new Error(`No se pudieron consultar los accesos: ${error.message}`);
+        if (!usuario) {
+            throw new Error('No se encontró el perfil del usuario autenticado.');
         }
 
         this.esAdmin.set(usuario.rol === 'admin');

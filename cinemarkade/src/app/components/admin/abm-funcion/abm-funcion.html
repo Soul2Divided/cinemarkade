@@ -42,14 +42,27 @@
                     <div class="card-header-badge">
                         <span class="badge-format">{{ funcion.formato }}</span>
                         <span class="badge-lang">{{ funcion.idioma | uppercase }}</span>
-                        @if (funcion.es_preventa) { <span class="badge-preventa">PREVENTA</span> }
-                        @if (!funcion.activa) { <span class="badge-lang">INACTIVA</span> }
+                        @if (funcion.es_preventa) {
+                            <span class="badge-preventa">PREVENTA</span>
+                        }
+                        @if (funcion.es_estreno) {
+                            <span class="badge-estreno">ESTRENO</span>
+                        }
+                        @if (!funcion.activa) {
+                            <span class="badge-lang">INACTIVA</span>
+                        }
                     </div>
                     <div class="card-body">
                         <h3 class="funcion-title">SALA #{{ funcion.sala_id }}</h3>
                         <div class="info-list">
                             <span class="info-item">📅 FECHA: {{ funcion.fecha }}</span>
                             <span class="info-item">⏰ PROYECCIONES: {{ horariosFuncion(funcion) }}</span>
+                            @if (funcion.es_preventa) {
+                                <span class="info-item">
+                                    🏷 PREVENTA DESDE: {{ funcion.fecha_disponible_preventa }} ·
+                                    RECARGO {{ funcion.porcentaje_recargo_preventa }}%
+                                </span>
+                            }
                         </div>
                         <div class="card-actions">
                             <button type="button" class="btn-action edit" (click)="modificarFuncion(funcion.id)"

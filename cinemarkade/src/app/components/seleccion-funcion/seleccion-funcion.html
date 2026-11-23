@@ -114,6 +114,7 @@
                                 <button
                                     type="button"
                                     class="showtime-card"
+                                    [disabled]="!preventaDisponible(opcion.funcion)"
                                     [class.selected]="
                                         horarioSeleccionado()?.proyeccion?.id ===
                                         opcion.proyeccion.id
@@ -124,8 +125,20 @@
                                     <span>
                                         {{ opcion.funcion.formato }} · {{ opcion.funcion.idioma }}
                                     </span>
+                                    @if (opcion.funcion.es_estreno) {
+                                        <small>ESTRENO</small>
+                                    }
                                     @if (opcion.funcion.es_preventa) {
-                                        <small>PREVENTA</small>
+                                        @if (preventaDisponible(opcion.funcion)) {
+                                            <small>
+                                                PREVENTA · +{{ opcion.funcion.porcentaje_recargo_preventa }}%
+                                            </small>
+                                        } @else {
+                                            <small>
+                                                PREVENTA DESDE
+                                                {{ opcion.funcion.fecha_disponible_preventa | date: 'dd/MM/yyyy' : '' : 'es-AR' }}
+                                            </small>
+                                        }
                                     }
                                 </button>
                             }

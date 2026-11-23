@@ -41,4 +41,78 @@
             </article>
         </div>
     }
+
+    <section class="analytics-section" [hidden]="!estadisticas() && !errorEstadisticas() && !cargandoEstadisticas()">
+        <header class="analytics-heading">
+            <div>
+                <p class="eyebrow">ESTADÍSTICAS DE CARTELERA Y CANDY</p>
+                <h2>PELÍCULAS MÁS VISTAS Y PRODUCTOS MÁS VENDIDOS</h2>
+                <p>Elegí el período de cartelera. Las semanas se cuentan en bloques de siete días dentro del mes; la última puede incluir menos días.</p>
+            </div>
+            <div class="analytics-period">
+                <label>
+                    AÑO
+                    <input type="number" min="2000" max="9999" [value]="anioSeleccionado()" (change)="anioSeleccionado.set(+$any($event.target).value); cambiarPeriodoEstadisticas()" />
+                </label>
+                <label>
+                    MES
+                    <input type="number" min="1" max="12" [value]="mesSeleccionado()" (change)="mesSeleccionado.set(+$any($event.target).value); cambiarPeriodoEstadisticas()" />
+                </label>
+                <label>
+                    SEMANA
+                    <input type="number" min="1" [max]="semanasDelMes()" [value]="semanaSeleccionada()" (change)="semanaSeleccionada.set(+$any($event.target).value); cargarEstadisticas()" />
+                </label>
+            </div>
+        </header>
+
+        @if (errorEstadisticas()) {
+            <section class="report-state report-error" role="alert">
+                <p>{{ errorEstadisticas() }}</p>
+                <button type="button" (click)="cargarEstadisticas()">REINTENTAR ESTADÍSTICAS</button>
+            </section>
+        }
+
+        @if (cargandoEstadisticas()) {
+            <p class="report-state" role="status">CARGANDO ESTADÍSTICAS...</p>
+        }
+
+        @if (estadisticas(); as datos) {
+            <div class="charts-grid movie-charts">
+                <article class="chart-card">
+                    <h3>SEMANA</h3>
+                    <p>Butacas de compras utilizadas entre los días {{ (semanaSeleccionada() - 1) * 7 + 1 }} y {{ ultimoDiaSemana() }} del mes</p>
+                    @if (datos.peliculasSemana.length === 0) {
+                        <p class="chart-empty">No hay entradas validadas en esta semana.</p>
+                    }
+                    <div class="chart-canvas pie-canvas">
+                        <canvas #graficoSemanaCanvas aria-label="Gráfico circular de películas más vistas durante la semana"></canvas>
+                    </div>
+                </article>
+
+                <article class="chart-card">
+                    <h3>MES</h3>
+                    <p>Butacas de compras con QR validado durante el mes seleccionado</p>
+                    @if (datos.peliculasMes.length === 0) {
+                        <p class="chart-empty">No hay entradas validadas en este mes.</p>
+                    }
+                    <div class="chart-canvas pie-canvas">
+                        <canvas #graficoMesCanvas aria-label="Gráfico circular de películas más vistas durante el mes"></canvas>
+                    </div>
+                </article>
+            </div>
+
+            <article class="chart-card candy-chart-card">
+                <div>
+                    <h3>PRODUCTOS CANDY MÁS VENDIDOS</h3>
+                    <p>Unidades en compras confirmadas o utilizadas, acumuladas históricamente</p>
+                </div>
+                @if (datos.productosCandy.length === 0) {
+                    <p class="chart-empty">Todavía no hay productos de candy vendidos.</p>
+                }
+                <div class="chart-canvas candy-canvas">
+                    <canvas #graficoCandyCanvas aria-label="Gráfico de barras de los productos candy más vendidos"></canvas>
+                </div>
+            </article>
+        }
+    </section>
 </section>

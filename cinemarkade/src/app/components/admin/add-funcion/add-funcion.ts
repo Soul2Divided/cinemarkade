@@ -26,6 +26,7 @@ export class AddFuncion implements OnInit {
   readonly formatosDisponibles = FORMATOS_SALA;
   readonly idiomasDisponibles: IdiomaFuncion[] = ['Subtitulada', 'Doblada'];
   readonly fechaMinima = this.fechaActualDelCine();
+  readonly fechaMinimaPreventa = this.sumarDias(this.fechaMinima, 7);
 
   peliculas = signal<Pelicula[]>([]);
   horariosSeleccionados = signal<string[]>([]);
@@ -33,6 +34,7 @@ export class AddFuncion implements OnInit {
   mostrarModal = signal(false);
   resultado = signal('');
   errorMessage = '';
+  funcionOriginal: Funcion | null = null;
 
   esEdicion = false;
   funcionId: number | null = null;
@@ -52,7 +54,10 @@ export class AddFuncion implements OnInit {
       nonNullable: true,
     }),
     idioma: new FormControl<IdiomaFuncion | null>(null, Validators.required),
+    esEstreno: new FormControl(false, { nonNullable: true }),
     esPreventa: new FormControl(false, { nonNullable: true }),
+    fechaDisponiblePreventa: new FormControl('', { nonNullable: true }),
+    porcentajeRecargoPreventa: new FormControl<number | null>(null),
   });
 
   get peliculaSeleccionada(): Pelicula | undefined {
@@ -89,6 +94,7 @@ export class AddFuncion implements OnInit {
   private async cargarFuncion(id: number): Promise<void> {
     try {
       const funcion = await this.funcionService.obtenerFuncionPorId(id);
+      this.funcionOriginal = funcion;
       const horarios = funcion.proyecciones
         .filter(proyeccion => proyeccion.activa)
         .map(proyeccion => proyeccion.horario.slice(0, 5))
@@ -101,8 +107,13 @@ export class AddFuncion implements OnInit {
         dias: 1,
         primerHorario: horarios[0] ?? '10:00',
         idioma: funcion.idioma,
+        esEstreno: funcion.es_estreno,
         esPreventa: funcion.es_preventa,
+        fechaDisponiblePreventa: funcion.fecha_disponible_preventa ?? '',
+        porcentajeRecargoPreventa: funcion.porcentaje_recargo_preventa,
       });
+
+      this.actualizarValidacionesPreventa();
 
       this.horariosSeleccionados.set(horarios);
 
@@ -158,6 +169,21 @@ export class AddFuncion implements OnInit {
       this.errorMessage = 'Completá los campos obligatorios.';
       return;
     }
+    if (this.formFuncion.controls.esPreventa.value) {
+      const fechaDisponible = this.formFuncion.controls.fechaDisponiblePreventa.value;
+      const conservaFechaDeHabilitacion =
+        this.funcionOriginal?.es_preventa &&
+        this.funcionOriginal.fecha_disponible_preventa === fechaDisponible;
+
+      if (!conservaFechaDeHabilitacion && fechaDisponible < this.fechaMinimaPreventa) {
+        this.errorMessage = 'La fecha de habilitación debe estar a siete días o más de hoy.';
+        return;
+      }
+      if (fechaDisponible >= this.formFuncion.controls.fecha.value) {
+        this.errorMessage = 'La preventa debe habilitarse antes de la fecha de la función.';
+        return;
+      }
+    }
     const pelicula = this.peliculaSeleccionada;
     if (this.horariosSeleccionados().length === 0 || !pelicula) {
       this.errorMessage = 'Agregá al menos un horario.';
@@ -186,7 +212,14 @@ export class AddFuncion implements OnInit {
       primerHorario: horariosOrdenados[0],
       horariosSeleccionados: horariosOrdenados,
       idioma: valores.idioma,
+      esEstreno: valores.esEstreno,
       esPreventa: valores.esPreventa,
+      fechaDisponiblePreventa: valores.esPreventa
+        ? valores.fechaDisponiblePreventa
+        : null,
+      porcentajeRecargoPreventa: valores.esPreventa
+        ? valores.porcentajeRecargoPreventa
+        : null,
     };
 
     this.mostrarLoader.set(true);
@@ -224,6 +257,48 @@ export class AddFuncion implements OnInit {
     }
   }
 
+  actualizarValidacionesPreventa(): void {
+    const fechaControl = this.formFuncion.controls.fechaDisponiblePreventa;
+    const recargoControl = this.formFuncion.controls.porcentajeRecargoPreventa;
+
+    if (this.formFuncion.controls.esPreventa.value) {
+      fechaControl.setValidators([Validators.required]);
+      recargoControl.setValidators([
+        Validators.required,
+        Validators.min(0.01),
+        Validators.max(100),
+      ]);
+    } else {
+      fechaControl.clearValidators();
+      recargoControl.clearValidators();
+    }
+
+    fechaControl.updateValueAndValidity();
+    recargoControl.updateValueAndValidity();
+  }
+
+  get fechaMinimaPreventaFormulario(): string {
+    const fechaActual = this.formFuncion.controls.fechaDisponiblePreventa.value;
+
+    if (
+      this.funcionOriginal?.es_preventa &&
+      this.funcionOriginal.fecha_disponible_preventa === fechaActual &&
+      fechaActual < this.fechaMinimaPreventa
+    ) {
+      return fechaActual;
+    }
+
+    return this.fechaMinimaPreventa;
+  }
+
+  get fechaMaximaPreventaFormulario(): string {
+    const fechaFuncion = this.formFuncion.controls.fecha.value;
+    const ultimaFecha = new Date(`${fechaFuncion}T00:00:00Z`);
+    ultimaFecha.setUTCDate(ultimaFecha.getUTCDate() - 1);
+
+    return ultimaFecha.toISOString().slice(0, 10);
+  }
+
   cancelar(): void {
     this.router.navigate(['/admin/funciones']);
   }
@@ -243,5 +318,12 @@ export class AddFuncion implements OnInit {
 
     const valor = (tipo: string) => partes.find(parte => parte.type === tipo)!.value;
     return `${valor('year')}-${valor('month')}-${valor('day')}`;
+  }
+
+  private sumarDias(fecha: string, dias: number): string {
+    const valor = new Date(`${fecha}T00:00:00Z`);
+    valor.setUTCDate(valor.getUTCDate() + dias);
+
+    return valor.toISOString().slice(0, 10);
   }
 }

@@ -1,0 +1,98 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+.notifications-page {
+    width: min(100% - 2rem, 1000px);
+    margin: 3rem auto;
+    color: theme.$arcade-text-white;
+}
+
+.page-heading {
+    margin-bottom: 2rem;
+    text-align: center;
+
+    .eyebrow,
+    h1 {
+        color: theme.$arcade-yellow;
+        font-family: theme.$font-pixel;
+    }
+
+    .eyebrow {
+        font-size: 0.65rem;
+    }
+
+    h1 {
+        font-size: clamp(1rem, 3vw, 1.5rem);
+        line-height: 1.7;
+    }
+
+    p {
+        color: #aaa;
+    }
+}
+
+.notification-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.notification-card,
+.empty-state,
+.state-message {
+    padding: 1.25rem;
+    background: #101014;
+    border: 2px solid #38383e;
+}
+
+.notification-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+
+    &.unread {
+        border-color: theme.$arcade-cyan;
+    }
+
+    h2 {
+        margin: 0.6rem 0;
+        font: 0.85rem/1.7 theme.$font-pixel;
+    }
+
+    p {
+        margin: 0 0 0.6rem;
+        line-height: 1.5;
+    }
+
+    time,
+    .notification-type,
+    .read-state {
+        color: #aaa;
+        font: 0.6rem/1.7 theme.$font-pixel;
+    }
+
+    button {
+        flex: 0 0 auto;
+        padding: 0.7rem;
+        color: theme.$arcade-cyan;
+        background: transparent;
+        border: 1px solid theme.$arcade-cyan;
+        font: 0.6rem theme.$font-pixel;
+        cursor: pointer;
+    }
+
+    @media (max-width: 650px) {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+.empty-state,
+.state-message {
+    color: #aaa;
+    font: 0.7rem/1.8 theme.$font-pixel;
+    text-align: center;
+}
+
+.error {
+    color: #ff7777;
+}

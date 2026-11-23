@@ -44,10 +44,22 @@
         <app-totales-compra [datos]="detalle.totales" [confirmada]="!!compraId()" />
         }
 
-        <app-resultado-compra [esCandy]="esCandy" [abierto]="mostrarModalExito()" [compraAnonima]="compraAnonima()" [compraId]="compraId()"
-            [codigoManual]="codigoManual()" [ticketDisponible]="!!ticketPdf()" [error]="error()"
-            (cerrar)="cerrarModalExito()" (descargar)="descargarTicket()" (volver)="volverAlInicio()"
-            (verEntradas)="irAMisEntradas()" />
+        <app-resultado-compra
+            [esCandy]="esCandy"
+            [abierto]="mostrarModalExito()"
+            [compraAnonima]="compraAnonima()"
+            [esPreventa]="compra.proyeccion?.esPreventa ?? false"
+            [recordatorioPreventaActivo]="recordatorioPreventaActivo()"
+            [pushPreventaActivo]="pushPreventaActivo()"
+            [compraId]="compraId()"
+            [codigoManual]="codigoManual()"
+            [ticketDisponible]="!!ticketPdf()"
+            [error]="error()"
+            (cerrar)="cerrarModalExito()"
+            (descargar)="descargarTicket()"
+            (volver)="volverAlInicio()"
+            (verEntradas)="irAMisEntradas()"
+        />
     </article>
 
     @if (error()) {

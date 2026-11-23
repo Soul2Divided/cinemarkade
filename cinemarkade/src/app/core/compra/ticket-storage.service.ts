@@ -1,41 +1,41 @@
-import { Injectable } from '@angular/core';
-import { SupabaseService } from '../services/supabase.service';
+import { Injectable, inject } from '@angular/core';
+import { GuardarTicketInput } from './ticket-storage.model';
+import { TicketStorageRepository } from './ticket-storage.repository';
 
 @Injectable({ providedIn: 'root' })
 export class TicketStorageService {
-  private readonly bucket = 'tickets';
+    private readonly repository = inject(TicketStorageRepository);
 
-  constructor(private readonly supabaseService: SupabaseService) {}
+    guardar(compraId: string, pdf: Blob): Promise<string | null> {
+        const datos: GuardarTicketInput = { compraId, archivo: pdf };
+        this.validarCompraId(datos.compraId);
 
-  async guardar(compraId: string, pdf: Blob): Promise<string | null> {
-    const { data: sesion } = await this.supabaseService.supabaseClient.auth.getSession();
-    const usuarioId = sesion.session?.user.id;
-    if (!usuarioId) return null;
+        if (!(datos.archivo instanceof Blob) || datos.archivo.type !== 'application/pdf') {
+            throw new Error('El archivo del ticket debe ser un PDF válido.');
+        }
 
-    const ruta = `${usuarioId}/${compraId}.pdf`;
-    const { error } = await this.supabaseService.supabaseClient.storage
-      .from(this.bucket)
-      .upload(ruta, pdf, { contentType: 'application/pdf', upsert: true });
-
-    if (error) throw new Error(`No se pudo guardar el PDF del ticket: ${error.message}`);
-    return ruta;
-  }
-
-  async obtenerUrlDescarga(ruta: string): Promise<string> {
-    const { data, error } = await this.supabaseService.supabaseClient.storage
-      .from(this.bucket)
-      .createSignedUrl(ruta, 60);
-
-    if (error || !data?.signedUrl) {
-      throw new Error(`No se pudo preparar la descarga del ticket: ${error?.message ?? 'URL no disponible'}`);
+        return this.repository.guardar(datos);
     }
-    return data.signedUrl;
-  }
 
-  async eliminar(ruta: string): Promise<void> {
-    const { error } = await this.supabaseService.supabaseClient.storage
-      .from(this.bucket)
-      .remove([ruta]);
-    if (error) throw new Error(`No se pudo eliminar el archivo del ticket: ${error.message}`);
-  }
+    obtenerUrlDescarga(ruta: string): Promise<string> {
+        if (!ruta.trim()) {
+            throw new Error('La ruta del ticket es obligatoria.');
+        }
+
+        return this.repository.obtenerUrlDescarga(ruta);
+    }
+
+    eliminar(ruta: string): Promise<void> {
+        if (!ruta.trim()) {
+            throw new Error('La ruta del ticket es obligatoria.');
+        }
+
+        return this.repository.eliminar(ruta);
+    }
+
+    private validarCompraId(compraId: string): void {
+        if (!compraId.trim()) {
+            throw new Error('El identificador de la compra es obligatorio.');
+        }
+    }
 }

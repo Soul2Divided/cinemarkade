@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { HostListener } from '@angular/core';
@@ -7,9 +7,12 @@ import { Router } from '@angular/router';
 import { Loader } from '../loader/loader';
 import { Modal } from '../modal/modal';
 import { PeliculaService } from '../../core/pelicula/pelicula.service';
+import { NotificacionService } from '../../core/notificacion/notificacion.service';
+import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
+import { PeticionPeliculaService } from '../../core/peticion-pelicula/peticion-pelicula.service';
 
 @Component({
-    imports: [RouterLink, UpperCasePipe, Loader, Modal],
+    imports: [RouterLink, UpperCasePipe, Loader, Modal, ReactiveFormsModule],
     selector: 'app-navbar',
     styleUrl: './navbar.scss',
     templateUrl: './navbar.html',
@@ -18,8 +21,19 @@ export class Navbar {
     mostrarModal = signal<boolean>(false);
     mostrarLoader = signal<boolean>(false);
     errorMessage: string = '';
+    readonly mostrarPeticion = signal(false);
+    readonly enviandoPeticion = signal(false);
+    readonly mensajePeticion = signal('');
+    readonly errorPeticion = signal('');
+    readonly formularioPeticion = new FormGroup({
+        titulo: new FormControl('', [Validators.required, Validators.maxLength(150)]),
+        descripcion: new FormControl('', [Validators.required, Validators.maxLength(3000)]),
+        motivo: new FormControl('', [Validators.required, Validators.maxLength(2000)]),
+    });
 
     private readonly peliculaService = inject(PeliculaService);
+    private readonly peticionService = inject(PeticionPeliculaService);
+    readonly notificacionService = inject(NotificacionService);
     private readonly peliculas = this.peliculaService.peliculas;
 
     readonly busqueda = signal('');
@@ -42,7 +56,19 @@ export class Navbar {
     constructor(
         public authService: AuthService,
         public router: Router,
-    ) {}
+    ) {
+        effect(() => {
+            const usuario = this.authService.usuarioActual();
+
+            if (usuario?.rol === 'cliente') {
+                void this.notificacionService.listar().catch((error) => {
+                    console.error('No se pudo cargar el contador de notificaciones:', error);
+                });
+            } else {
+                this.notificacionService.limpiar();
+            }
+        });
+    }
 
     menuAbierto = signal<boolean>(false);
 
@@ -52,6 +78,54 @@ export class Navbar {
 
     cerrarMenu(): void {
         this.menuAbierto.set(false);
+    }
+
+    abrirFormularioPeticion(): void {
+        this.cerrarMenu();
+        this.formularioPeticion.reset();
+        this.formularioPeticion.enable();
+        this.errorPeticion.set('');
+        this.mensajePeticion.set('');
+        this.mostrarPeticion.set(true);
+    }
+
+    cerrarFormularioPeticion(): void {
+        this.mostrarPeticion.set(false);
+    }
+
+    async enviarPeticion(): Promise<void> {
+        if (this.formularioPeticion.invalid || this.enviandoPeticion()) {
+            this.formularioPeticion.markAllAsTouched();
+            return;
+        }
+
+        this.enviandoPeticion.set(true);
+        this.errorPeticion.set('');
+
+        try {
+            const valores = this.formularioPeticion.getRawValue();
+            const catalogo = await this.peliculaService.listarPeliculas();
+            const tituloPropuesto = this.normalizarBusqueda(valores.titulo ?? '');
+            const yaEnCartelera = catalogo.some(pelicula =>
+                pelicula.activa && this.normalizarBusqueda(pelicula.nombre) === tituloPropuesto,
+            );
+
+            if (yaEnCartelera) {
+                throw new Error('Esa película ya está en nuestra cartelera.');
+            }
+
+            await this.peticionService.crear({
+                titulo: valores.titulo?.trim() ?? '',
+                descripcion: valores.descripcion?.trim() ?? '',
+                motivo: valores.motivo?.trim() ?? '',
+            });
+            this.mensajePeticion.set('Tu propuesta fue enviada. Gracias por ayudarnos a elegir películas.');
+            this.formularioPeticion.disable();
+        } catch (error) {
+            this.errorPeticion.set(error instanceof Error ? error.message : 'No se pudo enviar la propuesta.');
+        } finally {
+            this.enviandoPeticion.set(false);
+        }
     }
 
     async cerrarSesion(): Promise<void> {

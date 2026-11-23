@@ -79,7 +79,14 @@ export class FuncionService {
                     fecha: asignacion.fecha,
                     formato: asignacion.formato,
                     idioma: datos.idioma,
+                    es_estreno: datos.esEstreno && asignacion.fecha === datos.fecha,
                     es_preventa: datos.esPreventa,
+                    fecha_disponible_preventa: datos.esPreventa
+                        ? datos.fechaDisponiblePreventa
+                        : null,
+                    porcentaje_recargo_preventa: datos.esPreventa
+                        ? datos.porcentajeRecargoPreventa
+                        : null,
                     activa: true,
                 };
                 creadas.push(await this.funcionRepository.crearConProyecciones(
@@ -98,13 +105,17 @@ export class FuncionService {
 
     async actualizarFuncion(id: number, datos: CrearFuncionInput): Promise<Funcion> {
         this.validarId(id);
-        await this.validarDatos(datos);
+        const actual = await this.funcionRepository.obtenerPorId(id);
+        const conservaFechaDeHabilitacion =
+            actual.es_preventa &&
+            datos.esPreventa &&
+            actual.fecha_disponible_preventa === datos.fechaDisponiblePreventa;
+        await this.validarDatos(datos, !conservaFechaDeHabilitacion);
 
         if (datos.formatos.length !== 1) {
             throw new Error('Al editar una función, seleccioná un solo formato.');
         }
 
-        const actual = await this.funcionRepository.obtenerPorId(id);
         const pelicula = await this.peliculaService.obtenerPorId(datos.peliculaId);
         if (!pelicula.activa) {
             throw new Error('No se puede asignar una película inactiva.');
@@ -126,7 +137,14 @@ export class FuncionService {
             fecha: datos.fecha,
             formato,
             idioma: datos.idioma,
+            es_estreno: datos.esEstreno,
             es_preventa: datos.esPreventa,
+            fecha_disponible_preventa: datos.esPreventa
+                ? datos.fechaDisponiblePreventa
+                : null,
+            porcentaje_recargo_preventa: datos.esPreventa
+                ? datos.porcentajeRecargoPreventa
+                : null,
             activa: actual.activa,
         };
 
@@ -186,7 +204,10 @@ export class FuncionService {
         throw new Error(`No hay una sala disponible para el formato ${formato} en la fecha seleccionada.`);
     }
 
-    private async validarDatos(datos: CrearFuncionInput): Promise<void> {
+    private async validarDatos(
+        datos: CrearFuncionInput,
+        validarFechaMinimaPreventa = true,
+    ): Promise<void> {
         this.validarId(datos.peliculaId);
 
         if (!Array.isArray(datos.formatos) || datos.formatos.length === 0) {
@@ -209,6 +230,36 @@ export class FuncionService {
         }
         if (typeof datos.esPreventa !== 'boolean') {
             throw new Error('Indicá si la función estará en preventa.');
+        }
+        if (typeof datos.esEstreno !== 'boolean') {
+            throw new Error('Indicá si la función corresponde a un estreno en el cine.');
+        }
+        if (datos.esPreventa) {
+            const fechaMinimaPreventa = this.sumarDias(this.fechaActualDelCine(), 7);
+
+            if (!datos.fechaDisponiblePreventa) {
+                throw new Error('Indicá la fecha en que se habilitará la preventa.');
+            }
+            if (
+                validarFechaMinimaPreventa &&
+                datos.fechaDisponiblePreventa < fechaMinimaPreventa
+            ) {
+                throw new Error(
+                    'La fecha de habilitación debe estar a siete días o más de hoy.',
+                );
+            }
+            if (datos.fechaDisponiblePreventa >= datos.fecha) {
+                throw new Error(
+                    'La preventa debe habilitarse antes de la fecha de la función.',
+                );
+            }
+            if (
+                !Number.isFinite(datos.porcentajeRecargoPreventa) ||
+                (datos.porcentajeRecargoPreventa ?? 0) <= 0 ||
+                (datos.porcentajeRecargoPreventa ?? 0) > 100
+            ) {
+                throw new Error('El recargo de preventa debe ser mayor a 0 y no superar el 100%.');
+            }
         }
         if (!Array.isArray(datos.horariosSeleccionados) || datos.horariosSeleccionados.length === 0) {
             throw new Error('Seleccioná al menos un horario disponible.');
@@ -248,6 +299,13 @@ export class FuncionService {
 
     private horaActualDelCine(): string {
         return this.partesFechaHoraDelCine().hora;
+    }
+
+    private sumarDias(fecha: string, dias: number): string {
+        const valor = new Date(`${fecha}T00:00:00Z`);
+        valor.setUTCDate(valor.getUTCDate() + dias);
+
+        return valor.toISOString().slice(0, 10);
     }
 
     private partesFechaHoraDelCine(): { fecha: string; hora: string } {

@@ -9,7 +9,10 @@ export interface Funcion {
     fecha: string;
     formato: FormatoSala;
     idioma: IdiomaFuncion;
+    es_estreno: boolean;
     es_preventa: boolean;
+    fecha_disponible_preventa: string | null;
+    porcentaje_recargo_preventa: number | null;
     activa: boolean;
     proyecciones: Proyeccion[];
 }
@@ -27,7 +30,10 @@ export interface FuncionInput {
     fecha: string;
     formato: FormatoSala;
     idioma: IdiomaFuncion;
+    es_estreno: boolean;
     es_preventa: boolean;
+    fecha_disponible_preventa: string | null;
+    porcentaje_recargo_preventa: number | null;
     activa: boolean;
 }
 
@@ -39,5 +45,8 @@ export interface CrearFuncionInput {
     primerHorario: string;
     horariosSeleccionados: string[];
     idioma: IdiomaFuncion;
+    esEstreno: boolean;
     esPreventa: boolean;
+    fechaDisponiblePreventa: string | null;
+    porcentajeRecargoPreventa: number | null;
 }

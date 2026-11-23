@@ -61,6 +61,89 @@
     }
 }
 
+.top-sales-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.top-sales-card {
+    position: relative;
+    min-width: 0;
+    padding: 1rem;
+    border: 2px solid #666;
+    background: #0e0e11;
+    text-align: center;
+
+    p {
+        margin: 0.75rem 0 0;
+        color: #8be9ff;
+        font: 0.55rem/1.7 theme.$font-pixel;
+    }
+
+    &.first-place {
+        border-color: #ffcf4a;
+        box-shadow: 0 0 18px #ffcf4a55;
+    }
+}
+
+.sales-rank {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #ffcf4a;
+    font: 0.85rem/1.5 theme.$font-pixel;
+}
+
+.preventa-card {
+    min-width: 0;
+}
+
+.estreno-card {
+    min-width: 0;
+    text-align: center;
+}
+
+.notify-button {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.8rem 0.45rem;
+    color: #000;
+    background: #ffcf4a;
+    border: 2px solid #ffcf4a;
+    font: 0.55rem/1.6 theme.$font-pixel;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+        color: #ffcf4a;
+        background: transparent;
+    }
+
+    &:disabled {
+        opacity: 0.65;
+        cursor: default;
+    }
+}
+
+.recordatorio-message {
+    color: #8be9ff;
+    font: 0.65rem/1.8 theme.$font-pixel;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .top-sales-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.preventa-date {
+    margin: 0.75rem 0 0;
+    color: #ffcf4a;
+    font: 0.55rem/1.7 theme.$font-pixel;
+    text-align: center;
+}
+
 @keyframes age-badge-pulse {
     from {
         box-shadow: 0 0 5px #ff334f55;

@@ -75,6 +75,101 @@
     gap: 1rem;
 }
 
+.analytics-section {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.analytics-section[hidden] {
+    display: none;
+}
+
+.analytics-heading h2,
+.chart-card h3 {
+    margin: 0.4rem 0;
+    color: theme.$arcade-yellow;
+    font: 0.72rem/1.7 theme.$font-pixel;
+}
+
+.analytics-heading p,
+.chart-card p {
+    color: #aaa;
+    font: 0.9rem/1.5 sans-serif;
+}
+
+.analytics-heading .eyebrow {
+    color: theme.$arcade-cyan;
+    font: 0.55rem/1.6 theme.$font-pixel;
+}
+
+.analytics-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.analytics-period {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    label {
+        display: grid;
+        gap: 0.4rem;
+        color: #fff;
+        font: 0.55rem/1.6 theme.$font-pixel;
+    }
+
+    input {
+        width: 110px;
+        padding: 0.65rem;
+        border: 2px solid theme.$arcade-cyan;
+        border-radius: 0;
+        background: #090909;
+        color: #fff;
+        font: 1rem sans-serif;
+    }
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.chart-card {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+    padding: 1.25rem;
+    border: 2px solid #4d4d4d;
+    background: #141418;
+}
+
+.chart-card p {
+    margin: 0;
+}
+
+.chart-canvas {
+    position: relative;
+    min-width: 0;
+}
+
+.pie-canvas {
+    height: 300px;
+}
+
+.candy-canvas {
+    height: 380px;
+}
+
+.chart-empty {
+    color: theme.$arcade-cyan !important;
+}
+
 .report-card {
     display: grid;
     gap: 0.9rem;
@@ -131,6 +226,10 @@
     }
 
     .report-cards {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .charts-grid {
         grid-template-columns: minmax(0, 1fr);
     }
 }

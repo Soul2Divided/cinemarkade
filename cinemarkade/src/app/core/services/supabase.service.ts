@@ -5,11 +5,23 @@ import { environment } from "../../../environments/environment";
 @Injectable({providedIn: 'root'})
 export class SupabaseService {
     supabaseClient: SupabaseClient;
+    supabasePublicClient: SupabaseClient;
 
     constructor() {
         this.supabaseClient = createClient(
             environment.SUPABASE_URL, 
             environment.SUPABASE_KEY
+        );
+        this.supabasePublicClient = createClient(
+            environment.SUPABASE_URL,
+            environment.SUPABASE_KEY,
+            {
+                auth: {
+                    persistSession: false,
+                    autoRefreshToken: false,
+                    detectSessionInUrl: false,
+                },
+            },
         );
     }
 }
