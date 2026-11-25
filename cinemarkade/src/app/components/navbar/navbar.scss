@@ -371,28 +371,6 @@ app-modal {
     font: 0.9rem/1.5 Arial, sans-serif;
 }
 
-:host ::ng-deep .modal-footer [modal-actions] {
-    display: flex;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 0.85rem;
-    width: 100%;
-}
-
-:host ::ng-deep .modal-footer [modal-actions] button {
-    min-width: 150px;
-}
-
-@media (max-width: 480px) {
-    :host ::ng-deep .modal-footer [modal-actions] {
-        flex-direction: column-reverse;
-    }
-
-    :host ::ng-deep .modal-footer [modal-actions] button {
-        width: 100%;
-    }
-}
-
 @keyframes dropdown-pop {
     from {
         opacity: 0;

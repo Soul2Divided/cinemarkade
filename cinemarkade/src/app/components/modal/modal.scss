@@ -127,8 +127,34 @@
             gap: 1rem;
         }
 
+        ::ng-deep .proposal-actions {
+            display: flex;
+            justify-content:center;
+            align-items: stretch;
+            gap: 1.25rem;
+            width: 100%;
+
+            button {
+                flex: 1 1 0;
+                min-width: 0;
+            }
+        }
+
         &:empty {
             display: none;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-card .modal-footer {
+        ::ng-deep .proposal-actions {
+            flex-direction: column-reverse;
+            gap: 0.75rem;
+
+            button {
+                width: 100%;
+            }
         }
     }
 }

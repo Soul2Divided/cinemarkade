@@ -111,19 +111,7 @@ time {
 }
 
 .request-detail {
-    display: grid;
-    grid-template-columns: minmax(100px, 0.7fr) 1.5fr;
-    gap: 1rem;
-}
-
-.poster-placeholder {
-    display: grid;
-    min-height: 170px;
-    place-items: center;
-    background: linear-gradient(145deg, #17252a, #101014 70%);
-    border: 1px solid #36525a;
-    color: theme.$arcade-cyan;
-    font-size: 2rem;
+    display: block;
 }
 
 .detail-copy h2 {
@@ -141,10 +129,6 @@ time {
 @media (max-width: 640px) {
     .request-detail {
         grid-template-columns: 1fr;
-    }
-
-    .poster-placeholder {
-        min-height: 100px;
     }
 
     .request-row {

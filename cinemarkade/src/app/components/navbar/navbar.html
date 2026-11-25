@@ -233,9 +233,12 @@
                 <p class="proposal-error" role="alert">{{ errorPeticion() }}</p>
             }
 
-            <div modal-actions>
-                <button type="button" class="btn btn-pixel-outline" (click)="cerrarFormularioPeticion()">CANCELAR</button>
-                <button type="submit" class="btn btn-pixel cyan" [disabled]="formularioPeticion.invalid || enviandoPeticion()">
+            <div modal-actions class="proposal-actions"
+                style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; width: 100%;">
+                <button type="button" class="btn btn-pixel-outline" style="width: 100%; margin: 0;"
+                    (click)="cerrarFormularioPeticion()">CANCELAR</button>
+                <button type="submit" class="btn btn-pixel cyan" style="width: 100%; margin: 0;"
+                    [disabled]="formularioPeticion.invalid || enviandoPeticion()">
                     {{ enviandoPeticion() ? 'ENVIANDO...' : 'ENVIAR PROPUESTA' }}
                 </button>
             </div>
