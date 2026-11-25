@@ -119,6 +119,50 @@
     }
 }
 
+.view-switch {
+    display: flex;
+    align-self: flex-start;
+    gap: 0.6rem;
+    padding: 0.4rem;
+    border: 2px solid #3c3a36;
+    background: #080808;
+
+    button {
+        min-width: 180px;
+        padding: 0.85rem 1.2rem;
+        border: 2px solid transparent;
+        background: transparent;
+        color: #aaa;
+        font-family: theme.$font-pixel;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+        &:hover {
+            color: theme.$arcade-yellow;
+            border-color: #4d4521;
+        }
+
+        &.active {
+            border-color: theme.$arcade-cyan;
+            background: rgba(0, 229, 255, 0.12);
+            color: theme.$arcade-cyan;
+            box-shadow: inset 0 -3px 0 theme.$arcade-cyan;
+        }
+    }
+
+    @media (max-width: 480px) {
+        align-self: stretch;
+
+        button {
+            min-width: 0;
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            font-size: 0.62rem;
+        }
+    }
+}
+
 .funciones-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -185,8 +229,10 @@
 
     .card-header-badge {
         display: flex;
+        flex-wrap: wrap;
         gap: 0.6rem;
         align-items: center;
+        min-width: 0;
 
         .badge-format {
             font-family: theme.$font-pixel;
@@ -203,6 +249,9 @@
             border: 1px solid theme.$arcade-text-white;
             color: theme.$arcade-text-white;
             padding: 0.3rem 0.6rem;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-wrap: anywhere;
         }
 
         .badge-preventa {

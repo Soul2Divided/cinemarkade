@@ -5,7 +5,7 @@ import { UserRepository } from './user.repository';
 export const SECCIONES_ADMIN = [
     { permiso: 'peliculas', route: '/admin/peliculas', label: 'Películas', icon: '🎬' },
     { permiso: 'peticiones', route: '/admin/peticiones', label: 'Peticiones de usuarios', icon: '📨' },
-    { permiso: 'salas', route: '/admin/salas', label: 'Salas y butacas', icon: '🏛️' },
+    { permiso: 'salas', route: '/admin/salas', label: 'Salas', icon: '🏛️' },
     { permiso: 'funciones', route: '/admin/funciones', label: 'Funciones', icon: '⏰' },
     { permiso: 'productos', route: '/admin/productos', label: 'Productos candy', icon: '🍿' },
     { permiso: 'combos', route: '/admin/combos', label: 'Combos', icon: '🎟️' },

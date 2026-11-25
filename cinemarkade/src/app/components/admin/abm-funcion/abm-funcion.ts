@@ -44,6 +44,7 @@ export class AbmFuncion implements OnInit {
   mostrarModal = signal(false);
   mostrarLoader = signal(false);
   formatoFiltro = signal<FormatoSala | ''>('');
+  vistaProyecciones = signal<'programadas' | 'historial'>('programadas');
   grupoAbierto = signal<number | null>(null);
   proyeccionCancelacion = signal<ProyeccionSeleccionada | null>(null);
   resultadoCancelacion = signal<CancelarProyeccionResultado | null>(null);
@@ -59,6 +60,13 @@ export class AbmFuncion implements OnInit {
     const query = this.filtroBusqueda().toLowerCase().trim();
     return this.funciones().filter(funcion => {
       if (this.formatoFiltro() && funcion.formato !== this.formatoFiltro()) return false;
+      const proyeccionesDeVista = funcion.proyecciones.filter(proyeccion =>
+        this.vistaProyecciones() === 'historial'
+          ? this.esProyeccionPasada(funcion, proyeccion)
+          : proyeccion.activa && this.esProyeccionFutura(funcion, proyeccion)
+      );
+
+      if (proyeccionesDeVista.length === 0) return false;
       if (!query) return true;
       return (
       funcion.fecha.includes(query) ||
@@ -67,7 +75,7 @@ export class AbmFuncion implements OnInit {
       (this.nombrePelicula(funcion.pelicula_id)?.toLowerCase().includes(query) ?? false) ||
       funcion.formato.toLowerCase().includes(query) ||
       funcion.idioma.toLowerCase().includes(query) ||
-      funcion.proyecciones.some(proyeccion => proyeccion.horario.includes(query))
+      proyeccionesDeVista.some(proyeccion => proyeccion.horario.includes(query))
       );
     });
   });
@@ -151,10 +159,25 @@ export class AbmFuncion implements OnInit {
 
   horariosFuncion(funcion: Funcion): string {
     return funcion.proyecciones
-      .filter(proyeccion => proyeccion.activa)
+      .filter(proyeccion => this.esProyeccionDeVista(funcion, proyeccion))
       .map(proyeccion => proyeccion.horario.slice(0, 5))
       .sort()
       .join(' · ') || 'SIN HORARIOS';
+  }
+
+  cambiarVistaProyecciones(vista: 'programadas' | 'historial'): void {
+    this.vistaProyecciones.set(vista);
+    this.grupoAbierto.set(null);
+  }
+
+  esProyeccionDeVista(funcion: Funcion, proyeccion: Proyeccion): boolean {
+    return this.vistaProyecciones() === 'historial'
+      ? this.esProyeccionPasada(funcion, proyeccion)
+      : proyeccion.activa && this.esProyeccionFutura(funcion, proyeccion);
+  }
+
+  private esProyeccionPasada(funcion: Funcion, proyeccion: Proyeccion): boolean {
+    return proyeccion.activa && !this.esProyeccionFutura(funcion, proyeccion);
   }
 
   proyeccionesCancelables(funcion: Funcion): Proyeccion[] {

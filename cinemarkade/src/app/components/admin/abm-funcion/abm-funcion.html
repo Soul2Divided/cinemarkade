@@ -2,7 +2,7 @@
     <div class="abm-header">
         <div class="header-title-group">
             <h2 class="section-title">GESTIÓN DE FUNCIONES</h2>
-            <span class="total-badge">TOTAL: {{ funciones().length }}</span>
+            <span class="total-badge">FUNCIONES: {{ funcionesFiltradas().length }}</span>
         </div>
 
         <div class="header-tools">
@@ -19,6 +19,17 @@
                     (input)="onSearch($event)">
             </div>
         </div>
+    </div>
+
+    <div class="view-switch" role="tablist" aria-label="Vista de proyecciones">
+        <button type="button" [class.active]="vistaProyecciones() === 'programadas'"
+            (click)="cambiarVistaProyecciones('programadas')">
+            PROGRAMADAS
+        </button>
+        <button type="button" [class.active]="vistaProyecciones() === 'historial'"
+            (click)="cambiarVistaProyecciones('historial')">
+            HISTORIAL
+        </button>
     </div>
 
     @if (errorMessage()) {
@@ -51,6 +62,9 @@
                         @if (!funcion.activa) {
                             <span class="badge-lang">INACTIVA</span>
                         }
+                        @if (vistaProyecciones() === 'historial') {
+                            <span class="badge-lang">PROYECCIONES PASADAS</span>
+                        }
                     </div>
                     <div class="card-body">
                         <h3 class="funcion-title">SALA #{{ funcion.sala_id }}</h3>
@@ -64,6 +78,7 @@
                                 </span>
                             }
                         </div>
+                        @if (vistaProyecciones() === 'programadas') {
                         <div class="card-actions">
                             <button type="button" class="btn-action edit" (click)="modificarFuncion(funcion.id)"
                                 [disabled]="!funcion.activa">✏️ MODIFICAR</button>
@@ -72,6 +87,7 @@
                                 {{ funcion.activa ? '✖ DAR DE BAJA' : '↻ REACTIVAR' }}
                             </button>
                         </div>
+                        }
                         @if (proyeccionesCancelables(funcion).length) {
                             <div class="projection-cancellations">
                                 @for (proyeccion of proyeccionesCancelables(funcion); track proyeccion.id) {
@@ -97,7 +113,9 @@
         } @empty {
         <div class="empty-state">
             <span class="empty-icon">⏰</span>
-            <p class="empty-text">[ NO HAY FUNCIONES PROGRAMADAS ]</p>
+            <p class="empty-text">
+                {{ vistaProyecciones() === 'historial' ? '[ NO HAY PROYECCIONES PASADAS ]' : '[ NO HAY FUNCIONES PROGRAMADAS ]' }}
+            </p>
         </div>
         }
     </div>
