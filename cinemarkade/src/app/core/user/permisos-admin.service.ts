@@ -9,7 +9,7 @@ export const SECCIONES_ADMIN = [
     { permiso: 'funciones', route: '/admin/funciones', label: 'Funciones', icon: '⏰' },
     { permiso: 'productos', route: '/admin/productos', label: 'Productos candy', icon: '🍿' },
     { permiso: 'combos', route: '/admin/combos', label: 'Combos', icon: '🎟️' },
-    { permiso: 'recompensas', route: '/admin/puntos', label: 'Recompensas', icon: '🪙' },
+    { permiso: 'recompensas', route: '/admin/puntos', label: 'Recompensas', icon: '🏆' },
     { permiso: 'cupones', route: '/admin/cupones', label: 'Cupones', icon: '🏷️' },
     { permiso: 'reportes', route: '/admin/reportes', label: 'Reportes y estadísticas', icon: '📊' },
     { permiso: 'auditoria', route: '/admin/log-actividad', label: 'Registro de actividad', icon: '📜' },

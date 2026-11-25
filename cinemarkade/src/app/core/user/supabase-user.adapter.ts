@@ -46,7 +46,6 @@ export class SupabaseUserAdapter implements UserRepository {
             throw new Error('Iniciá sesión como administrador para crear empleados.');
         }
 
-        // El cliente de alta no reemplaza la sesión del administrador.
         const clienteAlta = createClient(environment.SUPABASE_URL, environment.SUPABASE_KEY, {
             auth: {
                 persistSession: false,

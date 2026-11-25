@@ -66,10 +66,10 @@ Deno.serve(async (request) => {
 
         const { data: pelicula } = funcion
             ? await supabase
-                  .from('pelicula')
-                  .select('nombre')
-                  .eq('id', funcion.pelicula_id)
-                  .maybeSingle()
+                .from('pelicula')
+                .select('nombre')
+                .eq('id', funcion.pelicula_id)
+                .maybeSingle()
             : { data: null };
 
         const nombrePelicula = pelicula?.nombre ?? 'Tu próximo estreno';
