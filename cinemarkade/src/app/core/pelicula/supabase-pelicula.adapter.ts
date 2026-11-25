@@ -86,98 +86,15 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
 
     async obtenerVentasPorPelicula(): Promise<VentasPelicula[]> {
         const cliente = this.supabaseService.supabaseClient;
-        type EntradaConPelicula = {
-            compra: {
-                estado: string | null;
-                proyeccion: {
-                    funcion: {
-                        pelicula_id: number;
-                    } | null;
-                } | null;
-            } | null;
-        };
+        const { data, error } = await cliente
+            .from('ranking_peliculas_publico')
+            .select('pelicula_id, entradas_vendidas')
+            .order('entradas_vendidas', { ascending: false });
 
-        const ventasPorPelicula = new Map<number, number>();
-
-        for (let offset = 0; ; offset += 500) {
-            const { data, error } = await cliente
-                .from('compra_butaca')
-                .select(`
-                    compra:compra!inner (
-                        estado,
-                        proyeccion:proyeccion (
-                            funcion:funcion (
-                                pelicula_id
-                            )
-                        )
-                    )
-                `)
-                .in('compra.estado', ['confirmada', 'utilizada'])
-                .order('id', { ascending: true })
-                .range(offset, offset + 499);
-
-            if (error) {
-                throw new Error(`No se pudieron consultar las entradas vendidas: ${error.message}`);
-            }
-
-            const entradas = (data ?? []) as unknown as EntradaConPelicula[];
-            for (const entrada of entradas) {
-                const peliculaId = entrada.compra?.proyeccion?.funcion?.pelicula_id;
-                if (peliculaId) {
-                    ventasPorPelicula.set(
-                        peliculaId,
-                        (ventasPorPelicula.get(peliculaId) ?? 0) + 1,
-                    );
-                }
-            }
-
-            if (!data || data.length < 500) {
-                break;
-            }
+        if (error) {
+            throw new Error(`No se pudo consultar el ranking de películas: ${error.message}`);
         }
 
-        return [...ventasPorPelicula.entries()].map(([pelicula_id, entradas_vendidas]) => ({
-            pelicula_id,
-            entradas_vendidas,
-        }));
-    }
-
-    private async listarRelacionPaginada<T extends { id: number }>(
-        tabla: 'proyeccion' | 'funcion',
-        columnas: string,
-        ids: number[],
-    ): Promise<T[]> {
-        const cliente = this.supabaseService.supabaseClient;
-        const filas: T[] = [];
-
-        for (const lote of this.dividirEnLotes(ids)) {
-            for (let offset = 0; ; offset += 1000) {
-                const { data, error } = await cliente
-                    .from(tabla)
-                    .select(columnas)
-                    .in('id', lote)
-                    .order('id', { ascending: true })
-                    .range(offset, offset + 999);
-
-                if (error) {
-                    throw new Error(`No se pudo consultar la relación de las películas: ${error.message}`);
-                }
-
-                filas.push(...((data ?? []) as unknown as T[]));
-                if (!data || data.length < 1000) {
-                    break;
-                }
-            }
-        }
-
-        return filas;
-    }
-
-    private dividirEnLotes<T>(elementos: T[], tamano = 500): T[][] {
-        const lotes: T[][] = [];
-        for (let indice = 0; indice < elementos.length; indice += tamano) {
-            lotes.push(elementos.slice(indice, indice + tamano));
-        }
-        return lotes;
+        return (data ?? []) as VentasPelicula[];
     }
 }
