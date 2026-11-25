@@ -86,81 +86,53 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
 
     async obtenerVentasPorPelicula(): Promise<VentasPelicula[]> {
         const cliente = this.supabaseService.supabaseClient;
-        const compras: { id: string; proyeccion_id: number }[] = [];
+        type EntradaConPelicula = {
+            compra: {
+                estado: string | null;
+                proyeccion: {
+                    funcion: {
+                        pelicula_id: number;
+                    } | null;
+                } | null;
+            } | null;
+        };
 
-        for (let offset = 0; ; offset += 1000) {
+        const ventasPorPelicula = new Map<number, number>();
+
+        for (let offset = 0; ; offset += 500) {
             const { data, error } = await cliente
-                .from('compra')
-                .select('id, proyeccion_id')
-                .in('estado', ['confirmada', 'utilizada'])
-                .not('proyeccion_id', 'is', null)
+                .from('compra_butaca')
+                .select(`
+                    compra:compra!inner (
+                        estado,
+                        proyeccion:proyeccion (
+                            funcion:funcion (
+                                pelicula_id
+                            )
+                        )
+                    )
+                `)
+                .in('compra.estado', ['confirmada', 'utilizada'])
                 .order('id', { ascending: true })
-                .range(offset, offset + 999);
+                .range(offset, offset + 499);
 
             if (error) {
                 throw new Error(`No se pudieron consultar las entradas vendidas: ${error.message}`);
             }
 
-            compras.push(...((data ?? []) as { id: string; proyeccion_id: number }[]));
-            if (!data || data.length < 1000) {
-                break;
-            }
-        }
-
-        if (compras.length === 0) {
-            return [];
-        }
-
-        const entradasPorCompra = new Map<string, number>();
-        const idsCompra = compras.map(compra => compra.id);
-
-        for (const lote of this.dividirEnLotes(idsCompra)) {
-            for (let offset = 0; ; offset += 1000) {
-                const { data, error } = await cliente
-                    .from('compra_butaca')
-                    .select('compra_id')
-                    .in('compra_id', lote)
-                    .order('id', { ascending: true })
-                    .range(offset, offset + 999);
-
-                if (error) {
-                    throw new Error(`No se pudieron contar las entradas vendidas: ${error.message}`);
-                }
-
-                for (const entrada of (data ?? []) as { compra_id: string }[]) {
-                    entradasPorCompra.set(
-                        entrada.compra_id,
-                        (entradasPorCompra.get(entrada.compra_id) ?? 0) + 1,
+            const entradas = (data ?? []) as unknown as EntradaConPelicula[];
+            for (const entrada of entradas) {
+                const peliculaId = entrada.compra?.proyeccion?.funcion?.pelicula_id;
+                if (peliculaId) {
+                    ventasPorPelicula.set(
+                        peliculaId,
+                        (ventasPorPelicula.get(peliculaId) ?? 0) + 1,
                     );
                 }
-
-                if (!data || data.length < 1000) {
-                    break;
-                }
             }
-        }
 
-        const proyecciones = await this.listarRelacionPaginada<{ id: number; funcion_id: number }>(
-            'proyeccion',
-            'id, funcion_id',
-            [...new Set(compras.map(compra => compra.proyeccion_id))],
-        );
-        const funcionPorProyeccion = new Map(proyecciones.map(proyeccion => [proyeccion.id, proyeccion.funcion_id]));
-        const funciones = await this.listarRelacionPaginada<{ id: number; pelicula_id: number }>(
-            'funcion',
-            'id, pelicula_id',
-            [...new Set(proyecciones.map(proyeccion => proyeccion.funcion_id))],
-        );
-        const peliculaPorFuncion = new Map(funciones.map(funcion => [funcion.id, funcion.pelicula_id]));
-        const ventasPorPelicula = new Map<number, number>();
-
-        for (const compra of compras) {
-            const funcionId = funcionPorProyeccion.get(compra.proyeccion_id);
-            const peliculaId = funcionId ? peliculaPorFuncion.get(funcionId) : undefined;
-            const cantidad = entradasPorCompra.get(compra.id) ?? 0;
-
-            if (peliculaId && cantidad > 0) {
-                ventasPorPelicula.set(peliculaId, (ventasPorPelicula.get(peliculaId) ?? 0) + cantidad);
+            if (!data || data.length < 500) {
+                break;
             }
         }
 

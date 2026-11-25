@@ -29,7 +29,6 @@ export class AddFuncion implements OnInit {
   readonly formatosDisponibles = FORMATOS_SALA;
   readonly idiomasDisponibles: IdiomaFuncion[] = ['Subtitulada', 'Doblada'];
   readonly fechaMinima = this.fechaActualDelCine();
-  readonly fechaMinimaPreventa = this.sumarDias(this.fechaMinima, 7);
 
   peliculas = signal<Pelicula[]>([]);
   horariosSeleccionados = signal<string[]>([]);
@@ -59,7 +58,7 @@ export class AddFuncion implements OnInit {
     idioma: new FormControl<IdiomaFuncion | null>(null, Validators.required),
     esEstreno: new FormControl(false, { nonNullable: true }),
     esPreventa: new FormControl(false, { nonNullable: true }),
-    fechaDisponiblePreventa: new FormControl('', { nonNullable: true }),
+    fechaDisponiblePreventa: new FormControl(this.fechaMinima, { nonNullable: true }),
     porcentajeRecargoPreventa: new FormControl<number | null>(null),
   });
 
@@ -169,17 +168,9 @@ export class AddFuncion implements OnInit {
       return;
     }
     if (this.formFuncion.controls.esPreventa.value) {
-      const fechaDisponible = this.formFuncion.controls.fechaDisponiblePreventa.value;
-      const conservaFechaDeHabilitacion =
-        this.funcionOriginal?.es_preventa &&
-        this.funcionOriginal.fecha_disponible_preventa === fechaDisponible;
-
-      if (!conservaFechaDeHabilitacion && fechaDisponible < this.fechaMinimaPreventa) {
-        this.errorMessage = 'La fecha de habilitación debe estar a siete días o más de hoy.';
-        return;
-      }
-      if (fechaDisponible >= this.formFuncion.controls.fecha.value) {
-        this.errorMessage = 'La preventa debe habilitarse antes de la fecha de la función.';
+      const fechaMinimaEstreno = this.sumarDias(this.fechaMinima, 7);
+      if (this.formFuncion.controls.fecha.value < fechaMinimaEstreno) {
+        this.errorMessage = 'La fecha de la función en preventa debe estar a siete días o más de hoy.';
         return;
       }
     }
@@ -214,7 +205,7 @@ export class AddFuncion implements OnInit {
       esEstreno: valores.esEstreno,
       esPreventa: valores.esPreventa,
       fechaDisponiblePreventa: valores.esPreventa
-        ? valores.fechaDisponiblePreventa
+        ? this.fechaMinima
         : null,
       porcentajeRecargoPreventa: valores.esPreventa
         ? valores.porcentajeRecargoPreventa
@@ -277,45 +268,19 @@ export class AddFuncion implements OnInit {
   }
 
   actualizarValidacionesPreventa(): void {
-    const fechaControl = this.formFuncion.controls.fechaDisponiblePreventa;
     const recargoControl = this.formFuncion.controls.porcentajeRecargoPreventa;
 
     if (this.formFuncion.controls.esPreventa.value) {
-      fechaControl.setValidators([Validators.required]);
       recargoControl.setValidators([
         Validators.required,
         Validators.min(0.01),
         Validators.max(100),
       ]);
     } else {
-      fechaControl.clearValidators();
       recargoControl.clearValidators();
     }
 
-    fechaControl.updateValueAndValidity();
     recargoControl.updateValueAndValidity();
-  }
-
-  get fechaMinimaPreventaFormulario(): string {
-    const fechaActual = this.formFuncion.controls.fechaDisponiblePreventa.value;
-
-    if (
-      this.funcionOriginal?.es_preventa &&
-      this.funcionOriginal.fecha_disponible_preventa === fechaActual &&
-      fechaActual < this.fechaMinimaPreventa
-    ) {
-      return fechaActual;
-    }
-
-    return this.fechaMinimaPreventa;
-  }
-
-  get fechaMaximaPreventaFormulario(): string {
-    const fechaFuncion = this.formFuncion.controls.fecha.value;
-    const ultimaFecha = new Date(`${fechaFuncion}T00:00:00Z`);
-    ultimaFecha.setUTCDate(ultimaFecha.getUTCDate() - 1);
-
-    return ultimaFecha.toISOString().slice(0, 10);
   }
 
   cancelar(): void {

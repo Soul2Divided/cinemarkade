@@ -153,19 +153,9 @@
 
                 @if (formFuncion.controls.esPreventa.value) {
                 <div class="form-group">
-                    <label class="form-label" for="fecha-disponible-preventa">
-                        DISPONIBLE PARA COMPRAR DESDE
-                    </label>
-                    <input
-                        id="fecha-disponible-preventa"
-                        type="date"
-                        formControlName="fechaDisponiblePreventa"
-                        class="form-control"
-                        [min]="fechaMinimaPreventaFormulario"
-                        [max]="fechaMaximaPreventaFormulario"
-                    >
                     <small class="field-hint">
-                        Obligatoria. Debe estar a siete días o más desde hoy y ser anterior a la función.
+                        La preventa quedará disponible para comprar inmediatamente al crear la programación.
+                        La fecha de la función debe ser al menos siete días posterior a hoy.
                     </small>
                 </div>
 

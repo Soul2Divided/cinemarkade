@@ -106,11 +106,7 @@ export class FuncionService {
     async actualizarFuncion(id: number, datos: CrearFuncionInput): Promise<Funcion> {
         this.validarId(id);
         const actual = await this.funcionRepository.obtenerPorId(id);
-        const conservaFechaDeHabilitacion =
-            actual.es_preventa &&
-            datos.esPreventa &&
-            actual.fecha_disponible_preventa === datos.fechaDisponiblePreventa;
-        await this.validarDatos(datos, !conservaFechaDeHabilitacion);
+        await this.validarDatos(datos);
 
         if (datos.formatos.length !== 1) {
             throw new Error('Al editar una función, seleccioná un solo formato.');
@@ -209,10 +205,7 @@ export class FuncionService {
         throw new Error(`No hay una sala disponible para el formato ${formato} en la fecha seleccionada.`);
     }
 
-    private async validarDatos(
-        datos: CrearFuncionInput,
-        validarFechaMinimaPreventa = true,
-    ): Promise<void> {
+    private async validarDatos(datos: CrearFuncionInput): Promise<void> {
         this.validarId(datos.peliculaId);
 
         if (!Array.isArray(datos.formatos) || datos.formatos.length === 0) {
@@ -240,22 +233,13 @@ export class FuncionService {
             throw new Error('Indicá si la función corresponde a un estreno en el cine.');
         }
         if (datos.esPreventa) {
-            const fechaMinimaPreventa = this.sumarDias(this.fechaActualDelCine(), 7);
-
             if (!datos.fechaDisponiblePreventa) {
-                throw new Error('Indicá la fecha en que se habilitará la preventa.');
+                throw new Error('No se pudo determinar la fecha de inicio de la preventa.');
             }
-            if (
-                validarFechaMinimaPreventa &&
-                datos.fechaDisponiblePreventa < fechaMinimaPreventa
-            ) {
+            const fechaMinimaFuncionPreventa = this.sumarDias(this.fechaActualDelCine(), 7);
+            if (datos.fecha < fechaMinimaFuncionPreventa) {
                 throw new Error(
-                    'La fecha de habilitación debe estar a siete días o más de hoy.',
-                );
-            }
-            if (datos.fechaDisponiblePreventa >= datos.fecha) {
-                throw new Error(
-                    'La preventa debe habilitarse antes de la fecha de la función.',
+                    'La fecha de la función en preventa debe estar a siete días o más de hoy.',
                 );
             }
             if (
