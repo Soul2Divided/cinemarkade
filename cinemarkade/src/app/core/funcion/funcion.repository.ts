@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Funcion, FuncionInput } from './funcion.model';
+import { CancelarProyeccionResultado, Funcion, FuncionInput } from './funcion.model';
 
 @Injectable()
 export abstract class FuncionRepository {
@@ -13,6 +13,7 @@ export abstract class FuncionRepository {
         horarios: string[]
     ): Promise<Funcion>;
     abstract cambiarActiva(id: number, activa: boolean): Promise<void>;
+    abstract cancelarProyeccion(id: number): Promise<CancelarProyeccionResultado>;
     abstract existeFuncionActivaEnSala(
         salaId: number,
         fecha: string,

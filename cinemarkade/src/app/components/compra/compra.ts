@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -162,7 +163,7 @@ export class Compra implements OnInit {
                     )
                 );
             } catch (e) {
-                this.errorRecompensas.set(e instanceof Error ? e.message : 'No se pudieron cargar las recompensas.');
+                this.errorRecompensas.set(registrarErrorUsuario('Error en compra.ts:', e));
             }
             const borradorGuardado = sessionStorage.getItem('cinemarkade-compra-borrador');
 
@@ -204,8 +205,7 @@ export class Compra implements OnInit {
                 }
             }
         } catch (error) {
-            console.error('No se pudo preparar la compra:', error);
-            this.error.set('No se pudo cargar la información de la compra. Intentá nuevamente.');
+            this.error.set(registrarErrorUsuario('Error al preparar la compra:', error));
         } finally {
             this.mostrarLoader.set(false);
         }

@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Component, ElementRef, OnDestroy, ViewChild, inject, signal } from '@angular/core';
@@ -5,6 +6,7 @@ import { CompraValidadaQr } from '../../../core/compra/compra.model';
 import { CompraService } from '../../../core/compra/compra.service';
 import { Loader } from '../../loader/loader';
 import { Navbar } from '../../navbar/navbar';
+import { LogActividadService } from '../../../core/log-actividad/log-actividad.service';
 
 interface ResultadoCodigo {
     rawValue: string;
@@ -24,6 +26,7 @@ type BarcodeDetectorNativo = new (options: { formats: string[] }) => DetectorQr;
 })
 export class EscanearEntrada implements OnDestroy {
     private readonly compraService = inject(CompraService);
+    private readonly logActividadService = inject(LogActividadService);
     @ViewChild('preview') private preview?: ElementRef<HTMLVideoElement>;
 
     readonly codigoManual = signal('');
@@ -91,9 +94,7 @@ export class EscanearEntrada implements OnDestroy {
         } catch (error) {
             this.detenerCamara();
             this.error.set(
-                error instanceof Error
-                    ? error.message
-                    : 'No se pudo acceder a la cámara. Revisá sus permisos.',
+                registrarErrorUsuario('Error en escanear-entrada.ts:', error),
             );
         }
     }
@@ -116,10 +117,14 @@ export class EscanearEntrada implements OnDestroy {
                 return;
             }
             this.entrada.set(entrada);
+            await this.logActividadService.registrar(
+                'validar_qr',
+                `Entrada de la compra #${entrada.compra.id} para “${entrada.pelicula}” validada.`
+            );
         } catch (error) {
             console.error('No se pudo validar el QR:', error);
             this.error.set(
-                error instanceof Error ? error.message : 'No se pudo validar la entrada.',
+                registrarErrorUsuario('Error en escanear-entrada.ts:', error),
             );
         } finally {
             this.validando.set(false);
@@ -166,7 +171,7 @@ export class EscanearEntrada implements OnDestroy {
         } catch (error) {
             this.detenerCamara();
             this.error.set(
-                error instanceof Error ? error.message : 'No se pudo leer el código QR.',
+                registrarErrorUsuario('Error en escanear-entrada.ts:', error),
             );
             return;
         }

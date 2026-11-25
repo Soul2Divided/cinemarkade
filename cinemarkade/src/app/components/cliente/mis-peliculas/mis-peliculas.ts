@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../auth/auth.service';
 import { CompraService } from '../../../core/compra/compra.service';
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Funcion, Proyeccion } from '../../../core/funcion/funcion.model';
 import { FuncionService } from '../../../core/funcion/funcion.service';
 import { Pelicula } from '../../../core/pelicula/pelicula.model';
@@ -130,10 +131,7 @@ export class MisPeliculas implements OnInit {
                 })),
             );
         } catch (error) {
-            console.error('No se pudieron cargar tus películas:', error);
-            this.error.set(
-                error instanceof Error ? error.message : 'No se pudieron cargar tus películas.',
-            );
+            this.error.set(registrarErrorUsuario('Error al cargar Mis películas:', error));
         } finally {
             this.cargando.set(false);
         }

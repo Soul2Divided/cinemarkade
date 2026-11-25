@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Navbar } from '../navbar/navbar';
@@ -51,7 +52,7 @@ export class SelectLogin {
             this.perfilesCargados = true;
         } catch (error) {
             this.errorPerfiles.set(
-                error instanceof Error ? error.message : 'No se pudieron cargar los perfiles.',
+                registrarErrorUsuario('Error en select-login.ts:', error),
             );
         } finally {
             this.cargandoPerfiles.set(false);
@@ -65,7 +66,7 @@ export class SelectLogin {
             void this.router.navigate(['/login']);
         } catch (error) {
             this.errorPerfiles.set(
-                error instanceof Error ? error.message : 'No se pudo elegir el perfil.',
+                registrarErrorUsuario('Error en select-login.ts:', error),
             );
         }
     }

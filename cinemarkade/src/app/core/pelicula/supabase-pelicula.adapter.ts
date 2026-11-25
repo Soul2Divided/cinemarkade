@@ -85,7 +85,7 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
     }
 
     async obtenerVentasPorPelicula(): Promise<VentasPelicula[]> {
-        const cliente = this.supabaseService.supabasePublicClient;
+        const cliente = this.supabaseService.supabaseClient;
         const compras: { id: string; proyeccion_id: number }[] = [];
 
         for (let offset = 0; ; offset += 1000) {
@@ -94,6 +94,7 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
                 .select('id, proyeccion_id')
                 .in('estado', ['confirmada', 'utilizada'])
                 .not('proyeccion_id', 'is', null)
+                .order('id', { ascending: true })
                 .range(offset, offset + 999);
 
             if (error) {
@@ -119,6 +120,7 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
                     .from('compra_butaca')
                     .select('compra_id')
                     .in('compra_id', lote)
+                    .order('id', { ascending: true })
                     .range(offset, offset + 999);
 
                 if (error) {
@@ -173,7 +175,7 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
         columnas: string,
         ids: number[],
     ): Promise<T[]> {
-        const cliente = this.supabaseService.supabasePublicClient;
+        const cliente = this.supabaseService.supabaseClient;
         const filas: T[] = [];
 
         for (const lote of this.dividirEnLotes(ids)) {
@@ -182,6 +184,7 @@ export class SupabasePeliculaAdapter implements PeliculaRepository {
                     .from(tabla)
                     .select(columnas)
                     .in('id', lote)
+                    .order('id', { ascending: true })
                     .range(offset, offset + 999);
 
                 if (error) {

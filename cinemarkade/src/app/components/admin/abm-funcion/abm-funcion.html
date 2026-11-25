@@ -72,6 +72,22 @@
                                 {{ funcion.activa ? '✖ DAR DE BAJA' : '↻ REACTIVAR' }}
                             </button>
                         </div>
+                        @if (proyeccionesCancelables(funcion).length) {
+                            <div class="projection-cancellations">
+                                @for (proyeccion of proyeccionesCancelables(funcion); track proyeccion.id) {
+                                    <div class="projection-cancellation-row">
+                                        <span>PROYECCIÓN {{ proyeccion.horario | slice: 0:5 }}</span>
+                                        <button
+                                            type="button"
+                                            class="btn-action cancel-projection"
+                                            (click)="solicitarCancelacionProyeccion(funcion, proyeccion)"
+                                        >
+                                            CANCELAR PROYECCIÓN
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 </div>
                 }
@@ -102,6 +118,50 @@
         <div modal-actions>
             <button type="button" class="btn btn-pixel-outline" (click)="cancelarCambioEstado()">CANCELAR</button>
             <button type="button" class="btn btn-pixel red" (click)="confirmarCambioEstado()">CONFIRMAR</button>
+        </div>
+    </app-modal>
+
+    <app-modal
+        [isOpen]="proyeccionCancelacion() !== null"
+        [title]="resultadoCancelacion() ? 'PROYECCIÓN CANCELADA' : 'CANCELAR PROYECCIÓN'"
+        [subtitle]="resultadoCancelacion() ? 'AVISO ENVIADO A LOS CLIENTES' : 'ACREDITAR PUNTOS Y LIBERAR BUTACAS'"
+        variant="red"
+        [closeOnBackdrop]="!cancelandoProyeccion()"
+        (close)="cerrarCancelacionProyeccion()"
+    >
+        @if (proyeccionCancelacion(); as seleccion) {
+            @if (resultadoCancelacion(); as resultado) {
+                <p>La proyección de las {{ seleccion.proyeccion.horario | slice: 0:5 }} se canceló correctamente.</p>
+                <p>Compras canceladas: <strong>{{ resultado.compras_canceladas }}</strong></p>
+                <p>Puntos acreditados: <strong>{{ resultado.puntos_reintegrados | number }}</strong></p>
+                <p>Notificaciones guardadas: <strong>{{ resultado.notificaciones_creadas }}</strong></p>
+            } @else {
+                <p>
+                    ¿Confirmás cancelar la proyección de
+                    <strong>{{ nombrePelicula(seleccion.funcion.pelicula_id) }}</strong>
+                    del {{ seleccion.funcion.fecha }} a las
+                    {{ seleccion.proyeccion.horario | slice: 0:5 }}?
+                </p>
+                <p>Se cancelarán sus compras, se acreditarán puntos y se liberarán las butacas.</p>
+                <p>Los compradores recibirán una notificación para elegir otro horario.</p>
+            }
+        }
+
+        @if (errorCancelacion()) {
+            <p class="error-banner" role="alert">{{ errorCancelacion() }}</p>
+        }
+
+        <div modal-actions>
+            @if (resultadoCancelacion()) {
+                <button type="button" class="btn btn-pixel red" (click)="cerrarCancelacionProyeccion()">LISTO</button>
+            } @else {
+                <button type="button" class="btn btn-pixel-outline" (click)="cerrarCancelacionProyeccion()" [disabled]="cancelandoProyeccion()">
+                    VOLVER
+                </button>
+                <button type="button" class="btn btn-pixel red" (click)="confirmarCancelacionProyeccion()" [disabled]="cancelandoProyeccion()">
+                    {{ cancelandoProyeccion() ? 'CANCELANDO...' : 'CONFIRMAR CANCELACIÓN' }}
+                </button>
+            }
         </div>
     </app-modal>
 

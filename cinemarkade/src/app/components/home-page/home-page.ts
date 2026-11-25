@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -37,6 +38,7 @@ export class HomePage implements OnInit {
     private readonly notificacionService = inject(NotificacionService);
 
     readonly ventasPorPelicula = signal<Map<number, number>>(new Map());
+    readonly errorRanking = signal('');
     readonly peliculas = computed(() =>
         [...this.peliculaService.peliculas().filter((pelicula) => pelicula.activa)].sort((a, b) =>
             (this.ventasPorPelicula().get(b.id) ?? 0) - (this.ventasPorPelicula().get(a.id) ?? 0)
@@ -150,6 +152,9 @@ export class HomePage implements OnInit {
                 this.funcionService.listarFuncionesActivas(),
                 this.peliculaService.obtenerVentasPorPelicula().catch((error) => {
                     console.error('No se pudo cargar el ranking de películas:', error);
+                    this.errorRanking.set(
+                        registrarErrorUsuario('Error en home-page.ts:', error),
+                    );
                     return [];
                 }),
             ]);
@@ -207,7 +212,7 @@ export class HomePage implements OnInit {
             this.mensajeRecordatorio.set('Te avisaremos el día del estreno.');
         } catch (error) {
             this.mensajeRecordatorio.set(
-                error instanceof Error ? error.message : 'No se pudo activar el recordatorio.',
+                registrarErrorUsuario('Error en home-page.ts:', error),
             );
         } finally {
             this.funcionConRecordatorioEnProceso.set(null);

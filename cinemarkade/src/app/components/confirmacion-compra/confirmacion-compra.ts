@@ -20,6 +20,7 @@ import { ResultadoCompra } from './components/resultado-compra/resultado-compra'
 import QRCode from 'qrcode';
 import { NotificacionService } from '../../core/notificacion/notificacion.service';
 import { environment } from '../../../environments/environment';
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 
 @Component({
     imports: [Navbar, Loader, Modal, DatosEntrada, DetalleCompra, TotalesCompra, ResultadoCompra],
@@ -79,12 +80,7 @@ export class ConfirmacionCompra implements OnInit {
             this.borrador.set(actualizado);
             sessionStorage.setItem('cinemarkade-compra-borrador', JSON.stringify(actualizado));
         } catch (error) {
-            console.error('No se pudo preparar el ticket:', error);
-            this.error.set(
-                error instanceof Error
-                    ? error.message
-                    : 'No se pudo cargar el resumen de la compra.',
-            );
+            this.error.set(registrarErrorUsuario('Error al preparar la compra:', error));
         } finally {
             this.cargando.set(false);
         }
@@ -180,10 +176,7 @@ export class ConfirmacionCompra implements OnInit {
             try {
                 await this.prepararTicket();
             } catch (error) {
-                console.error('La compra se confirmó, pero no se pudo preparar el PDF:', error);
-                this.error.set(
-                    'La compra quedó confirmada, pero no se pudo generar el ticket. Usá Reintentar descarga.',
-                );
+                this.error.set(registrarErrorUsuario('Error al preparar el PDF de compra confirmada:', error));
             }
 
             if (!tieneSesion && this.ticketPdf()) {
@@ -192,12 +185,7 @@ export class ConfirmacionCompra implements OnInit {
 
             this.mostrarModalExito.set(true);
         } catch (error) {
-            console.error('No se pudo confirmar la compra:', error);
-            this.error.set(
-                error instanceof Error
-                    ? error.message
-                    : 'No se pudo confirmar la compra. Intentá nuevamente.',
-            );
+            this.error.set(registrarErrorUsuario('Error al confirmar la compra:', error));
         } finally {
             this.confirmando.set(false);
         }
@@ -245,9 +233,7 @@ export class ConfirmacionCompra implements OnInit {
 
             this.ticketPdfService.descargar(this.ticketPdf()!, this.compraId());
         } catch (error) {
-            this.error.set(
-                error instanceof Error ? error.message : 'No se pudo descargar el ticket.',
-            );
+            this.error.set(registrarErrorUsuario('Error al descargar el ticket:', error));
         } finally {
             this.preparandoTicket.set(false);
         }

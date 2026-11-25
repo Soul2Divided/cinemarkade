@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -107,9 +108,7 @@ export class MiPerfil {
             this.exito.set('Tu perfil se actualizó correctamente.');
         } catch (error) {
             this.error.set(
-                error instanceof Error
-                    ? error.message
-                    : 'No se pudo guardar el perfil. Intentá nuevamente.',
+                registrarErrorUsuario('Error en mi-perfil.ts:', error),
             );
         } finally {
             this.guardando.set(false);

@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
@@ -32,7 +33,7 @@ export class PeticionesUsuarios {
         try {
             this.peticiones.set(await this.servicio.listarPendientes());
         } catch (error) {
-            this.error.set(error instanceof Error ? error.message : 'No se pudieron cargar las peticiones.');
+            this.error.set(registrarErrorUsuario('Error en peticiones-usuarios.ts:', error));
         } finally {
             this.cargando.set(false);
         }
@@ -52,7 +53,7 @@ export class PeticionesUsuarios {
             this.seleccionada.set(null);
             await this.cargar();
         } catch (error) {
-            this.error.set(error instanceof Error ? error.message : 'No se pudo rechazar la petición.');
+            this.error.set(registrarErrorUsuario('Error en peticiones-usuarios.ts:', error));
         } finally {
             this.procesando.set(false);
         }
@@ -79,7 +80,7 @@ export class PeticionesUsuarios {
                 },
             });
         } catch (error) {
-            this.error.set(error instanceof Error ? error.message : 'No se pudo aceptar la petición.');
+            this.error.set(registrarErrorUsuario('Error en peticiones-usuarios.ts:', error));
         } finally {
             this.procesando.set(false);
         }

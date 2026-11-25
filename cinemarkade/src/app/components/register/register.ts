@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { Component, signal, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -135,9 +136,7 @@ export class Register {
       await this.userService.registrarCliente(datos);
       this.mostrarModal.set(true);
     } catch (error) {
-      this.triggerError(error instanceof Error
-        ? error.message
-        : 'No se pudo crear el usuario');
+      this.triggerError(registrarErrorUsuario('Error en register.ts:', error));
     } finally {
       this.mostrarLoader.set(false);
     }

@@ -54,14 +54,38 @@ export class SupabaseNotificacionAdapter implements NotificacionRepository {
     async listar(): Promise<NotificacionUsuario[]> {
         const { data, error } = await this.supabase
             .from('notificacion_usuario')
-            .select('id, titulo, mensaje, creada_en, leida_en, funcion_id')
+            .select(`
+                id,
+                titulo,
+                mensaje,
+                creada_en,
+                leida_en,
+                funcion_id,
+                tipo,
+                funcion:funcion!notificacion_usuario_funcion_id_fkey (
+                    pelicula_id
+                )
+            `)
             .order('creada_en', { ascending: false });
 
         if (error) {
             throw new Error(`No se pudieron cargar las notificaciones: ${error.message}`);
         }
 
-        return (data ?? []) as NotificacionUsuario[];
+        type NotificacionConFuncion = Omit<NotificacionUsuario, 'pelicula_id'> & {
+            funcion: { pelicula_id: number | null } | null;
+        };
+
+        return ((data ?? []) as unknown as NotificacionConFuncion[]).map(notificacion => ({
+            id: notificacion.id,
+            titulo: notificacion.titulo,
+            mensaje: notificacion.mensaje,
+            creada_en: notificacion.creada_en,
+            leida_en: notificacion.leida_en,
+            funcion_id: notificacion.funcion_id,
+            tipo: notificacion.tipo,
+            pelicula_id: notificacion.funcion?.pelicula_id ?? null,
+        }));
     }
 
     async marcarLeida(id: string, leidaEn: string): Promise<void> {

@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import {
     AfterViewInit,
@@ -15,6 +16,7 @@ import { isPlatformBrowser } from '@angular/common';
 import type { Chart as ChartInstance } from 'chart.js';
 import { EstadisticasReporte, ReporteVentasDiario } from '../../../core/reporte-ventas/reporte-ventas.model';
 import { ReporteVentasService } from '../../../core/reporte-ventas/reporte-ventas.service';
+import { ReporteExportacionService } from '../../../core/reporte-ventas/reporte-exportacion.service';
 
 @Component({
     selector: 'app-reporte-ventas',
@@ -24,6 +26,7 @@ import { ReporteVentasService } from '../../../core/reporte-ventas/reporte-venta
 })
 export class ReporteVentas implements OnInit, AfterViewInit, OnDestroy {
     private readonly reporteVentasService = inject(ReporteVentasService);
+    private readonly reporteExportacionService = inject(ReporteExportacionService);
     private readonly esNavegador = isPlatformBrowser(inject(PLATFORM_ID));
     private vistaLista = false;
     private cargaActual = 0;
@@ -46,6 +49,7 @@ export class ReporteVentas implements OnInit, AfterViewInit, OnDestroy {
     readonly cargandoEstadisticas = signal(true);
     readonly error = signal('');
     readonly errorEstadisticas = signal('');
+    readonly errorExportacion = signal('');
 
     constructor() { }
 
@@ -87,6 +91,36 @@ export class ReporteVentas implements OnInit, AfterViewInit, OnDestroy {
         await this.cargarEstadisticas();
     }
 
+    async exportarPdf(): Promise<void> {
+        const reporte = this.reporte();
+        if (!reporte) {
+            return;
+        }
+
+        this.errorExportacion.set('');
+
+        try {
+            await this.reporteExportacionService.exportarPdf(reporte);
+        } catch (error) {
+            this.errorExportacion.set(registrarErrorUsuario('Error al exportar el reporte a PDF:', error));
+        }
+    }
+
+    exportarCsv(): void {
+        const reporte = this.reporte();
+        if (!reporte) {
+            return;
+        }
+
+        this.errorExportacion.set('');
+
+        try {
+            this.reporteExportacionService.exportarCsv(reporte);
+        } catch (error) {
+            this.errorExportacion.set(registrarErrorUsuario('Error al exportar el reporte a CSV:', error));
+        }
+    }
+
     async cargarReporte(fecha = this.fechaSeleccionada()): Promise<void> {
         const carga = ++this.cargaActual;
         this.cargando.set(true);
@@ -103,13 +137,8 @@ export class ReporteVentas implements OnInit, AfterViewInit, OnDestroy {
         if (resultadoDiario.status === 'fulfilled') {
             this.reporte.set(resultadoDiario.value);
         } else {
-            console.error('No se pudo cargar el reporte de ventas:', resultadoDiario.reason);
             this.reporte.set(null);
-            this.error.set(
-                resultadoDiario.reason instanceof Error
-                    ? resultadoDiario.reason.message
-                    : 'No se pudo cargar el reporte de ventas.',
-            );
+            this.error.set(registrarErrorUsuario('Error al cargar el reporte diario:', resultadoDiario.reason));
         }
 
         this.cargando.set(false);
@@ -141,9 +170,8 @@ export class ReporteVentas implements OnInit, AfterViewInit, OnDestroy {
                 return;
             }
 
-            console.error('No se pudieron cargar las estadísticas:', error);
             this.errorEstadisticas.set(
-                error instanceof Error ? error.message : 'No se pudieron cargar las estadísticas.',
+                registrarErrorUsuario('Error en reporte-ventas.ts:', error),
             );
             this.cargandoEstadisticas.set(false);
         }
@@ -272,7 +300,19 @@ export class ReporteVentas implements OnInit, AfterViewInit, OnDestroy {
         return Math.min(this.semanaSeleccionada() * 7, new Date(Date.UTC(this.anioSeleccionado(), this.mesSeleccionado(), 0)).getUTCDate());
     }
 
+    porcentajeFacturacionEntradas(reporte: ReporteVentasDiario): number {
+        return this.porcentajeFacturacion(reporte.facturacionEntradasPesos, reporte.facturacionPesos);
+    }
+
+    porcentajeFacturacionCandy(reporte: ReporteVentasDiario): number {
+        return this.porcentajeFacturacion(reporte.facturacionCandyPesos, reporte.facturacionPesos);
+    }
+
     private semanaDelMes(fecha: string): number {
         return Math.ceil(Number(fecha.slice(8, 10)) / 7);
+    }
+
+    private porcentajeFacturacion(valor: number, total: number): number {
+        return total > 0 ? (valor / total) * 100 : 0;
     }
 }

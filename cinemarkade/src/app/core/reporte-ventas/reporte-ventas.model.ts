@@ -1,5 +1,7 @@
 export interface ReporteVentasDiario {
     fecha: string;
+    facturacionEntradasPesos: number;
+    facturacionCandyPesos: number;
     facturacionPesos: number;
     entradasVendidas: number;
 }

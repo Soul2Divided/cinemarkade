@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -213,8 +214,7 @@ export class SeleccionFuncion implements OnInit {
                 return;
             }
 
-            console.error('No se pudo cargar la cartelera de la película:', e);
-            this.error.set('No se pudo cargar la información de la película y sus funciones.');
+            this.error.set(registrarErrorUsuario('Error al cargar la cartelera:', e));
         } finally {
             if (version === this.versionCarga) {
                 this.cargando.set(false);
@@ -250,7 +250,7 @@ export class SeleccionFuncion implements OnInit {
         } catch (error) {
             if (version === this.versionCarga) {
                 this.errorResenas.set(
-                    error instanceof Error ? error.message : 'No se pudieron cargar las reseñas.',
+                    registrarErrorUsuario('Error en seleccion-funcion.ts:', error),
                 );
             }
         } finally {
@@ -290,7 +290,7 @@ export class SeleccionFuncion implements OnInit {
         } catch (error) {
             if (version === this.versionCarga) {
                 this.errorResenas.set(
-                    error instanceof Error ? error.message : 'No se pudo guardar la reseña.',
+                    registrarErrorUsuario('Error en seleccion-funcion.ts:', error),
                 );
             }
         } finally {
@@ -323,7 +323,7 @@ export class SeleccionFuncion implements OnInit {
         } catch (error) {
             if (version === this.versionCarga) {
                 this.errorResenas.set(
-                    error instanceof Error ? error.message : 'No se pudo eliminar la reseña.',
+                    registrarErrorUsuario('Error en seleccion-funcion.ts:', error),
                 );
             }
         } finally {

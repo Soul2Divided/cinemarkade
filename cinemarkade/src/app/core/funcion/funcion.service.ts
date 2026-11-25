@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { FuncionRepository } from './funcion.repository';
-import { CrearFuncionInput, Funcion, FuncionInput } from './funcion.model';
+import { CancelarProyeccionResultado, CrearFuncionInput, Funcion, FuncionInput } from './funcion.model';
 import { FORMATOS_SALA, FormatoSala, Sala } from '../sala/sala.model';
 import { PeliculaService } from '../pelicula/pelicula.service';
 import { SalaService } from '../sala/sala.service';
@@ -158,6 +158,11 @@ export class FuncionService {
     async cambiarActiva(id: number, activa: boolean): Promise<void> {
         this.validarId(id);
         return this.funcionRepository.cambiarActiva(id, activa);
+    }
+
+    async cancelarProyeccion(id: number): Promise<CancelarProyeccionResultado> {
+        this.validarId(id);
+        return this.funcionRepository.cancelarProyeccion(id);
     }
 
     /** Da de baja la programación de una sala y luego la sala. */

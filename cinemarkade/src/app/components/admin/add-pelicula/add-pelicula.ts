@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, ChangeDetectorRef, signal, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -164,9 +165,7 @@ export class AddPelicula implements OnInit {
 
       this.mostrarModal.set(true);
     } catch (error) {
-      this.triggerError(error instanceof Error
-        ? error.message
-        : 'No se pudo guardar la película');
+      this.triggerError(registrarErrorUsuario('Error en add-pelicula.ts:', error));
     } finally {
       this.mostrarLoader.set(false);
     }

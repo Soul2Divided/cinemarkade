@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Loader } from '../../loader/loader';
 import { Modal } from '../../modal/modal';
@@ -9,6 +10,7 @@ import { PeliculaService } from '../../../core/pelicula/pelicula.service';
 import { Pelicula } from '../../../core/pelicula/pelicula.model';
 import { FORMATOS_SALA, FormatoSala } from '../../../core/sala/sala.model';
 import { validarHorarioFuncion, validarHorarioIndividual, validarHorariosFuncion } from '../../../utils/horario-funcion.util';
+import { LogActividadService } from '../../../core/log-actividad/log-actividad.service';
 
 @Component({
   selector: 'app-add-funcion',
@@ -22,6 +24,7 @@ export class AddFuncion implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly funcionService = inject(FuncionService);
   private readonly peliculaService = inject(PeliculaService);
+  private readonly logActividadService = inject(LogActividadService);
 
   readonly formatosDisponibles = FORMATOS_SALA;
   readonly idiomasDisponibles: IdiomaFuncion[] = ['Subtitulada', 'Doblada'];
@@ -85,9 +88,7 @@ export class AddFuncion implements OnInit {
       const peliculas = await this.peliculaService.listarPeliculas();
       this.peliculas.set((peliculas ?? []).filter(pelicula => pelicula.activa));
     } catch (error) {
-      this.errorMessage = error instanceof Error
-        ? error.message
-        : 'No se pudieron cargar las películas.';
+      this.errorMessage = registrarErrorUsuario('Error al cargar películas para funciones:', error);
     }
   }
 
@@ -121,9 +122,7 @@ export class AddFuncion implements OnInit {
         this.errorMessage = 'Esta función está inactiva y no se puede editar.';
       }
     } catch (error) {
-      this.errorMessage = error instanceof Error
-        ? error.message
-        : 'No se pudo cargar la función.';
+      this.errorMessage = registrarErrorUsuario('Error al cargar la función:', error);
     }
   }
 
@@ -226,20 +225,40 @@ export class AddFuncion implements OnInit {
     try {
       if (this.esEdicion && this.funcionId !== null) {
         const funcion = await this.funcionService.actualizarFuncion(this.funcionId, datos);
+        const titulo = pelicula.nombre;
+        await this.logActividadService.registrar(
+          'actualizar_funcion',
+          `Función #${funcion.id} de “${titulo}” actualizada para el ${funcion.fecha}.`
+        );
+
+        const recargoAnterior = this.funcionOriginal?.porcentaje_recargo_preventa ?? null;
+        const recargoNuevo = datos.esPreventa ? datos.porcentajeRecargoPreventa : null;
+        if (recargoAnterior !== recargoNuevo) {
+          await this.logActividadService.registrar(
+            'modificar_precio_preventa',
+            `Recargo de preventa de “${titulo}” en la función #${funcion.id}: ${recargoAnterior ?? 0}% → ${recargoNuevo ?? 0}%.`
+          );
+        }
+
         this.resultado.set(
           `Función actualizada en la sala #${funcion.sala_id} con ${funcion.proyecciones.length} horarios.`
         );
       } else {
         const funciones = await this.funcionService.crearFunciones(datos);
+        for (const funcion of funciones) {
+          await this.logActividadService.registrar(
+            'crear_funcion',
+            `Función #${funcion.id} de “${pelicula.nombre}” creada para el ${funcion.fecha}, formato ${funcion.formato}.`
+          );
+        }
+
         this.resultado.set(
           `Se crearon ${funciones.length} funciones: ${datos.dias} ${datos.dias === 1 ? 'día' : 'días'} por cada uno de los ${datos.formatos.length} formatos, con ${horariosOrdenados.length} horarios por día.`
         );
       }
       this.mostrarModal.set(true);
     } catch (error) {
-      this.errorMessage = error instanceof Error
-        ? error.message
-        : 'No se pudo guardar la función.';
+      this.errorMessage = registrarErrorUsuario('Error al guardar la función:', error);
     } finally {
       this.mostrarLoader.set(false);
     }

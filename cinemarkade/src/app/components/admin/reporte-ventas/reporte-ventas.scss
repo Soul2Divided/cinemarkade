@@ -71,8 +71,99 @@
 
 .report-cards {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
+}
+
+.revenue-breakdown {
+    display: grid;
+    gap: 0.9rem;
+    padding: 1.25rem;
+    border: 2px solid #4d4d4d;
+    background: #141418;
+
+    h2 {
+        margin: 0 0 0.25rem;
+        color: theme.$arcade-yellow;
+        font: 0.68rem/1.7 theme.$font-pixel;
+    }
+}
+
+.revenue-group {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.revenue-group-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+
+    h3 {
+        margin: 0;
+        color: #fff;
+        font: 0.6rem/1.6 theme.$font-pixel;
+    }
+
+    p {
+        margin: 0.25rem 0 0;
+        color: #aaa;
+        font: 0.9rem/1.4 sans-serif;
+    }
+
+    strong {
+        color: #fff;
+        font: 0.85rem/1.5 theme.$font-pixel;
+    }
+}
+
+.revenue-bar {
+    height: 16px;
+    overflow: hidden;
+    border: 1px solid #5a5a60;
+    background: #090909;
+
+    span {
+        display: block;
+        height: 100%;
+        transition: width 180ms ease;
+    }
+}
+
+.tickets-revenue-bar {
+    background: theme.$arcade-cyan;
+}
+
+.candy-revenue-bar {
+    background: theme.$arcade-yellow;
+}
+
+.report-export-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    button {
+        padding: 0.8rem 1rem;
+        border: 2px solid theme.$arcade-cyan;
+        background: #090909;
+        color: theme.$arcade-cyan;
+        cursor: pointer;
+        font: 0.55rem/1.6 theme.$font-pixel;
+
+        &:hover {
+            border-color: theme.$arcade-yellow;
+            color: theme.$arcade-yellow;
+        }
+    }
+}
+
+.report-export-error {
+    margin: 0;
+    color: #ff8da5;
+    font: 0.65rem/1.8 theme.$font-pixel;
 }
 
 .analytics-section {

@@ -2,6 +2,9 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Navbar } from '../../navbar/navbar';
 import { NotificacionService } from '../../../core/notificacion/notificacion.service';
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
+import { Router } from '@angular/router';
+import { NotificacionUsuario } from '../../../core/notificacion/notificacion.model';
 
 @Component({
     selector: 'app-notificaciones',
@@ -11,6 +14,7 @@ import { NotificacionService } from '../../../core/notificacion/notificacion.ser
 })
 export class Notificaciones implements OnInit {
     readonly notificacionService = inject(NotificacionService);
+    private readonly router = inject(Router);
     readonly cargando = signal(true);
     readonly error = signal('');
 
@@ -18,7 +22,7 @@ export class Notificaciones implements OnInit {
         try {
             await this.notificacionService.listar();
         } catch (error) {
-            this.error.set(error instanceof Error ? error.message : 'No se pudo cargar el historial.');
+            this.error.set(registrarErrorUsuario('Error al cargar notificaciones:', error));
         } finally {
             this.cargando.set(false);
         }
@@ -28,7 +32,21 @@ export class Notificaciones implements OnInit {
         try {
             await this.notificacionService.marcarLeida(id);
         } catch (error) {
-            this.error.set(error instanceof Error ? error.message : 'No se pudo actualizar el aviso.');
+            this.error.set(registrarErrorUsuario('Error al marcar una notificación:', error));
         }
+    }
+
+    async elegirOtroHorario(notificacion: NotificacionUsuario): Promise<void> {
+        if (!notificacion.pelicula_id) {
+            return;
+        }
+
+        try {
+            await this.notificacionService.marcarLeida(notificacion.id);
+        } catch (error) {
+            console.error('No se pudo marcar la notificación como leída:', error);
+        }
+
+        await this.router.navigate(['/funciones', notificacion.pelicula_id]);
     }
 }

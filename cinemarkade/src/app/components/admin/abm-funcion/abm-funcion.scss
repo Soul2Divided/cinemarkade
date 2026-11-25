@@ -284,6 +284,33 @@
                 }
             }
         }
+
+        .projection-cancellations {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .projection-cancellation-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed #555;
+            color: theme.$arcade-cyan;
+            font: 0.65rem theme.$font-pixel;
+        }
+
+        .cancel-projection {
+            color: theme.$arcade-red;
+            border-color: theme.$arcade-red !important;
+        }
+
+        .cancel-projection:hover {
+            background-color: theme.$arcade-red !important;
+            color: #fff !important;
+        }
     }
 }
 

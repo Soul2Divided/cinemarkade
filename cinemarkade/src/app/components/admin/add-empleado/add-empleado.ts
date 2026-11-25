@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, HostListener, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -123,7 +124,7 @@ export class AddEmpleado {
             await this.userService.crearEmpleado(datos, this.permisos());
             this.mostrarModal.set(true);
         } catch (error) {
-            this.triggerError(error instanceof Error ? error.message : 'No se pudo crear el empleado.');
+            this.triggerError(registrarErrorUsuario('Error en add-empleado.ts:', error));
         } finally {
             this.mostrarLoader.set(false);
         }

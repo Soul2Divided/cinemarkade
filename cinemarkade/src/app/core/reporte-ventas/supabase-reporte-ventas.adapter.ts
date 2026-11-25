@@ -54,22 +54,39 @@ export class SupabaseReporteVentasAdapter implements ReporteVentasRepository {
         const compras = await this.listarComprasDelDia(fecha);
 
         if (compras.length === 0) {
-            return { fecha, facturacionPesos: 0, entradasVendidas: 0 };
+            return {
+                fecha,
+                facturacionEntradasPesos: 0,
+                facturacionCandyPesos: 0,
+                facturacionPesos: 0,
+                entradasVendidas: 0,
+            };
         }
 
         const comprasDeEntradas = compras.filter((compra) => compra.proyeccion_id !== null);
+        const comprasCandy = compras.filter((compra) => compra.proyeccion_id === null);
         const butacasVendidas = comprasDeEntradas.length
             ? await this.contarButacas(comprasDeEntradas.map((compra) => compra.id))
             : 0;
+        const facturacionEntradasPesos = this.totalCompras(comprasDeEntradas);
+        const facturacionCandyPesos = this.totalCompras(comprasCandy);
 
         return {
             fecha,
-            facturacionPesos: compras.reduce(
-                (total, compra) => total + Number(compra.total || 0),
-                0,
-            ),
+            facturacionEntradasPesos,
+            facturacionCandyPesos,
+            facturacionPesos: facturacionEntradasPesos + facturacionCandyPesos,
             entradasVendidas: butacasVendidas,
         };
+    }
+
+    private totalCompras(compras: CompraReporte[]): number {
+        const totalCentavos = compras.reduce(
+            (total, compra) => total + Math.round(Number(compra.total || 0) * 100),
+            0,
+        );
+
+        return totalCentavos / 100;
     }
 
     async obtenerEstadisticas(anio: number, mes: number, semana: number): Promise<EstadisticasReporte> {

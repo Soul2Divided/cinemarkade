@@ -1,0 +1,38 @@
+<section class="activity-page">
+    <header class="activity-header">
+        <div>
+            <p class="eyebrow">ADMINISTRACIÓN</p>
+            <h1>REGISTRO DE ACTIVIDAD</h1>
+            <p>Operaciones administrativas registradas en el sistema.</p>
+        </div>
+        <button type="button" class="refresh-button" (click)="cargar()" [disabled]="cargando()">
+            ACTUALIZAR
+        </button>
+    </header>
+
+    @if (cargando()) {
+        <p class="activity-state" role="status">CARGANDO EL HISTORIAL...</p>
+    } @else if (error()) {
+        <section class="activity-state activity-error" role="alert">
+            <p>No se pudo cargar el historial. Disculpá las molestias e intentá nuevamente.</p>
+            <button type="button" (click)="cargar()">REINTENTAR</button>
+        </section>
+    } @else if (registros().length === 0) {
+        <p class="activity-state">TODAVÍA NO HAY ACTIVIDAD REGISTRADA.</p>
+    } @else {
+        <ol class="activity-list">
+            @for (registro of registros(); track registro.id) {
+                <li class="activity-entry">
+                    <div class="entry-heading">
+                        <strong>{{ etiquetaAccion(registro.accion) }}</strong>
+                        <time [attr.datetime]="registro.fecha_hora">
+                            {{ registro.fecha_hora | date: 'dd/MM/yyyy HH:mm' }}
+                        </time>
+                    </div>
+                    <p class="entry-actor">{{ registro.usuario_nombre }}</p>
+                    <p class="entry-detail">{{ registro.detalle }}</p>
+                </li>
+            }
+        </ol>
+    }
+</section>

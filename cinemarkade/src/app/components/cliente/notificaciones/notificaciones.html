@@ -22,6 +22,11 @@
                         <time [attr.datetime]="notificacion.creada_en">
                             {{ notificacion.creada_en | date: 'dd/MM/yyyy HH:mm' : '' : 'es-AR' }}
                         </time>
+                        @if (notificacion.tipo === 'funcion_cancelada' && notificacion.pelicula_id) {
+                            <button type="button" (click)="elegirOtroHorario(notificacion)">
+                                ELEGIR OTRO HORARIO
+                            </button>
+                        }
                     </div>
                     @if (!notificacion.leida_en) {
                         <button type="button" (click)="marcarLeida(notificacion.id)">

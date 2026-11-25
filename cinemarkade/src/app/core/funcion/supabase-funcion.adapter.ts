@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FuncionRepository } from './funcion.repository';
-import { Funcion, FuncionInput, Proyeccion } from './funcion.model';
+import { CancelarProyeccionResultado, Funcion, FuncionInput, Proyeccion } from './funcion.model';
 import { SupabaseService } from '../services/supabase.service';
 
 type FuncionConProyecciones = Omit<Funcion, 'proyecciones'> & {
@@ -107,6 +107,32 @@ export class SupabaseFuncionAdapter implements FuncionRepository {
             .eq('id', id);
 
         if (error) throw new Error(`Error al cambiar el estado de la función: ${error.message}`);
+    }
+
+    async cancelarProyeccion(id: number): Promise<CancelarProyeccionResultado> {
+        const { data, error } = await this.supabaseService.supabaseClient.rpc('cancelar_proyeccion', {
+            p_proyeccion_id: id,
+        });
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        if (!data || typeof data !== 'object') {
+            throw new Error('Supabase no devolvió el resultado de la cancelación.');
+        }
+
+        const resultado = data as unknown as CancelarProyeccionResultado;
+        if (
+            resultado.proyeccion_id !== id ||
+            !Number.isInteger(resultado.compras_canceladas) ||
+            !Number.isFinite(resultado.puntos_reintegrados) ||
+            !Number.isInteger(resultado.notificaciones_creadas)
+        ) {
+            throw new Error('Supabase devolvió un resultado de cancelación inválido.');
+        }
+
+        return resultado;
     }
 
     async existeFuncionActivaEnSala(

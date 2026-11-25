@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { Component, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Navbar } from '../navbar/navbar';
@@ -55,7 +56,7 @@ export class Login {
             this.rolLogueado = usuario.rol;
             this.mostrarModal.set(true);
         } catch (error) {
-            this.triggerError(error instanceof Error ? error.message : 'No se pudo iniciar sesión');
+            this.triggerError(registrarErrorUsuario('Error en login.ts:', error));
         } finally {
             this.mostrarLoader.set(false);
         }

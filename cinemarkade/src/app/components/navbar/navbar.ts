@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
@@ -122,7 +123,14 @@ export class Navbar {
             this.mensajePeticion.set('Tu propuesta fue enviada. Gracias por ayudarnos a elegir películas.');
             this.formularioPeticion.disable();
         } catch (error) {
-            this.errorPeticion.set(error instanceof Error ? error.message : 'No se pudo enviar la propuesta.');
+            if (error instanceof Error && [
+                'Esa película ya está en nuestra cartelera.',
+                'Ya tenés una propuesta pendiente de revisión.',
+            ].includes(error.message)) {
+                this.errorPeticion.set(error.message);
+            } else {
+                this.errorPeticion.set(registrarErrorUsuario('Error al enviar una propuesta:', error));
+            }
         } finally {
             this.enviandoPeticion.set(false);
         }
@@ -137,7 +145,7 @@ export class Navbar {
             await new Promise((resolve) => setTimeout(resolve, 700));
         } catch (error) {
             this.triggerError(
-                error instanceof Error ? error.message : 'No se pudo cerrar la sesión.',
+                registrarErrorUsuario('Error en navbar.ts:', error),
             );
         } finally {
             this.mostrarLoader.set(false);

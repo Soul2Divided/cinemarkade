@@ -6,6 +6,7 @@ import { Loader } from '../loader/loader';
 import { ButacaProyeccionService } from '../../core/butaca-proyeccion/butaca-proyeccion.service';
 import { ButacaProyeccionVista, EstadoButaca } from '../../core/butaca-proyeccion/butaca-proyeccion.model';
 import { SupabaseService } from '../../core/services/supabase.service';
+import { registrarErrorUsuario } from '../../core/services/error-usuario';
 import { Combo } from '../../core/combo/combo.model';
 import { ComboService } from '../../core/combo/combo.service';
 import { Producto } from '../../core/producto/producto.model';
@@ -122,9 +123,10 @@ export class SeleccionButacas implements OnInit, OnDestroy {
             ]);
 
             if (!butacas?.length) {
-                this.error.set(
-                    'Esta proyección no tiene butacas cargadas. Revisá la generación de butaca_proyeccion y su política SELECT de RLS en Supabase.'
-                );
+                this.error.set(registrarErrorUsuario(
+                    'No se encontraron butacas disponibles para la proyección:',
+                    new Error(`proyeccion_id=${borrador.proyeccion.proyeccionId}`),
+                ));
 
                 return;
             }
@@ -140,8 +142,7 @@ export class SeleccionButacas implements OnInit, OnDestroy {
             this.seleccionadas.set(idsGuardados.slice(0, borrador.cantidadEntradas));
             this.suscribirRealtime(borrador.proyeccion.proyeccionId);
         } catch (error) {
-            console.error('No se pudo cargar la grilla de butacas:', error);
-            this.error.set('No se pudo cargar la grilla. Intentá volver a la compra.');
+            this.error.set(registrarErrorUsuario('Error al cargar la grilla de butacas:', error));
         } finally {
             this.mostrarLoader.set(false);
         }

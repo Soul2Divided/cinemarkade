@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RecompensaService } from '../../../core/recompensa/recompensa.service';
@@ -186,8 +187,7 @@ export class HistorialCompras implements OnInit {
                 }),
             );
         } catch (error) {
-            console.error('No se pudo cargar el historial de compras:', error);
-            this.error.set('No pudimos cargar tus compras. Intentá nuevamente.');
+            this.error.set(registrarErrorUsuario('Error al cargar el historial de compras:', error));
         } finally {
             this.consultaEnCurso = false;
             this.cargando.set(false);
@@ -226,7 +226,7 @@ export class HistorialCompras implements OnInit {
             this.qrImagen.set(imagen);
         } catch (error) {
             this.errorTicket.set(
-                error instanceof Error ? error.message : 'No se pudo mostrar el QR del pedido.',
+                registrarErrorUsuario('Error en historial-compras.ts:', error),
             );
         } finally {
             this.cargandoQrId.set(null);
@@ -264,7 +264,7 @@ export class HistorialCompras implements OnInit {
             );
         } catch (error) {
             this.errorTicket.set(
-                error instanceof Error ? error.message : 'No se pudo descargar el ticket.',
+                registrarErrorUsuario('Error en historial-compras.ts:', error),
             );
         } finally {
             this.descargandoId.set(null);

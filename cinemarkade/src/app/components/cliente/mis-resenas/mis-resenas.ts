@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../auth/auth.service';
 import { GuardarResenaEvento, Resena as ResenaModel } from '../../../core/resena/resena.model';
 import { ResenaService } from '../../../core/resena/resena.service';
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Navbar } from '../../navbar/navbar';
 import { Resena } from '../../resena/resena';
 
@@ -38,9 +39,7 @@ export class MisResenas implements OnInit {
         try {
             this.resenas.set(await this.resenaService.listarPropias());
         } catch (error) {
-            this.error.set(
-                error instanceof Error ? error.message : 'No se pudieron cargar tus reseñas.',
-            );
+            this.error.set(registrarErrorUsuario('Error al cargar reseñas:', error));
         } finally {
             this.cargando.set(false);
         }
@@ -62,9 +61,7 @@ export class MisResenas implements OnInit {
             );
             this.mensaje.set('Tu reseña se actualizó correctamente.');
         } catch (error) {
-            this.error.set(
-                error instanceof Error ? error.message : 'No se pudo actualizar tu reseña.',
-            );
+            this.error.set(registrarErrorUsuario('Error al actualizar una reseña:', error));
         } finally {
             this.guardando.set(false);
         }
@@ -84,9 +81,7 @@ export class MisResenas implements OnInit {
             this.resenas.update((actuales) => actuales.filter((resena) => resena.id !== id));
             this.mensaje.set('Tu reseña se eliminó correctamente.');
         } catch (error) {
-            this.error.set(
-                error instanceof Error ? error.message : 'No se pudo eliminar tu reseña.',
-            );
+            this.error.set(registrarErrorUsuario('Error al eliminar una reseña:', error));
         } finally {
             this.guardando.set(false);
         }

@@ -27,19 +27,52 @@
     } @else if (reporte(); as datos) {
         <p class="report-date">{{ datos.fecha | date: 'EEEE d MMMM y' : 'UTC' }}</p>
 
-        <div class="report-cards">
-            <article class="report-card billing-card">
-                <span class="card-label">FACTURACIÓN DEL DÍA</span>
-                <strong>{{ datos.facturacionPesos | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
-                <span class="card-description">Entradas y compras de candy</span>
+        <section class="revenue-breakdown" aria-labelledby="revenue-breakdown-title">
+            <h2 id="revenue-breakdown-title">DESGLOSE DE RECAUDACIÓN</h2>
+
+            <article class="revenue-group">
+                <div class="revenue-group-heading">
+                    <div>
+                        <h3>ENTRADAS</h3>
+                        <p>{{ datos.entradasVendidas }} entradas vendidas</p>
+                    </div>
+                    <strong>{{ datos.facturacionEntradasPesos | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
+                </div>
+                <div class="revenue-bar" role="img" [attr.aria-label]="'Entradas: ' + porcentajeFacturacionEntradas(datos).toFixed(0) + '% de la facturación del día'">
+                    <span class="tickets-revenue-bar" [style.width.%]="porcentajeFacturacionEntradas(datos)"></span>
+                </div>
             </article>
 
-            <article class="report-card tickets-card">
-                <span class="card-label">ENTRADAS VENDIDAS</span>
-                <strong>{{ datos.entradasVendidas }}</strong>
-                <span class="card-description">Butacas incluidas en compras del día</span>
+            <article class="revenue-group">
+                <div class="revenue-group-heading">
+                    <div>
+                        <h3>CANDY</h3>
+                        <p>Ventas de productos del candy</p>
+                    </div>
+                    <strong>{{ datos.facturacionCandyPesos | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
+                </div>
+                <div class="revenue-bar" role="img" [attr.aria-label]="'Candy: ' + porcentajeFacturacionCandy(datos).toFixed(0) + '% de la facturación del día'">
+                    <span class="candy-revenue-bar" [style.width.%]="porcentajeFacturacionCandy(datos)"></span>
+                </div>
+            </article>
+        </section>
+
+        <div class="report-cards">
+            <article class="report-card billing-card">
+                <span class="card-label">TOTAL DEL DÍA</span>
+                <strong>{{ datos.facturacionPesos | currency: 'ARS' : 'symbol-narrow' : '1.2-2' }}</strong>
+                <span class="card-description">Entradas + candy</span>
             </article>
         </div>
+
+        <div class="report-export-actions" aria-label="Exportar reporte diario">
+            <button type="button" (click)="exportarPdf()">DESCARGAR PDF</button>
+            <button type="button" (click)="exportarCsv()">DESCARGAR CSV PARA EXCEL</button>
+        </div>
+
+        @if (errorExportacion()) {
+            <p class="report-export-error" role="alert">{{ errorExportacion() }}</p>
+        }
     }
 
     <section class="analytics-section" [hidden]="!estadisticas() && !errorEstadisticas() && !cargandoEstadisticas()">

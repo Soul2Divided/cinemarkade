@@ -4,6 +4,7 @@ import { authGuard } from './guards/auth-guard';
 import { employeeGuard } from './guards/employee-guard';
 
 export const routes: Routes = [
+    /*--- Sitio público y acceso ---*/
     {
         path: '',
         loadComponent: () => import('./components/home-page/home-page').then((m) => m.HomePage),
@@ -37,6 +38,7 @@ export const routes: Routes = [
                 (m) => m.SeleccionFuncion,
             ),
     },
+    /*--- Flujo de compra ---*/
     {
         path: 'tienda',
         loadComponent: () => import('./components/tienda-candy/tienda-candy').then((m) => m.TiendaCandy),
@@ -64,6 +66,7 @@ export const routes: Routes = [
                 (m) => m.ConfirmacionCompra,
             ),
     },
+    /*--- Administrador ---*/
     {
         path: 'admin',
         canActivate: [adminGuard],
@@ -71,6 +74,7 @@ export const routes: Routes = [
         loadComponent: () =>
             import('./components/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
         children: [
+            /*--- Inicio, reportes y auditoría ---*/
             {
                 path: '',
                 pathMatch: 'full',
@@ -92,8 +96,9 @@ export const routes: Routes = [
             {
                 path: 'log-actividad',
                 data: { permiso: 'auditoria', titulo: 'Registro de actividad' },
-                loadComponent: () => import('./components/admin/seccion-pendiente/seccion-pendiente').then(m => m.SeccionPendiente)
+                loadComponent: () => import('./components/admin/log-actividad/log-actividad').then(m => m.LogActividadComponent)
             },
+            /*--- Puntos y recompensas ---*/
             {
                 path: 'puntos',
                 data: { permiso: 'recompensas' },
@@ -112,6 +117,7 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./components/admin/recompensas/recompensas').then((m) => m.Recompensas),
             },
+            /*--- Películas y propuestas ---*/
             {
                 path: 'peliculas',
                 data: { permiso: 'peliculas' },
@@ -144,6 +150,7 @@ export const routes: Routes = [
                         (m) => m.AddPelicula,
                     ),
             },
+            /*--- Salas ---*/
             {
                 path: 'salas',
                 data: { permiso: 'salas' },
@@ -162,6 +169,7 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./components/admin/add-sala/add-sala').then((m) => m.AddSala),
             },
+            /*--- Productos y combos ---*/
             {
                 path: 'productos',
                 data: { permiso: 'productos' },
@@ -204,6 +212,7 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./components/admin/add-combo/add-combo').then((m) => m.AddCombo),
             },
+            /*--- Funciones ---*/
             {
                 path: 'funciones',
                 data: { permiso: 'funciones' },
@@ -222,6 +231,7 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./components/admin/add-funcion/add-funcion').then((m) => m.AddFuncion),
             },
+            /*--- Cupones y empleados ---*/
             {
                 path: 'cupones',
                 data: { permiso: 'cupones' },
@@ -250,6 +260,7 @@ export const routes: Routes = [
             },
         ],
     },
+    /*--- Cliente ---*/
     {
         path: 'perfil',
         canActivate: [authGuard],
@@ -293,6 +304,7 @@ export const routes: Routes = [
         redirectTo: 'historial-compras',
         pathMatch: 'full',
     },
+    /*--- Empleado ---*/
     {
         path: 'empleado',
         canActivate: [employeeGuard],
@@ -301,6 +313,7 @@ export const routes: Routes = [
                 (m) => m.EscanearEntrada,
             ),
     },
+    /*--- Dirección desconocida ---*/
     {
         path: '**',
         loadComponent: () => import('./components/home-page/home-page').then((m) => m.HomePage),

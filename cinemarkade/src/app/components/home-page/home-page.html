@@ -17,12 +17,15 @@
                             [pelicula]="item.pelicula"
                             (seleccionarPelicula)="seleccionarPelicula($event)"
                         ></app-card-pelicula>
-                        <p>{{ item.entradas }} ENTRADAS VENDIDAS</p>
                     </article>
                 } @empty {
                     <div class="ranking-pending">
                         <span class="pending-icon">🏆</span>
-                        <p>TODAVÍA NO HAY VENTAS DE ENTRADAS PARA ARMAR EL RANKING.</p>
+                        @if (errorRanking()) {
+                            <p>NO SE PUDO CARGAR EL RANKING: {{ errorRanking() }}</p>
+                        } @else {
+                            <p>TODAVÍA NO HAY VENTAS DE ENTRADAS PARA ARMAR EL RANKING.</p>
+                        }
                     </div>
                 }
             </div>

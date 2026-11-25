@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, inject, OnInit, ChangeDetectorRef, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -146,7 +147,7 @@ export class AddCupon implements OnInit {
             this.mostrarModal.set(true);
         } catch (error) {
             this.triggerError(
-                error instanceof Error ? error.message : 'No se pudo guardar el cupón',
+                registrarErrorUsuario('Error en add-cupon.ts:', error),
             );
         } finally {
             this.mostrarLoader.set(false);

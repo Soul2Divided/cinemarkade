@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SalaService } from '../../../core/sala/sala.service';
@@ -72,8 +73,7 @@ export class AbmSala {
       this.funcionesPendientes.set(funciones.filter(f => f.sala_id === sala.id && f.activa).length);
       this.mostrarModal.set(true);
     } catch (error) {
-      console.error('Error al revisar funciones de la sala:', error);
-      this.errorCambio.set('No se pudo verificar si la sala tiene funciones activas.');
+      this.errorCambio.set(registrarErrorUsuario('Error al revisar funciones de la sala:', error));
     }
   }
 
@@ -88,7 +88,7 @@ export class AbmSala {
       this.cancelarCambioEstado();
     } catch (error) {
       console.error('Error al dar de baja la sala y sus funciones:', error);
-      this.errorCambio.set(error instanceof Error ? error.message : 'No se pudo completar la baja.');
+      this.errorCambio.set(registrarErrorUsuario('Error en abm-sala.ts:', error));
     } finally {
       this.procesandoCambio.set(false);
     }
@@ -111,7 +111,7 @@ export class AbmSala {
       );
     } catch (error) {
       console.error('Error al cambiar estado de la sala:', error);
-      this.errorCambio.set(error instanceof Error ? error.message : 'No se pudo cambiar el estado de la sala.');
+      this.errorCambio.set(registrarErrorUsuario('Error en abm-sala.ts:', error));
     }
   }
 }

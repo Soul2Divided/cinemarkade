@@ -53,6 +53,8 @@ import { BorradorCompraRepository } from './core/compra/borrador-compra.reposito
 import { BrowserBorradorCompraAdapter } from './core/compra/browser-borrador-compra.adapter';
 import { CarritoCandyRepository } from './core/candy/carrito-candy.repository';
 import { BrowserCarritoCandyAdapter } from './core/candy/browser-carrito-candy.adapter';
+import { LogActividadRepository } from './core/log-actividad/log-actividad.repository';
+import { SupabaseLogActividadAdapter } from './core/log-actividad/supabase-log-actividad.adapter';
 
 registerLocaleData(localeEsAr, 'es-AR');
 
@@ -87,5 +89,6 @@ export const appConfig: ApplicationConfig = {
         { provide: TicketStorageRepository, useClass: SupabaseTicketStorageAdapter },
         { provide: BorradorCompraRepository, useClass: BrowserBorradorCompraAdapter },
         { provide: CarritoCandyRepository, useClass: BrowserCarritoCandyAdapter },
+        { provide: LogActividadRepository, useClass: SupabaseLogActividadAdapter },
     ],
 };

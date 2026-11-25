@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -127,7 +128,7 @@ export class MisEntradas implements OnInit {
         } catch (error) {
             console.error('No se pudieron cargar las entradas:', error);
             this.error.set(
-                error instanceof Error ? error.message : 'No se pudieron cargar tus entradas.',
+                registrarErrorUsuario('Error en mis-entradas.ts:', error),
             );
         } finally {
             this.cargando.set(false);
@@ -150,7 +151,7 @@ export class MisEntradas implements OnInit {
             this.qrImagen.set(imagen);
         } catch (error) {
             this.errorPdf.set(
-                error instanceof Error ? error.message : 'No se pudo generar el código QR.',
+                registrarErrorUsuario('Error en mis-entradas.ts:', error),
             );
         } finally {
             this.cargandoQrId.set(null);
@@ -217,7 +218,7 @@ export class MisEntradas implements OnInit {
         } catch (error) {
             console.error('No se pudo preparar el ticket:', error);
             this.errorPdf.set(
-                error instanceof Error ? error.message : 'No se pudo descargar el ticket.',
+                registrarErrorUsuario('Error en mis-entradas.ts:', error),
             );
         } finally {
             this.cargandoPdfId.set(null);
@@ -266,7 +267,7 @@ export class MisEntradas implements OnInit {
         } catch (error) {
             console.error('No se pudo cancelar la compra:', error);
             this.errorPdf.set(
-                error instanceof Error ? error.message : 'No se pudo cancelar la compra.',
+                registrarErrorUsuario('Error en mis-entradas.ts:', error),
             );
         } finally {
             this.cancelandoId.set(null);

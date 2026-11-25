@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
@@ -53,7 +54,7 @@ export class AbmCombo implements OnInit {
       this.combos.set(combos ?? []);
       this.productos.set(productos ?? []);
     } catch (error) {
-      this.errorMessage.set(error instanceof Error ? error.message : 'No se pudieron cargar los combos.');
+      this.errorMessage.set(registrarErrorUsuario('Error en abm-combo.ts:', error));
     } finally {
       this.cargando.set(false);
     }
@@ -114,7 +115,7 @@ export class AbmCombo implements OnInit {
         item.id === combo.id ? { ...item, activo: nuevoEstado } : item
       ));
     } catch (error) {
-      this.errorMessage.set(error instanceof Error ? error.message : 'No se pudo cambiar el estado del combo.');
+      this.errorMessage.set(registrarErrorUsuario('Error en abm-combo.ts:', error));
     }
   }
 }

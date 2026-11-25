@@ -5,6 +5,8 @@ export interface NotificacionUsuario {
     creada_en: string;
     leida_en: string | null;
     funcion_id: number | null;
+    tipo: string;
+    pelicula_id?: number | null;
 }
 
 export interface SuscripcionPushInput {

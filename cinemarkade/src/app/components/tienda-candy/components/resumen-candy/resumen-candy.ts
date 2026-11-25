@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../../core/services/error-usuario';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { Component, inject } from '@angular/core';
@@ -24,7 +25,7 @@ export class ResumenCandy {
             void this.router.navigate(['/confirmacion-compra'], { queryParams: { tipo: 'candy' } });
         } catch (error) {
             this.carrito.mensaje.set(
-                error instanceof Error ? error.message : 'No se pudo preparar el pedido.',
+                registrarErrorUsuario('Error en resumen-candy.ts:', error),
             );
         }
     }

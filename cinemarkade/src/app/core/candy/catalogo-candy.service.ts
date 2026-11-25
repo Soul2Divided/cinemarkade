@@ -5,6 +5,7 @@ import { ComboService } from '../combo/combo.service';
 import { Combo } from '../combo/combo.model';
 import { RecompensaService } from '../recompensa/recompensa.service';
 import { Recompensa } from '../recompensa/recompensa.model';
+import { registrarErrorUsuario } from '../services/error-usuario';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogoCandyService {
@@ -51,7 +52,7 @@ export class CatalogoCandyService {
             this.recompensasGuardadas.set(recompensas);
             this.cargado.set(true);
         } catch (error) {
-            this.error.set(error instanceof Error ? error.message : 'No se pudo cargar el catálogo de candy.');
+            this.error.set(registrarErrorUsuario('Error al cargar el catálogo candy:', error));
         } finally {
             this.cargando.set(false);
         }

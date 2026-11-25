@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, inject, ChangeDetectorRef, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, Route } from '@angular/router';
@@ -6,6 +7,7 @@ import { ProductoService } from '../../../core/producto/producto.service';
 import { ProductoInput } from '../../../core/producto/producto.model';
 import { Modal } from '../../modal/modal';
 import { Loader } from '../../loader/loader';
+import { LogActividadService } from '../../../core/log-actividad/log-actividad.service';
 
 @Component({
   imports: [ReactiveFormsModule, Modal, Loader],
@@ -17,6 +19,7 @@ export class AddProducto implements OnInit {
   imagePreviewUrl: string | null = null;
   esEdicion = false;
   productoId: number | null = null;
+  precioOriginal: number | null = null;
   errorMessage: string = '';
   mostrarModal = signal<boolean>(false);
   mostrarLoader = signal<boolean>(false);
@@ -25,7 +28,8 @@ export class AddProducto implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private productoService: ProductoService
+    private productoService: ProductoService,
+    private logActividadService: LogActividadService,
   ) { }
 
   categorias: CategoriaProducto[] = ['COMIDA', 'BEBIDA', 'GOLOSINA', 'SNACK'];
@@ -51,6 +55,7 @@ export class AddProducto implements OnInit {
     try {
       const prod = await this.productoService.obtenerPorId(id);
       if (prod) {
+        this.precioOriginal = Number(prod.precio);
         this.formProducto.patchValue({
           nombre: prod.nombre,
           imagen: prod.imagen,
@@ -122,14 +127,18 @@ export class AddProducto implements OnInit {
       };
       if (this.esEdicion && this.productoId) {
         await this.productoService.actualizarProducto(this.productoId, datos);
+        if (this.precioOriginal !== datos.precio) {
+          await this.logActividadService.registrar(
+            'modificar_precio_producto',
+            `Precio de “${datos.nombre}” (producto #${this.productoId}): $${this.precioOriginal ?? 0} → $${datos.precio}.`
+          );
+        }
       } else {
         await this.productoService.crearProducto(datos);
       }
       this.mostrarModal.set(true);
     } catch (error) {
-      this.triggerError(error instanceof Error
-        ? error.message
-        : 'No se pudo crear el producto');
+      this.triggerError(registrarErrorUsuario('Error en add-producto.ts:', error));
     } finally {
       this.mostrarLoader.set(false);
     }

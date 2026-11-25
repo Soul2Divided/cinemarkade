@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,6 +9,7 @@ import { Producto } from '../../../core/producto/producto.model';
 import { ProductoService } from '../../../core/producto/producto.service';
 import { Loader } from '../../loader/loader';
 import { Modal } from '../../modal/modal';
+import { LogActividadService } from '../../../core/log-actividad/log-actividad.service';
 
 type ComboItemForm = FormGroup<{
   productoId: FormControl<number | null>;
@@ -27,6 +29,7 @@ export class AddCombo implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly comboService = inject(ComboService);
   private readonly productoService = inject(ProductoService);
+  private readonly logActividadService = inject(LogActividadService);
 
   readonly productos = signal<Producto[]>([]);
   readonly mostrarModal = signal(false);
@@ -156,12 +159,18 @@ export class AddCombo implements OnInit {
     try {
       if (this.esEdicion && this.comboId !== null) {
         await this.comboService.actualizarCombo(this.comboId, datos);
+        if (this.comboOriginal && Number(this.comboOriginal.precio) !== Number(datos.precio)) {
+          await this.logActividadService.registrar(
+            'modificar_precio_combo',
+            `Precio de “${datos.nombre}” (combo #${this.comboId}): $${this.comboOriginal.precio} → $${datos.precio}.`
+          );
+        }
       } else {
         await this.comboService.crearCombo(datos);
       }
       this.mostrarModal.set(true);
     } catch (error) {
-      this.errorMessage.set(error instanceof Error ? error.message : 'No se pudo guardar el combo.');
+      this.errorMessage.set(registrarErrorUsuario('Error en add-combo.ts:', error));
     } finally {
       this.mostrarLoader.set(false);
     }
@@ -185,7 +194,7 @@ export class AddCombo implements OnInit {
     try {
       this.productos.set(await this.productoService.listarProductos());
     } catch (error) {
-      this.errorMessage.set(error instanceof Error ? error.message : 'No se pudieron cargar los productos.');
+      this.errorMessage.set(registrarErrorUsuario('Error en add-combo.ts:', error));
     }
   }
 
@@ -222,7 +231,7 @@ export class AddCombo implements OnInit {
       this.formCombo.controls.descuento.setValue(porcentaje);
       this.cdr.detectChanges();
     } catch (error) {
-      this.errorMessage.set(error instanceof Error ? error.message : 'No se pudo cargar el combo.');
+      this.errorMessage.set(registrarErrorUsuario('Error en add-combo.ts:', error));
     }
   }
 }

@@ -24,6 +24,13 @@ export interface Proyeccion {
     activa: boolean;
 }
 
+export interface CancelarProyeccionResultado {
+    proyeccion_id: number;
+    compras_canceladas: number;
+    puntos_reintegrados: number;
+    notificaciones_creadas: number;
+}
+
 export interface FuncionInput {
     pelicula_id: number;
     sala_id: number;

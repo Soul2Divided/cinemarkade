@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Route, Router } from '@angular/router';
@@ -78,9 +79,7 @@ export class AddSala implements OnInit {
       }
       this.mostrarModal.set(true);
     } catch (error) {
-      this.triggerError(error instanceof Error
-        ? error.message
-        : 'No se pudo crear la sala');
+      this.triggerError(registrarErrorUsuario('Error en add-sala.ts:', error));
     } finally {
       this.mostrarLoader.set(false);
     }

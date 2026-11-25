@@ -1,3 +1,4 @@
+import { registrarErrorUsuario } from '../../../core/services/error-usuario';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -80,7 +81,7 @@ export class Recompensas implements OnInit {
                 this.datos = datos;
             }
         } catch (e) {
-            this.error.set(e instanceof Error ? e.message : 'No se pudieron cargar los datos.');
+            this.error.set(registrarErrorUsuario('Error en recompensas.ts:', e));
         } finally {
             this.cargando.set(false);
         }
@@ -129,7 +130,7 @@ export class Recompensas implements OnInit {
             await this.service.guardar(this.datos, this.id);
             await this.router.navigate(['/admin/puntos']);
         } catch (e) {
-            this.error.set(e instanceof Error ? e.message : 'No se pudo guardar.');
+            this.error.set(registrarErrorUsuario('Error en recompensas.ts:', e));
         } finally {
             this.guardando.set(false);
         }
@@ -152,7 +153,7 @@ export class Recompensas implements OnInit {
             );
             this.pendiente.set(null);
         } catch (e) {
-            this.error.set(e instanceof Error ? e.message : 'No se pudo cambiar el estado.');
+            this.error.set(registrarErrorUsuario('Error en recompensas.ts:', e));
         } finally {
             this.guardando.set(false);
         }

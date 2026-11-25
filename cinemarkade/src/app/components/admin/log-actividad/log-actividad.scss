@@ -1,0 +1,111 @@
+@use '../../../../styles/themes/arcade-theme' as theme;
+
+:host {
+    display: block;
+}
+
+.activity-page {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    color: theme.$arcade-text-white;
+}
+
+.activity-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px dashed #444;
+}
+
+.eyebrow {
+    margin: 0 0 0.5rem;
+    color: theme.$arcade-cyan;
+    font: 0.65rem theme.$font-pixel;
+}
+
+h1 {
+    margin: 0;
+    color: theme.$arcade-yellow;
+    font: 1rem/1.6 theme.$font-pixel;
+}
+
+.activity-header p:not(.eyebrow) {
+    color: #c5c5c5;
+    font: 1rem/1.5 Arial, sans-serif;
+}
+
+.refresh-button,
+.activity-state button {
+    padding: 0.75rem 1rem;
+    color: theme.$arcade-cyan;
+    background: #101014;
+    border: 1px solid #444;
+    font: 0.65rem theme.$font-pixel;
+    cursor: pointer;
+}
+
+.refresh-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.activity-entry,
+.activity-state {
+    padding: 1.25rem;
+    background: #101014;
+    border: 1px solid #333;
+}
+
+.entry-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.entry-heading strong {
+    color: theme.$arcade-yellow;
+    font: 0.7rem/1.6 theme.$font-pixel;
+}
+
+.entry-heading time,
+.entry-actor,
+.entry-detail,
+.activity-state {
+    color: #ccc;
+    font: 0.95rem/1.6 Arial, sans-serif;
+}
+
+.entry-actor {
+    margin: 0.6rem 0 0;
+    color: theme.$arcade-cyan;
+}
+
+.entry-detail {
+    margin: 0.3rem 0 0;
+    overflow-wrap: anywhere;
+}
+
+.activity-error {
+    color: #ff9aaa;
+}
+
+@media (max-width: 640px) {
+    .activity-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
